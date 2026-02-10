@@ -1,6 +1,6 @@
 "use client"
 
-import { Bell, Search, User, Menu, X } from "lucide-react"
+import { Bell, Search, User, Menu, X, Calendar as CalendarIcon, Info, AlertCircle, Zap } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { 
@@ -47,27 +47,43 @@ export function TopNav() {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-80 text-right rounded-2xl p-0 shadow-xl border-none mt-2 overflow-hidden">
-            <div className="p-4 bg-muted/30 font-bold border-b text-right">התראות ותזכורות</div>
-            <ScrollArea className="h-[300px]">
+            <div className="p-4 bg-muted/30 font-bold border-b text-right flex items-center justify-between flex-row-reverse">
+              <span>התראות ותזכורות</span>
+              {unreadCount > 0 && <Badge variant="destructive" className="rounded-full text-[10px]">{unreadCount} חדשות</Badge>}
+            </div>
+            <ScrollArea className="h-[400px]">
               {notifications.length > 0 ? (
                 notifications.map(n => (
                   <div 
                     key={n.id} 
-                    className={`p-4 border-b hover:bg-muted/20 cursor-pointer transition-colors text-right ${!n.read ? 'bg-primary/5' : ''}`}
+                    className={`p-4 border-b hover:bg-muted/20 cursor-pointer transition-colors text-right relative ${!n.read ? 'bg-primary/5' : ''}`}
                     onClick={() => markNotificationAsRead(n.id)}
                   >
-                    <div className="flex justify-between items-start flex-row-reverse">
-                      <Badge variant={n.type === 'critical' ? 'destructive' : 'secondary'} className="text-[10px]">
-                        {n.type === 'critical' ? 'דחוף' : 'מידע'}
-                      </Badge>
-                      {!n.read && <div className="h-2 w-2 rounded-full bg-primary" />}
+                    <div className="flex justify-between items-start flex-row-reverse mb-1">
+                      <div className="flex items-center gap-2">
+                        {n.priority === 'critical' && <Zap className="h-3 w-3 text-destructive animate-pulse" />}
+                        {n.priority === 'high' && <AlertCircle className="h-3 w-3 text-orange-500" />}
+                        <Badge 
+                          variant={n.type === 'critical' ? 'destructive' : 'secondary'} 
+                          className={`text-[9px] px-1.5 ${n.priority === 'high' ? 'bg-orange-500 hover:bg-orange-600' : ''}`}
+                        >
+                          {n.priority === 'critical' ? 'קריטי' : n.priority === 'high' ? 'דחוף' : 'מידע'}
+                        </Badge>
+                      </div>
+                      <span className="text-[10px] text-muted-foreground">
+                        {new Date(n.date).toLocaleDateString('he-IL', { hour: '2-digit', minute: '2-digit' })}
+                      </span>
                     </div>
-                    <div className="font-bold text-sm mt-1">{n.title}</div>
-                    <div className="text-xs text-muted-foreground mt-0.5">{n.message}</div>
+                    <div className="font-bold text-sm text-foreground">{n.title}</div>
+                    <div className="text-xs text-muted-foreground mt-1 leading-relaxed">{n.message}</div>
+                    {!n.read && <div className="absolute right-1 top-1/2 -translate-y-1/2 h-1.5 w-1.5 rounded-full bg-primary" />}
                   </div>
                 ))
               ) : (
-                <div className="p-10 text-center text-muted-foreground italic">אין התראות חדשות</div>
+                <div className="p-12 text-center text-muted-foreground italic flex flex-col items-center gap-2">
+                  <div className="h-12 w-12 rounded-full bg-muted/50 flex items-center justify-center text-2xl">✨</div>
+                  אין התראות חדשות
+                </div>
               )}
             </ScrollArea>
           </DropdownMenuContent>
@@ -75,24 +91,27 @@ export function TopNav() {
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="rounded-full gap-3 bg-muted/30 hover:bg-muted/50 transition-all pr-2 ripple">
-              <div className="bg-primary text-white h-8 w-8 rounded-full flex items-center justify-center font-bold">י</div>
+            <Button variant="ghost" className="rounded-full gap-3 bg-muted/30 hover:bg-muted/50 transition-all pr-2 ripple h-10">
+              <div className="bg-primary text-white h-8 w-8 rounded-full flex items-center justify-center font-bold shadow-sm">י</div>
               <span className="text-sm font-medium hidden sm:inline-block">ישראל ישראלי</span>
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-64 text-right rounded-2xl p-2 shadow-xl border-none mt-2">
             <DropdownMenuLabel className="flex flex-col items-center gap-1 py-4">
-              <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center text-primary text-2xl font-bold">י</div>
-              <div className="font-bold text-lg">ישראל ישראלי</div>
+              <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center text-primary text-2xl font-bold border-2 border-primary/20">י</div>
+              <div className="font-bold text-lg mt-2">ישראל ישראלי</div>
               <div className="text-xs text-muted-foreground font-normal">israel@example.com</div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem className="rounded-lg gap-2 flex-row-reverse py-3 cursor-pointer">
               <User className="h-4 w-4" /> פרופיל אישי
             </DropdownMenuItem>
+            <DropdownMenuItem className="rounded-lg gap-2 flex-row-reverse py-3 cursor-pointer">
+              <CalendarIcon className="h-4 w-4" /> היסטוריית חיובים
+            </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem className="rounded-lg text-destructive focus:bg-destructive/5 focus:text-destructive gap-2 flex-row-reverse py-3 cursor-pointer">
-              התנתק
+              התנתק מהמערכת
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

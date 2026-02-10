@@ -1,7 +1,7 @@
 "use client"
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { Subscription, SAMPLE_SUBSCRIPTIONS } from '@/app/lib/subscription-store';
+import { Subscription, SAMPLE_SUBSCRIPTIONS, PRIORITY_CONFIG } from '@/app/lib/subscription-store';
 
 interface SubscriptionsContextType {
   subscriptions: Subscription[];
@@ -23,11 +23,11 @@ interface Notification {
   date: string;
   read: boolean;
   type: 'info' | 'warning' | 'critical';
+  priority?: 'critical' | 'high' | 'medium';
 }
 
 const SubscriptionsContext = createContext<SubscriptionsContextType | undefined>(undefined);
 
-// Simple encryption/obfuscation
 const encrypt = (data: string) => btoa(encodeURIComponent(data));
 const decrypt = (data: string) => decodeURIComponent(atob(data));
 
@@ -37,7 +37,7 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
   const [notifications, setNotifications] = useState<Notification[]>([]);
 
   useEffect(() => {
-    const saved = localStorage.getItem('panda_subs_v2');
+    const saved = localStorage.getItem('panda_subs_v3');
     const wizardState = localStorage.getItem('panda_wizard');
     
     if (saved) {
@@ -59,7 +59,7 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
 
   useEffect(() => {
     if (subscriptions.length > 0) {
-      localStorage.setItem('panda_subs_v2', encrypt(JSON.stringify(subscriptions)));
+      localStorage.setItem('panda_subs_v3', encrypt(JSON.stringify(subscriptions)));
     }
     checkReminders();
   }, [subscriptions]);
@@ -72,28 +72,59 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
       const renewalDate = new Date(sub.renewalDate);
       const diffDays = Math.ceil((renewalDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
       
+      // Check Renewal Reminders
       if (diffDays <= 3 && diffDays > 0) {
         newNotifications.push({
-          id: `reminder-${sub.id}`,
-          title: `תזכורת קריטית: ${sub.name}`,
-          message: `המינוי מתחדש בעוד ${diffDays} ימים. כדאי לבדוק!`,
+          id: `renewal-crit-${sub.id}`,
+          title: `דחוף: חיוב מחר/היום עבור ${sub.name}`,
+          message: `המינוי מתחדש בעוד ${diffDays} ימים. סכום: ${sub.amount} ${sub.currency}`,
           date: today.toISOString(),
           read: false,
-          type: 'critical'
+          type: 'critical',
+          priority: 'critical'
+        });
+      } else if (diffDays <= 7 && diffDays > 0) {
+        newNotifications.push({
+          id: `renewal-high-${sub.id}`,
+          title: `תזכורת: ${sub.name} מתחדש בקרוב`,
+          message: `נשארו עוד ${diffDays} ימים עד לחיוב הבא.`,
+          date: today.toISOString(),
+          read: false,
+          type: 'warning',
+          priority: 'high'
         });
       }
 
+      // Check Trial End
+      if (sub.status === 'trial' && sub.trialEndsAt) {
+        const trialEnd = new Date(sub.trialEndsAt);
+        const trialDiff = Math.ceil((trialEnd.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+        if (trialDiff <= 3 && trialDiff > 0) {
+          newNotifications.push({
+            id: `trial-${sub.id}`,
+            title: `תקופת ניסיון מסתיימת: ${sub.name}`,
+            message: `שים לב, תקופת הניסיון מסתיימת בעוד ${trialDiff} ימים.`,
+            date: today.toISOString(),
+            read: false,
+            type: 'critical',
+            priority: 'critical'
+          });
+        }
+      }
+
+      // Check Inactivity
       if (sub.lastUsed) {
         const lastUsedDate = new Date(sub.lastUsed);
         const daysSinceUsed = Math.ceil((today.getTime() - lastUsedDate.getTime()) / (1000 * 60 * 60 * 24));
-        if (daysSinceUsed >= 30) {
+        if (daysSinceUsed >= 30 && sub.status === 'active') {
           newNotifications.push({
             id: `usage-${sub.id}`,
-            title: `חוסר שימוש: ${sub.name}`,
-            message: `לא נעשה שימוש במינוי כבר ${daysSinceUsed} ימים. אולי כדאי לבטל?`,
+            title: `מינוי לא בשימוש: ${sub.name}`,
+            message: `לא השתמשת ב-${sub.name} כבר חודש. אולי כדאי לבטל ולחסוך?`,
             date: today.toISOString(),
             read: false,
-            type: 'warning'
+            type: 'warning',
+            priority: 'medium'
           });
         }
       }
@@ -102,7 +133,7 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
     setNotifications(prev => {
       const existingIds = new Set(prev.map(n => n.id));
       const added = newNotifications.filter(n => !existingIds.has(n.id));
-      return [...added, ...prev].slice(0, 20);
+      return [...added, ...prev].slice(0, 30);
     });
   };
 
@@ -132,14 +163,14 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
   };
 
   const exportData = () => {
-    const headers = ['שם', 'קטגוריה', 'סכום', 'מטבע', 'תאריך חידוש', 'סטטוס'];
-    const rows = subscriptions.map(s => [s.name, s.category, s.amount, s.currency, s.renewalDate, s.status]);
+    const headers = ['Name', 'Category', 'Amount', 'Currency', 'Renewal Date', 'Status', 'Priority'];
+    const rows = subscriptions.map(s => [s.name, s.category, s.amount, s.currency, s.renewalDate, s.status, s.priority || 'none']);
     const csvContent = "data:text/csv;charset=utf-8,\uFEFF" 
       + [headers, ...rows].map(e => e.join(",")).join("\n");
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
     link.setAttribute("href", encodedUri);
-    link.setAttribute("download", "subscriptions_panda.csv");
+    link.setAttribute("download", "panda_subscriptions_export.csv");
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);

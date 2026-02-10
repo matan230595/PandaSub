@@ -18,11 +18,13 @@ export interface Subscription {
   currency: string;
   renewalDate: string;
   trialEndsAt?: string;
+  autoCancelDate?: string;
   status: SubscriptionStatus;
   atRisk?: boolean;
   usageCount?: number;
   lastUsed?: string;
   priority?: 'critical' | 'high' | 'medium' | 'none';
+  notes?: string;
 }
 
 export const CATEGORY_METADATA: Record<SubscriptionCategory, { label: string; icon: string; color: string }> = {
@@ -44,11 +46,11 @@ export const STATUS_METADATA: Record<SubscriptionStatus, { label: string; color:
   not_in_use: { label: 'לא בשימוש', color: '#FFC107' },
 };
 
-export const PRIORITY_COLORS = {
-  critical: '#F44336', // 3 days
-  high: '#FF9800',     // 7 days
-  medium: '#FFEB3B',   // 30 days
-  none: '#E0E0E0'
+export const PRIORITY_CONFIG = {
+  critical: { label: 'קריטי (3 ימים)', color: '#F44336', days: 3 },
+  high: { label: 'גבוה (7 ימים)', color: '#FF9800', days: 7 },
+  medium: { label: 'בינוני (30 יום)', color: '#FFEB3B', days: 30 },
+  none: { label: 'ללא', color: '#E0E0E0', days: 999 }
 };
 
 export const SAMPLE_SUBSCRIPTIONS: Subscription[] = [
@@ -62,6 +64,7 @@ export const SAMPLE_SUBSCRIPTIONS: Subscription[] = [
     status: 'active',
     usageCount: 12,
     lastUsed: '2024-05-20',
+    priority: 'medium'
   },
   {
     id: '2',
@@ -73,6 +76,7 @@ export const SAMPLE_SUBSCRIPTIONS: Subscription[] = [
     status: 'active',
     usageCount: 45,
     lastUsed: '2024-05-22',
+    priority: 'none'
   },
   {
     id: '3',
@@ -85,6 +89,7 @@ export const SAMPLE_SUBSCRIPTIONS: Subscription[] = [
     atRisk: true,
     usageCount: 2,
     lastUsed: '2024-04-15',
+    priority: 'high'
   },
   {
     id: '4',
@@ -93,8 +98,11 @@ export const SAMPLE_SUBSCRIPTIONS: Subscription[] = [
     amount: 199,
     currency: '₪',
     renewalDate: '2025-05-28',
-    status: 'active',
+    status: 'trial',
+    trialEndsAt: '2025-05-28',
+    autoCancelDate: '2025-05-27',
     usageCount: 8,
     lastUsed: '2024-05-18',
+    priority: 'critical'
   },
 ];
