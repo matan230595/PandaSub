@@ -137,9 +137,9 @@ export function SubscriptionList() {
             >
               {visibleColumns.name && (
                 <TableCell className="py-2 text-right">
-                  <div className="flex items-center gap-2 flex-row-reverse">
+                  <div className="flex items-center gap-2 flex-row-reverse justify-end">
                     <span className="text-lg">{CATEGORY_METADATA[sub.category].icon}</span>
-                    <span className="font-bold text-sm">{sub.name}</span>
+                    <span className="font-bold text-sm text-right">{sub.name}</span>
                   </div>
                 </TableCell>
               )}
@@ -202,8 +202,8 @@ export function SubscriptionList() {
                   {CATEGORY_METADATA[sub.category].icon}
                 </div>
                 <div className="text-right">
-                  <h3 className="font-bold text-sm truncate">{sub.name}</h3>
-                  <div className="text-[10px] font-bold" style={{ color: CATEGORY_METADATA[sub.category].color }}>{CATEGORY_METADATA[sub.category].label}</div>
+                  <h3 className="font-bold text-sm truncate text-right">{sub.name}</h3>
+                  <div className="text-[10px] font-bold text-right" style={{ color: CATEGORY_METADATA[sub.category].color }}>{CATEGORY_METADATA[sub.category].label}</div>
                 </div>
               </div>
               <Badge style={{ backgroundColor: STATUS_METADATA[sub.status].color, color: 'white' }} className="text-[9px] px-1.5 h-4">
@@ -251,7 +251,7 @@ export function SubscriptionList() {
                 {items.map(sub => (
                   <Card key={sub.id} className="p-2.5 rounded-lg bg-white shadow-sm cursor-pointer" onClick={() => { setSelectedSub(sub); setIsModalOpen(true); }}>
                     <div className="flex justify-between items-center flex-row-reverse mb-1">
-                      <span className="font-bold text-xs truncate">{sub.name}</span>
+                      <span className="font-bold text-xs truncate text-right">{sub.name}</span>
                       <span className="text-[10px]">{sub.amount}₪</span>
                     </div>
                     {renderCountdown(sub)}
@@ -286,9 +286,9 @@ export function SubscriptionList() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="text-right">
-              <DropdownMenuItem onClick={() => setCategoryFilter('all')}>הכל</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setCategoryFilter('all')} className="text-right">הכל</DropdownMenuItem>
               {Object.entries(CATEGORY_METADATA).map(([key, val]) => (
-                <DropdownMenuItem key={key} onClick={() => setCategoryFilter(key as any)}>{val.label}</DropdownMenuItem>
+                <DropdownMenuItem key={key} onClick={() => setCategoryFilter(key as any)} className="text-right">{val.label}</DropdownMenuItem>
               ))}
             </DropdownMenuContent>
           </DropdownMenu>
@@ -306,7 +306,7 @@ export function SubscriptionList() {
             <DropdownMenuContent align="end" className="text-right">
               {Object.keys(visibleColumns).map(col => (
                 <DropdownMenuCheckboxItem key={col} checked={visibleColumns[col as ColumnKey]} onCheckedChange={() => toggleColumn(col as ColumnKey)} className="text-right flex-row-reverse">
-                  {col}
+                  {col === 'name' ? 'שם' : col === 'category' ? 'קטגוריה' : col === 'amount' ? 'סכום' : col === 'renewal' ? 'חידוש' : col === 'status' ? 'סטטוס' : 'פעולות'}
                 </DropdownMenuCheckboxItem>
               ))}
             </DropdownMenuContent>

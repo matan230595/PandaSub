@@ -179,7 +179,9 @@ export function AddSubscriptionModal({ open, onOpenChange, subscription }: AddSu
           <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col max-h-[90vh]">
             <div className="p-5 bg-primary/5 border-b flex items-center justify-between flex-row-reverse">
               <div className="text-right">
-                <DialogTitle className="text-xl font-bold">{isEdit ? "ניהול מינוי" : "הוסף מינוי"}</DialogTitle>
+                <DialogTitle className="text-xl font-bold text-right">
+                  {isEdit ? "ניהול מינוי" : "הוסף מינוי"}
+                </DialogTitle>
                 <DialogDescription className="text-xs text-right mt-0.5">
                   {isEdit ? "עריכת הגדרות והתראות" : "הזן פרטים למעקב"}
                 </DialogDescription>
