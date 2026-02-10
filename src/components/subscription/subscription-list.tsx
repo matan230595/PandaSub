@@ -104,12 +104,23 @@ export function SubscriptionList() {
 
   const renderCountdown = (sub: Subscription) => {
     const daysLeft = calculateDaysLeft(sub.renewalDate)
-    if (daysLeft < 0) return <span className="text-destructive font-black">פג תוקף</span>
-    if (daysLeft === 0) return <span className="text-primary font-black animate-pulse">היום!</span>
     
-    const colorClass = daysLeft <= 3 ? "text-destructive" : daysLeft <= 7 ? "text-orange-500" : "text-green-600"
+    if (daysLeft < 0) return <span className="text-destructive font-black">פג תוקף</span>
+    if (daysLeft === 0) return (
+      <div className="flex items-center gap-1 font-black text-xs text-primary animate-pulse">
+        <Clock className="h-3 w-3" />
+        היום!
+      </div>
+    )
+    
+    // סולם צבעים חכם
+    let colorClass = "text-green-600"
+    if (daysLeft <= 3) colorClass = "text-destructive animate-bounce"
+    else if (daysLeft <= 7) colorClass = "text-orange-500"
+    else if (daysLeft <= 14) colorClass = "text-blue-500"
+
     return (
-      <div className={cn("flex items-center gap-1 font-black text-xs", colorClass)}>
+      <div className={cn("flex items-center gap-1 font-black text-xs transition-colors duration-500", colorClass)}>
         <Clock className="h-3 w-3" />
         עוד {daysLeft} ימים
       </div>
@@ -149,25 +160,32 @@ export function SubscriptionList() {
                 </div>
               </div>
               
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
-                  <Button variant="ghost" size="icon" className="rounded-full h-10 w-10 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <MoreVertical className="h-5 w-5" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="rounded-2xl p-2 text-right">
-                  <DropdownMenuItem onClick={() => handleEdit(sub)} className="flex-row-reverse gap-2 rounded-xl">
-                    <Edit2 className="h-4 w-4" /> ערוך פרטים
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => duplicateSubscription(sub.id)} className="flex-row-reverse gap-2 rounded-xl">
-                    <Copy className="h-4 w-4" /> שכפל מינוי
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => { setDeleteConfirmId(sub.id); }} className="flex-row-reverse gap-2 rounded-xl text-destructive">
-                    <Trash2 className="h-4 w-4" /> מחק מינוי
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              <div className="flex gap-1">
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  className="rounded-full h-8 w-8 hover:bg-primary/5"
+                  onClick={(e) => { e.stopPropagation(); handleEdit(sub); }}
+                >
+                  <Edit2 className="h-4 w-4 text-muted-foreground" />
+                </Button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+                    <Button variant="ghost" size="icon" className="rounded-full h-8 w-8">
+                      <MoreVertical className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="rounded-2xl p-2 text-right">
+                    <DropdownMenuItem onClick={() => duplicateSubscription(sub.id)} className="flex-row-reverse gap-2 rounded-xl">
+                      <Copy className="h-4 w-4" /> שכפל מינוי
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={() => { setDeleteConfirmId(sub.id); }} className="flex-row-reverse gap-2 rounded-xl text-destructive">
+                      <Trash2 className="h-4 w-4" /> מחק מינוי
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
             </div>
             
             <div className="grid grid-cols-2 gap-4 mb-6">
@@ -190,7 +208,6 @@ export function SubscriptionList() {
               </div>
             </div>
 
-            {/* שדה אמצעי תשלום ותזכורות */}
             <div className="space-y-3">
               <div className="flex items-center justify-between flex-row-reverse text-xs">
                 <span className="font-bold text-muted-foreground">שיטת תשלום:</span>
