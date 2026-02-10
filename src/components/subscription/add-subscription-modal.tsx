@@ -1,3 +1,4 @@
+
 "use client"
 
 import * as React from "react"
@@ -35,6 +36,7 @@ import { CATEGORY_METADATA, SubscriptionCategory, SubscriptionStatus, PRIORITY_C
 import { useToast } from "@/hooks/use-toast"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { User, Key, Mail, Phone, Copy, Trash2, Save, FileText } from "lucide-react"
+import { ScrollArea } from "@/components/ui/scroll-area"
 
 const formSchema = z.object({
   name: z.string().min(2, { message: "שם המינוי חייב להכיל לפחות 2 תווים" }),
@@ -84,7 +86,6 @@ export function AddSubscriptionModal({ open, onOpenChange, subscription }: AddSu
     },
   })
 
-  // טעינת נתונים בעת עריכה
   React.useEffect(() => {
     if (open && subscription) {
       form.reset({
@@ -173,59 +174,59 @@ export function AddSubscriptionModal({ open, onOpenChange, subscription }: AddSu
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[650px] text-right p-0 overflow-hidden border-none shadow-2xl rounded-[2.5rem]">
+      <DialogContent className="sm:max-w-[500px] max-h-[90vh] text-right p-0 overflow-hidden border-none shadow-2xl rounded-3xl">
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)}>
-            <div className="p-8 bg-primary/5 border-b flex items-center justify-between flex-row-reverse">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col max-h-[90vh]">
+            <div className="p-5 bg-primary/5 border-b flex items-center justify-between flex-row-reverse">
               <div className="text-right">
-                <DialogTitle className="text-2xl font-black">{isEdit ? "ניהול מינוי" : "הוסף מינוי חדש"}</DialogTitle>
-                <DialogDescription className="text-right mt-1 font-medium">
-                  {isEdit ? "עריכת הגדרות, התראות ופרטי גישה" : "הזן את פרטי המינוי כדי להתחיל לעקוב"}
+                <DialogTitle className="text-xl font-bold">{isEdit ? "ניהול מינוי" : "הוסף מינוי"}</DialogTitle>
+                <DialogDescription className="text-xs text-right mt-0.5">
+                  {isEdit ? "עריכת הגדרות והתראות" : "הזן פרטים למעקב"}
                 </DialogDescription>
               </div>
               {isEdit && (
-                <div className="flex items-center gap-3">
-                  <Button type="button" variant="outline" size="icon" className="rounded-full h-10 w-10 shadow-sm" onClick={handleDuplicate}>
-                    <Copy className="h-4 w-4" />
+                <div className="flex items-center gap-2">
+                  <Button type="button" variant="outline" size="icon" className="h-8 w-8 rounded-full shadow-sm" onClick={handleDuplicate}>
+                    <Copy className="h-3.5 w-3.5" />
                   </Button>
-                  <Button type="button" variant="outline" size="icon" className="rounded-full h-10 w-10 text-destructive hover:bg-destructive/10 border-destructive/20 shadow-sm" onClick={handleDelete}>
-                    <Trash2 className="h-4 w-4" />
+                  <Button type="button" variant="outline" size="icon" className="h-8 w-8 rounded-full text-destructive hover:bg-destructive/10 border-destructive/20 shadow-sm" onClick={handleDelete}>
+                    <Trash2 className="h-3.5 w-3.5" />
                   </Button>
                 </div>
               )}
             </div>
 
-            <div className="p-8">
+            <ScrollArea className="flex-1 p-6">
               <Tabs defaultValue="basic" className="w-full">
-                <TabsList className="grid w-full grid-cols-3 mb-8 bg-muted/50 p-1.5 rounded-2xl h-14">
-                  <TabsTrigger value="basic" className="rounded-xl font-bold text-base">בסיסי</TabsTrigger>
-                  <TabsTrigger value="advanced" className="rounded-xl font-bold text-base">ניהול חכם</TabsTrigger>
-                  <TabsTrigger value="credentials" className="rounded-xl font-bold text-base">התחברות</TabsTrigger>
+                <TabsList className="grid w-full grid-cols-3 mb-6 bg-muted/50 p-1 rounded-xl h-12">
+                  <TabsTrigger value="basic" className="rounded-lg font-bold text-xs">בסיסי</TabsTrigger>
+                  <TabsTrigger value="advanced" className="rounded-lg font-bold text-xs">מתקדם</TabsTrigger>
+                  <TabsTrigger value="credentials" className="rounded-lg font-bold text-xs">אבטחה</TabsTrigger>
                 </TabsList>
                 
-                <TabsContent value="basic" className="space-y-6">
+                <TabsContent value="basic" className="space-y-4">
                   <FormField
                     control={form.control}
                     name="name"
                     render={({ field }) => (
                       <FormItem className="text-right">
-                        <FormLabel className="text-base font-bold">שם המינוי</FormLabel>
+                        <FormLabel className="text-sm font-bold">שם המינוי</FormLabel>
                         <FormControl>
-                          <Input placeholder="לדוגמה: Netflix" className="rounded-xl h-12 text-lg text-right" {...field} />
+                          <Input placeholder="לדוגמה: Netflix" className="rounded-lg h-10 text-right" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
-                  <div className="grid grid-cols-2 gap-6">
+                  <div className="grid grid-cols-2 gap-4">
                     <FormField
                       control={form.control}
                       name="amount"
                       render={({ field }) => (
                         <FormItem className="text-right">
-                          <FormLabel className="text-base font-bold">סכום (₪)</FormLabel>
+                          <FormLabel className="text-sm font-bold">סכום (₪)</FormLabel>
                           <FormControl>
-                            <Input type="number" step="0.01" className="rounded-xl h-12 text-lg text-right" {...field} />
+                            <Input type="number" step="0.01" className="rounded-lg h-10 text-right" {...field} />
                           </FormControl>
                         </FormItem>
                       )}
@@ -235,9 +236,9 @@ export function AddSubscriptionModal({ open, onOpenChange, subscription }: AddSu
                       name="renewalDate"
                       render={({ field }) => (
                         <FormItem className="text-right">
-                          <FormLabel className="text-base font-bold">תאריך חידוש</FormLabel>
+                          <FormLabel className="text-sm font-bold">תאריך חידוש</FormLabel>
                           <FormControl>
-                            <Input type="date" className="rounded-xl h-12 text-lg text-right" {...field} />
+                            <Input type="date" className="rounded-lg h-10 text-right" {...field} />
                           </FormControl>
                         </FormItem>
                       )}
@@ -248,16 +249,16 @@ export function AddSubscriptionModal({ open, onOpenChange, subscription }: AddSu
                     name="category"
                     render={({ field }) => (
                       <FormItem className="text-right">
-                        <FormLabel className="text-base font-bold">קטגוריה</FormLabel>
+                        <FormLabel className="text-sm font-bold">קטגוריה</FormLabel>
                         <Select onValueChange={field.onChange} value={field.value}>
                           <FormControl>
-                            <SelectTrigger className="rounded-xl h-12 text-lg flex-row-reverse">
+                            <SelectTrigger className="rounded-lg h-10 flex-row-reverse">
                               <SelectValue placeholder="בחר קטגוריה" />
                             </SelectTrigger>
                           </FormControl>
-                          <SelectContent className="rounded-xl">
+                          <SelectContent className="rounded-lg">
                             {Object.entries(CATEGORY_METADATA).map(([key, value]) => (
-                              <SelectItem key={key} value={key} className="text-right py-3 flex-row-reverse">
+                              <SelectItem key={key} value={key} className="text-right py-2 flex-row-reverse">
                                 <span className="flex items-center gap-2 flex-row-reverse">
                                   <span>{value.icon}</span>
                                   <span>{value.label}</span>
@@ -271,25 +272,25 @@ export function AddSubscriptionModal({ open, onOpenChange, subscription }: AddSu
                   />
                 </TabsContent>
 
-                <TabsContent value="advanced" className="space-y-6">
-                  <div className="grid grid-cols-2 gap-6">
+                <TabsContent value="advanced" className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
                     <FormField
                       control={form.control}
                       name="status"
                       render={({ field }) => (
                         <FormItem className="text-right">
-                          <FormLabel className="text-base font-bold">סטטוס</FormLabel>
+                          <FormLabel className="text-sm font-bold">סטטוס</FormLabel>
                           <Select onValueChange={field.onChange} value={field.value}>
                             <FormControl>
-                              <SelectTrigger className="rounded-xl h-12 text-lg flex-row-reverse">
+                              <SelectTrigger className="rounded-lg h-10 flex-row-reverse">
                                 <SelectValue placeholder="סטטוס" />
                               </SelectTrigger>
                             </FormControl>
-                            <SelectContent className="rounded-xl">
-                              <SelectItem value="active" className="text-right py-3">פעיל</SelectItem>
-                              <SelectItem value="trial" className="text-right py-3">תקופת ניסיון</SelectItem>
-                              <SelectItem value="frozen" className="text-right py-3">מוקפא</SelectItem>
-                              <SelectItem value="not_in_use" className="text-right py-3">לא בשימוש</SelectItem>
+                            <SelectContent className="rounded-lg">
+                              <SelectItem value="active" className="text-right py-2">פעיל</SelectItem>
+                              <SelectItem value="trial" className="text-right py-2">ניסיון</SelectItem>
+                              <SelectItem value="frozen" className="text-right py-2">מוקפא</SelectItem>
+                              <SelectItem value="not_in_use" className="text-right py-2">לא בשימוש</SelectItem>
                             </SelectContent>
                           </Select>
                         </FormItem>
@@ -300,18 +301,18 @@ export function AddSubscriptionModal({ open, onOpenChange, subscription }: AddSu
                       name="priority"
                       render={({ field }) => (
                         <FormItem className="text-right">
-                          <FormLabel className="text-base font-bold">עדיפות תזכורות</FormLabel>
+                          <FormLabel className="text-sm font-bold">עדיפות</FormLabel>
                           <Select onValueChange={field.onChange} value={field.value}>
                             <FormControl>
-                              <SelectTrigger className="rounded-xl h-12 text-lg flex-row-reverse">
+                              <SelectTrigger className="rounded-lg h-10 flex-row-reverse">
                                 <SelectValue placeholder="עדיפות" />
                               </SelectTrigger>
                             </FormControl>
-                            <SelectContent className="rounded-xl">
+                            <SelectContent className="rounded-lg">
                               {Object.entries(PRIORITY_CONFIG).map(([key, config]) => (
-                                <SelectItem key={key} value={key} className="text-right py-3">
+                                <SelectItem key={key} value={key} className="text-right py-2">
                                   <span className="flex items-center gap-2 flex-row-reverse justify-end">
-                                    <div className="h-3 w-3 rounded-full" style={{ backgroundColor: config.color }} />
+                                    <div className="h-2 w-2 rounded-full" style={{ backgroundColor: config.color }} />
                                     {config.label}
                                   </span>
                                 </SelectItem>
@@ -323,15 +324,15 @@ export function AddSubscriptionModal({ open, onOpenChange, subscription }: AddSu
                     />
                   </div>
                   
-                  <div className="grid grid-cols-2 gap-6">
+                  <div className="grid grid-cols-2 gap-4">
                     <FormField
                       control={form.control}
                       name="trialEndsAt"
                       render={({ field }) => (
                         <FormItem className="text-right">
-                          <FormLabel className="text-base font-bold">סיום תקופת ניסיון</FormLabel>
+                          <FormLabel className="text-sm font-bold">סיום ניסיון</FormLabel>
                           <FormControl>
-                            <Input type="date" className="rounded-xl h-12 text-lg text-right" {...field} />
+                            <Input type="date" className="rounded-lg h-10 text-right" {...field} />
                           </FormControl>
                         </FormItem>
                       )}
@@ -341,9 +342,9 @@ export function AddSubscriptionModal({ open, onOpenChange, subscription }: AddSu
                       name="cancelLeadDays"
                       render={({ field }) => (
                         <FormItem className="text-right">
-                          <FormLabel className="text-base font-bold">ביטול יזום (ימים מראש)</FormLabel>
+                          <FormLabel className="text-sm font-bold">ביטול יזום (ימים מראש)</FormLabel>
                           <FormControl>
-                            <Input type="number" className="rounded-xl h-12 text-lg text-right" {...field} />
+                            <Input type="number" className="rounded-lg h-10 text-right" {...field} />
                           </FormControl>
                         </FormItem>
                       )}
@@ -351,15 +352,15 @@ export function AddSubscriptionModal({ open, onOpenChange, subscription }: AddSu
                   </div>
                 </TabsContent>
 
-                <TabsContent value="credentials" className="space-y-6">
-                  <div className="grid grid-cols-2 gap-6">
+                <TabsContent value="credentials" className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
                     <FormField
                       control={form.control}
                       name="username"
                       render={({ field }) => (
                         <FormItem className="text-right">
-                          <FormLabel className="flex items-center gap-1.5 justify-end text-base font-bold"><User className="h-4 w-4" /> שם משתמש</FormLabel>
-                          <FormControl><Input className="rounded-xl h-12 text-lg text-right" {...field} /></FormControl>
+                          <FormLabel className="flex items-center gap-1 justify-end text-sm font-bold"><User className="h-3 w-3" /> משתמש</FormLabel>
+                          <FormControl><Input className="rounded-lg h-10 text-right" {...field} /></FormControl>
                         </FormItem>
                       )}
                     />
@@ -368,20 +369,20 @@ export function AddSubscriptionModal({ open, onOpenChange, subscription }: AddSu
                       name="email"
                       render={({ field }) => (
                         <FormItem className="text-right">
-                          <FormLabel className="flex items-center gap-1.5 justify-end text-base font-bold"><Mail className="h-4 w-4" /> אימייל</FormLabel>
-                          <FormControl><Input type="email" className="rounded-xl h-12 text-lg text-right" {...field} /></FormControl>
+                          <FormLabel className="flex items-center gap-1 justify-end text-sm font-bold"><Mail className="h-3 w-3" /> אימייל</FormLabel>
+                          <FormControl><Input type="email" className="rounded-lg h-10 text-right" {...field} /></FormControl>
                         </FormItem>
                       )}
                     />
                   </div>
-                  <div className="grid grid-cols-2 gap-6">
+                  <div className="grid grid-cols-2 gap-4">
                     <FormField
                       control={form.control}
                       name="password"
                       render={({ field }) => (
                         <FormItem className="text-right">
-                          <FormLabel className="flex items-center gap-1.5 justify-end text-base font-bold"><Key className="h-4 w-4" /> סיסמה</FormLabel>
-                          <FormControl><Input type="password" placeholder="••••••••" className="rounded-xl h-12 text-lg text-left" {...field} /></FormControl>
+                          <FormLabel className="flex items-center gap-1 justify-end text-sm font-bold"><Key className="h-3 w-3" /> סיסמה</FormLabel>
+                          <FormControl><Input type="password" placeholder="••••" className="rounded-lg h-10 text-left" {...field} /></FormControl>
                         </FormItem>
                       )}
                     />
@@ -390,8 +391,8 @@ export function AddSubscriptionModal({ open, onOpenChange, subscription }: AddSu
                       name="phone"
                       render={({ field }) => (
                         <FormItem className="text-right">
-                          <FormLabel className="flex items-center gap-1.5 justify-end text-base font-bold"><Phone className="h-4 w-4" /> נייד</FormLabel>
-                          <FormControl><Input className="rounded-xl h-12 text-lg text-right" {...field} /></FormControl>
+                          <FormLabel className="flex items-center gap-1 justify-end text-sm font-bold"><Phone className="h-3 w-3" /> נייד</FormLabel>
+                          <FormControl><Input className="rounded-lg h-10 text-right" {...field} /></FormControl>
                         </FormItem>
                       )}
                     />
@@ -401,23 +402,23 @@ export function AddSubscriptionModal({ open, onOpenChange, subscription }: AddSu
                     name="notes"
                     render={({ field }) => (
                       <FormItem className="text-right">
-                        <FormLabel className="flex items-center gap-1.5 justify-end text-base font-bold"><FileText className="h-4 w-4" /> הערות נוספות</FormLabel>
+                        <FormLabel className="flex items-center gap-1 justify-end text-sm font-bold"><FileText className="h-3 w-3" /> הערות</FormLabel>
                         <FormControl>
-                          <Textarea placeholder="קוד קופון, תנאי ביטול או הערות מיוחדות..." className="rounded-xl min-h-[100px] text-lg text-right p-4" {...field} />
+                          <Textarea placeholder="קוד קופון, הערות..." className="rounded-lg min-h-[80px] text-sm text-right p-3" {...field} />
                         </FormControl>
                       </FormItem>
                     )}
                   />
                 </TabsContent>
               </Tabs>
-            </div>
+            </ScrollArea>
 
-            <DialogFooter className="p-8 bg-muted/20 gap-4 flex-row-reverse sm:justify-start">
-              <Button type="submit" className="bg-primary hover:bg-primary/90 rounded-full px-10 h-14 text-lg font-bold gap-3 shadow-xl shadow-primary/20">
-                <Save className="h-5 w-5" /> {isEdit ? "שמור שינויים" : "שמור מינוי"}
+            <DialogFooter className="p-5 bg-muted/20 gap-3 flex-row-reverse sm:justify-start">
+              <Button type="submit" className="bg-primary hover:bg-primary/90 rounded-full px-8 h-12 text-sm font-bold gap-2 shadow-lg">
+                <Save className="h-4 w-4" /> {isEdit ? "שמור שינויים" : "שמור מינוי"}
               </Button>
-              <Button type="button" variant="ghost" onClick={() => onOpenChange(false)} className="rounded-full h-14 px-8 text-lg font-medium">
-                ביטול וסגירה
+              <Button type="button" variant="ghost" onClick={() => onOpenChange(false)} className="rounded-full h-12 px-6 text-sm font-medium">
+                ביטול
               </Button>
             </DialogFooter>
           </form>
