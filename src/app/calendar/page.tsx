@@ -3,9 +3,8 @@
 import * as React from "react"
 import { TopNav } from "@/components/dashboard/top-nav"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { Calendar } from "@/components/ui/calendar"
 import { useSubscriptions } from "@/context/subscriptions-context"
-import { CATEGORY_METADATA, Subscription } from "@/app/lib/subscription-store"
+import { CATEGORY_METADATA } from "@/app/lib/subscription-store"
 import { Badge } from "@/components/ui/badge"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { 
@@ -15,9 +14,8 @@ import {
   Clock, 
   Bell, 
   ChevronDown,
-  Info,
-  MoreHorizontal,
-  Plus
+  Plus,
+  ArrowRight
 } from "lucide-react"
 import { 
   format, 
@@ -31,7 +29,8 @@ import {
   endOfWeek,
   isSameMonth,
   addDays,
-  startOfDay
+  startOfDay,
+  isToday as isDateToday
 } from "date-fns"
 import { he } from "date-fns/locale"
 import { Button } from "@/components/ui/button"
@@ -48,27 +47,27 @@ type ViewType = 'month' | 'week' | 'day'
 
 export default function CalendarPage() {
   const { subscriptions } = useSubscriptions()
-  const [currentMonth, setCurrentMonth] = React.useState(new Date())
+  const [currentDate, setCurrentDate] = React.useState(new Date())
   const [selectedDate, setSelectedDate] = React.useState<Date>(new Date())
   const [view, setView] = React.useState<ViewType>('month')
   const [isAddModalOpen, setIsAddModalOpen] = React.useState(false)
 
   // ניווט
   const next = () => {
-    if (view === 'month') setCurrentMonth(addMonths(currentMonth, 1))
-    else if (view === 'week') setCurrentMonth(addDays(currentMonth, 7))
-    else setCurrentMonth(addDays(currentMonth, 1))
+    if (view === 'month') setCurrentDate(addMonths(currentDate, 1))
+    else if (view === 'week') setCurrentDate(addDays(currentDate, 7))
+    else setCurrentDate(addDays(currentDate, 1))
   }
   
   const prev = () => {
-    if (view === 'month') setCurrentMonth(subMonths(currentMonth, 1))
-    else if (view === 'week') setCurrentMonth(addDays(currentMonth, -7))
-    else setCurrentMonth(addDays(currentMonth, -1))
+    if (view === 'month') setCurrentDate(subMonths(currentDate, 1))
+    else if (view === 'week') setCurrentDate(addDays(currentDate, -7))
+    else setCurrentDate(addDays(currentDate, -1))
   }
 
   const goToToday = () => {
     const today = new Date()
-    setCurrentMonth(today)
+    setCurrentDate(today)
     setSelectedDate(today)
   }
 
@@ -89,22 +88,22 @@ export default function CalendarPage() {
   // חישוב טווח הימים לתצוגה
   const calendarDays = React.useMemo(() => {
     if (view === 'month') {
-      const monthStart = startOfMonth(currentMonth)
+      const monthStart = startOfMonth(currentDate)
       const monthEnd = endOfMonth(monthStart)
       const startDate = startOfWeek(monthStart, { weekStartsOn: 0 })
       const endDate = endOfWeek(monthEnd, { weekStartsOn: 0 })
       return eachDayOfInterval({ start: startDate, end: endDate })
     } else if (view === 'week') {
-      const startDate = startOfWeek(currentMonth, { weekStartsOn: 0 })
-      const endDate = endOfWeek(currentMonth, { weekStartsOn: 0 })
+      const startDate = startOfWeek(currentDate, { weekStartsOn: 0 })
+      const endDate = endOfWeek(currentDate, { weekStartsOn: 0 })
       return eachDayOfInterval({ start: startDate, end: endDate })
     } else {
-      return [startOfDay(currentMonth)]
+      return [startOfDay(currentDate)]
     }
-  }, [currentMonth, view])
+  }, [currentDate, view])
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#F8F9FA]">
+    <div className="min-h-screen flex flex-col bg-[#F8F9FA] overflow-x-hidden">
       <TopNav />
       <main className="flex-1 container mx-auto p-4 md:p-8 space-y-6 animate-fade-in pb-20">
         
@@ -112,12 +111,14 @@ export default function CalendarPage() {
         <div className="flex flex-col md:flex-row items-center justify-between gap-4 bg-white p-4 rounded-2xl shadow-sm border border-border/50">
           <div className="flex items-center gap-6 flex-row-reverse">
             <div className="flex items-center gap-2">
-              <CalendarIcon className="h-6 w-6 text-primary" />
+              <div className="bg-primary/10 p-2 rounded-xl">
+                <CalendarIcon className="h-6 w-6 text-primary" />
+              </div>
               <h1 className="text-2xl font-bold tracking-tight">יומן חיובים</h1>
             </div>
             
             <div className="flex items-center gap-2">
-              <Button variant="outline" onClick={goToToday} className="rounded-full px-6 font-bold hover:bg-primary/5">היום</Button>
+              <Button variant="outline" onClick={goToToday} className="rounded-full px-6 font-bold hover:bg-primary/5 h-10">היום</Button>
               <div className="flex items-center gap-1">
                 <Button variant="ghost" size="icon" onClick={prev} className="rounded-full">
                   <ChevronRight className="h-5 w-5" />
@@ -127,7 +128,7 @@ export default function CalendarPage() {
                 </Button>
               </div>
               <span className="text-xl font-bold min-w-[150px] text-center">
-                {format(currentMonth, view === 'day' ? "d בMMMM yyyy" : "MMMM yyyy", { locale: he })}
+                {format(currentDate, view === 'day' ? "d בMMMM yyyy" : "MMMM yyyy", { locale: he })}
               </span>
             </div>
           </div>
@@ -140,13 +141,13 @@ export default function CalendarPage() {
                   <ChevronDown className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="rounded-xl">
-                <DropdownMenuItem onClick={() => setView('month')} className="text-right">תצוגה חודשית</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setView('week')} className="text-right">תצוגה שבועית</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setView('day')} className="text-right">תצוגה יומית</DropdownMenuItem>
+              <DropdownMenuContent align="end" className="rounded-xl p-1">
+                <DropdownMenuItem onClick={() => setView('month')} className="text-right rounded-lg">תצוגה חודשית</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setView('week')} className="text-right rounded-lg">תצוגה שבועית</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setView('day')} className="text-right rounded-lg">תצוגה יומית</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-            <Button onClick={() => setIsAddModalOpen(true)} className="rounded-full google-btn gap-2 shadow-lg h-10 px-5">
+            <Button onClick={() => setIsAddModalOpen(true)} className="rounded-full google-btn gap-2 shadow-lg h-10 px-6">
               <Plus className="h-4 w-4" /> הוסף חיוב
             </Button>
           </div>
@@ -154,54 +155,54 @@ export default function CalendarPage() {
         
         <div className="grid lg:grid-cols-12 gap-6">
           {/* לוח השנה המרכזי */}
-          <div className="lg:col-span-9 bg-white rounded-3xl shadow-xl border border-border/50 overflow-hidden min-h-[700px]">
+          <div className="lg:col-span-9 bg-white rounded-3xl shadow-xl border border-border/50 overflow-hidden flex flex-col">
             {/* כותרות ימי השבוע */}
             <div className="grid grid-cols-7 border-b bg-muted/20">
               {['א', 'ב', 'ג', 'ד', 'ה', 'ו', 'ש'].map(day => (
-                <div key={day} className="py-3 text-center text-sm font-bold text-muted-foreground">
+                <div key={day} className="py-4 text-center text-sm font-bold text-muted-foreground uppercase tracking-wider">
                   יום {day}'
                 </div>
               ))}
             </div>
 
-            {/* גריד הימים - משתנה לפי התצוגה */}
+            {/* גריד הימים */}
             <div className={cn(
-              "grid min-h-[600px]",
+              "grid flex-1",
               view === 'month' ? "grid-cols-7" : view === 'week' ? "grid-cols-7" : "grid-cols-1"
             )}>
               {calendarDays.map((day, idx) => {
                 const daySubs = getSubForDay(day)
                 const isSelected = isSameDay(day, selectedDate)
-                const isToday = isSameDay(day, new Date())
-                const isCurrentMonth = isSameMonth(day, currentMonth)
+                const isToday = isDateToday(day)
+                const isCurrentMonth = isSameMonth(day, currentDate)
 
                 return (
                   <div 
                     key={idx}
-                    onClick={() => { setSelectedDate(day); setCurrentMonth(day); }}
+                    onClick={() => { setSelectedDate(day); }}
                     className={cn(
-                      "min-h-[120px] p-2 border-l border-b last:border-l-0 transition-colors cursor-pointer hover:bg-muted/30 flex flex-col gap-1",
-                      view === 'month' && !isCurrentMonth && "bg-muted/10 opacity-40",
-                      isSelected && "bg-primary/5",
-                      isToday && "bg-orange-50/30"
+                      "min-h-[140px] p-2 border-l border-b last:border-l-0 transition-all cursor-pointer hover:bg-muted/30 flex flex-col gap-1 relative group",
+                      view === 'month' && !isCurrentMonth && "bg-muted/5 opacity-40",
+                      isSelected && "bg-primary/[0.03]",
+                      isToday && "bg-blue-50/30"
                     )}
                   >
                     <div className="flex justify-between items-center mb-1">
                       <span className={cn(
-                        "h-8 w-8 flex items-center justify-center rounded-full text-sm font-bold",
-                        isToday && "bg-primary text-white",
-                        isSelected && !isToday && "bg-muted text-foreground"
+                        "h-8 w-8 flex items-center justify-center rounded-full text-sm font-bold transition-colors",
+                        isToday ? "bg-primary text-white" : "text-muted-foreground group-hover:bg-muted group-hover:text-foreground",
+                        isSelected && !isToday && "bg-muted text-foreground ring-2 ring-primary/20"
                       )}>
                         {day.getDate()}
                       </span>
                       {daySubs.length > 0 && (
-                        <span className="text-[10px] font-bold text-muted-foreground">
+                        <span className="text-[11px] font-black text-primary/70 bg-primary/5 px-2 py-0.5 rounded-full">
                           ₪{daySubs.reduce((s, b) => s + b.amount, 0).toLocaleString()}
                         </span>
                       )}
                     </div>
 
-                    <div className="flex-1 space-y-1 overflow-hidden">
+                    <div className="flex-1 space-y-1.5 overflow-hidden">
                       {daySubs.slice(0, 4).map(sub => (
                         <div 
                           key={sub.id} 
@@ -209,15 +210,16 @@ export default function CalendarPage() {
                           style={{ backgroundColor: CATEGORY_METADATA[sub.category].color }}
                         >
                           <span className="truncate">{sub.name}</span>
-                          <span className="ml-auto font-mono text-[9px] opacity-80">{sub.amount}</span>
+                          <span className="ml-auto font-mono text-[9px] opacity-90">{sub.amount}</span>
                         </div>
                       ))}
                       {daySubs.length > 4 && (
-                        <div className="text-[10px] font-bold text-muted-foreground text-center pt-1">
+                        <div className="text-[10px] font-bold text-primary text-center pt-1 hover:underline">
                           +{daySubs.length - 4} נוספים...
                         </div>
                       )}
                     </div>
+                    {isSelected && <div className="absolute inset-0 border-2 border-primary pointer-events-none rounded-sm" />}
                   </div>
                 )
               })}
@@ -233,17 +235,17 @@ export default function CalendarPage() {
                     <CalendarIcon className="h-5 w-5" />
                   </div>
                   <Badge variant="secondary" className="rounded-full bg-white shadow-sm border-none px-4 py-1 text-primary font-bold">
-                    {selectedDaySubs.length} אירועים
+                    {selectedDaySubs.length} חיובים
                   </Badge>
                 </div>
-                <CardTitle className="text-2xl font-black">
+                <CardTitle className="text-2xl font-black text-right">
                   {format(selectedDate, "EEEE, d בMMMM", { locale: he })}
                 </CardTitle>
-                <CardDescription className="text-base">פירוט חיובים והתראות ליום זה</CardDescription>
+                <CardDescription className="text-base text-right">סיכום תשלומים מתוכנן</CardDescription>
               </CardHeader>
               
               <CardContent className="flex-1 p-0 overflow-hidden">
-                <ScrollArea className="h-[450px] p-6">
+                <ScrollArea className="h-[480px] p-6">
                   {selectedDaySubs.length > 0 ? (
                     <div className="space-y-4">
                       {selectedDaySubs.map(sub => (
@@ -252,30 +254,27 @@ export default function CalendarPage() {
                           className="group relative flex items-center justify-between p-4 rounded-2xl bg-muted/30 hover:bg-white hover:shadow-md transition-all cursor-pointer border-r-4" 
                           style={{ borderRightColor: CATEGORY_METADATA[sub.category].color }}
                         >
-                          <div className="flex items-center gap-4">
+                          <div className="flex items-center gap-4 flex-row-reverse">
                             <span className="text-3xl filter drop-shadow-sm">{CATEGORY_METADATA[sub.category].icon}</span>
-                            <div>
+                            <div className="text-right">
                               <div className="font-bold text-foreground">{sub.name}</div>
-                              <div className="text-xs text-muted-foreground flex items-center gap-1">
-                                <Clock className="h-3 w-3" />
+                              <div className="text-xs text-muted-foreground flex items-center gap-1 justify-end">
                                 {sub.status === 'trial' ? 'סיום ניסיון' : 'חידוש חודשי'}
+                                <Clock className="h-3 w-3" />
                               </div>
                             </div>
                           </div>
                           <div className="text-left">
                             <div className="font-black text-lg text-primary">{sub.amount} {sub.currency}</div>
-                            <Badge variant="outline" className="text-[10px] rounded-full border-none bg-white py-0 h-5">
-                              {CATEGORY_METADATA[sub.category].label}
-                            </Badge>
                           </div>
                         </div>
                       ))}
                     </div>
                   ) : (
-                    <div className="flex flex-col items-center justify-center py-20 text-center opacity-30">
+                    <div className="flex flex-col items-center justify-center py-24 text-center opacity-30">
                       <div className="text-7xl mb-6">🏝️</div>
-                      <div className="font-bold text-lg">יום שקט בחיובים</div>
-                      <p className="text-sm">אין תשלומים מתוכננים להיום</p>
+                      <div className="font-bold text-lg">יום חופשי מחיובים</div>
+                      <p className="text-sm">אין תשלומים שמתוכננים להיום</p>
                     </div>
                   )}
                 </ScrollArea>
@@ -283,25 +282,25 @@ export default function CalendarPage() {
               
               {dailyTotal > 0 && (
                 <div className="p-6 bg-primary/5 border-t mt-auto">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm font-bold text-muted-foreground">סיכום יומי:</span>
+                  <div className="flex justify-between items-center flex-row-reverse">
+                    <span className="text-sm font-bold text-muted-foreground">סה"כ ליום זה:</span>
                     <span className="text-3xl font-black text-primary">₪{dailyTotal.toLocaleString()}</span>
                   </div>
                 </div>
               )}
             </Card>
 
-            {/* כרטיס טיפ חכם */}
-            <Card className="card-shadow border-none rounded-3xl bg-gradient-to-br from-orange-500 to-orange-600 text-white overflow-hidden group">
+            {/* תובנה חכמה */}
+            <Card className="card-shadow border-none rounded-3xl bg-gradient-to-br from-primary to-blue-700 text-white overflow-hidden group">
               <CardContent className="p-6">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="bg-white/20 p-2.5 rounded-xl group-hover:scale-110 transition-transform">
+                <div className="flex items-center gap-3 mb-4 flex-row-reverse">
+                  <div className="bg-white/20 p-2.5 rounded-xl group-hover:rotate-12 transition-transform">
                     <Bell className="h-5 w-5" />
                   </div>
-                  <h3 className="font-bold text-lg">תובנת פנדה 🐼</h3>
+                  <h3 className="font-bold text-lg">טיפ PandaSub 🐼</h3>
                 </div>
-                <p className="text-sm text-orange-50 leading-relaxed font-medium">
-                  ניהול היומן עוזר לך להבין את תזרים המזומנים הצפוי החודש. וודא שיש כיסוי לכל המינויים! 🚀
+                <p className="text-sm text-blue-50 leading-relaxed font-medium text-right">
+                  מעקב חודשי ביומן עוזר לך לחזות את שיא ההוצאות בחודש ולתכנן את התקציב שלך טוב יותר.
                 </p>
               </CardContent>
             </Card>
@@ -315,19 +314,22 @@ export default function CalendarPage() {
         .calendar-event-pill {
           display: flex;
           align-items: center;
-          padding: 2px 8px;
-          border-radius: 6px;
+          padding: 3px 10px;
+          border-radius: 8px;
           font-size: 11px;
-          font-weight: 700;
+          font-weight: 800;
           color: white;
           white-space: nowrap;
           overflow: hidden;
-          transition: transform 0.1s;
-          box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+          transition: transform 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.15s;
+          box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+          border: 1px solid rgba(255,255,255,0.1);
         }
         .calendar-event-pill:hover {
-          transform: scale(1.02);
+          transform: scale(1.05) translateX(-2px);
           filter: brightness(1.1);
+          box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+          z-index: 10;
         }
       `}</style>
     </div>
