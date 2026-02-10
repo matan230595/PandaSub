@@ -1,3 +1,4 @@
+
 "use client"
 
 import * as React from "react"
@@ -5,6 +6,7 @@ import { TopNav } from "@/components/dashboard/top-nav"
 import { AIRecommendations } from "@/components/gen-ai/recommendations"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Sparkles, BrainCircuit, Lightbulb, Zap, TrendingDown, Target } from "lucide-react"
+import Link from "next/link"
 
 export default function InsightsPage() {
   return (
@@ -65,18 +67,20 @@ export default function InsightsPage() {
               </CardContent>
             </Card>
 
-            <Card className="card-shadow border-none rounded-3xl bg-gradient-to-br from-blue-600 to-indigo-700 text-white">
+            <Card className="card-shadow border-none rounded-3xl bg-gradient-to-br from-blue-600 to-indigo-700 text-white group">
               <CardContent className="p-6 text-right space-y-4">
                 <div className="flex items-center justify-between flex-row-reverse">
-                  <Sparkles className="h-6 w-6" />
-                  <span className="font-bold text-lg">Panda Pro</span>
+                  <Sparkles className="h-6 w-6 animate-pulse" />
+                  <span className="font-bold text-lg tracking-tight">Panda Pro</span>
                 </div>
-                <p className="text-xs opacity-80">
+                <p className="text-sm leading-relaxed opacity-90">
                   הצטרף למסלול ה-Pro וקבל ניתוח אוטומטי של חשבונות הבנק שלך וביטול מינויים בלחיצת כפתור אחת.
                 </p>
-                <button className="w-full bg-white text-primary font-bold py-2 rounded-xl text-sm shadow-lg ripple">
-                  למידע נוסף
-                </button>
+                <Link href="/pro">
+                  <button className="w-full mt-2 bg-white text-blue-700 font-bold py-3 rounded-2xl text-sm shadow-xl ripple hover:scale-105 transition-transform active:scale-95">
+                    למידע נוסף
+                  </button>
+                </Link>
               </CardContent>
             </Card>
           </div>
