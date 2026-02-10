@@ -72,7 +72,7 @@ export const SAMPLE_SUBSCRIPTIONS: Subscription[] = [
     renewalDate: '2025-06-15',
     billingCycle: 'monthly',
     paymentMethod: 'Visa 4242',
-    reminderDays: [7, 3, 1],
+    reminderDays: [7, 3, 0],
     status: 'active',
     usageCount: 12,
     lastUsed: '2024-05-20',

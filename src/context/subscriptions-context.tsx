@@ -76,7 +76,7 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
   const audioContextRef = useRef<AudioContext | null>(null);
 
   useEffect(() => {
-    const saved = localStorage.getItem('panda_subs_v6');
+    const saved = localStorage.getItem('panda_subs_v7');
     const wizardState = localStorage.getItem('panda_wizard');
     const savedSettings = localStorage.getItem('panda_settings');
     
@@ -113,7 +113,7 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
 
   useEffect(() => {
     if (subscriptions.length > 0) {
-      localStorage.setItem('panda_subs_v6', encrypt(JSON.stringify(subscriptions)));
+      localStorage.setItem('panda_subs_v7', encrypt(JSON.stringify(subscriptions)));
     }
     checkReminders();
   }, [subscriptions]);
@@ -149,7 +149,6 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
       const renewalDate = new Date(sub.renewalDate);
       const diffDays = Math.ceil((renewalDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
       
-      // בדיקת תזכורות מרובות
       const activeReminders = sub.reminderDays || [3];
       if (activeReminders.includes(diffDays)) {
         newNotifications.push({
