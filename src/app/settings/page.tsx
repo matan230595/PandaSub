@@ -65,7 +65,7 @@ export default function SettingsPage() {
     
     const subListText = activeSubs.map(s => `• ${s.name}: ${s.amount}${s.currency} (חידוש ב-${s.renewalDate})`).join('\n');
     
-    const subject = encodeURIComponent(`סיכום מינויים שבועי - PandaSub IL`);
+    const subject = encodeURIComponent("סיכום מינויים שבועי - PandaSub IL");
     const body = encodeURIComponent(
       `שלום ${localProfile.userName},\n\nלהלן סיכום המינויים הפעילים שלך:\n\n${subListText}\n\nסה"כ חודשי: ${total.toLocaleString()} ${settings.currency}\n\nנשלח מ-PandaSub IL`
     );
@@ -94,8 +94,8 @@ export default function SettingsPage() {
   return (
     <div className="min-h-screen flex flex-col bg-[#F8F9FA] dark:bg-zinc-950">
       <TopNav />
-      <main className="flex-1 container mx-auto p-4 md:p-8 space-y-8 animate-fade-in pb-24 max-w-5xl">
-        <div className="flex flex-col md:flex-row items-center justify-between gap-4 border-b pb-6 flex-row-reverse">
+      <main className="flex-1 container mx-auto p-4 md:p-8 space-y-8 animate-fade-in pb-24 max-w-5xl text-right" dir="rtl">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-4 border-b pb-6">
           <div className="text-right">
             <h1 className="text-4xl font-black tracking-tight">הגדרות</h1>
             <p className="text-muted-foreground text-lg">ניהול החשבון והעדפות המערכת</p>
@@ -109,7 +109,7 @@ export default function SettingsPage() {
           </Button>
         </div>
 
-        <Tabs defaultValue="profile" className="w-full" dir="rtl">
+        <Tabs defaultValue="profile" className="w-full">
           <TabsList className="grid w-full grid-cols-4 bg-muted/50 rounded-2xl p-1 mb-8 h-14">
             <TabsTrigger value="profile" className="rounded-xl font-bold gap-2">
               <User className="h-4 w-4" /> פרופיל
@@ -126,12 +126,12 @@ export default function SettingsPage() {
           </TabsList>
 
           <TabsContent value="profile" className="space-y-6">
-            <Card className="card-shadow border-none rounded-3xl overflow-hidden bg-white">
-              <CardHeader className="text-right items-start">
+            <Card className="card-shadow border-none rounded-3xl overflow-hidden bg-white dark:bg-zinc-900">
+              <CardHeader className="text-right">
                 <CardTitle className="text-xl">מידע אישי</CardTitle>
                 <CardDescription>פרטי המשתמש המשמשים לניהול המינויים</CardDescription>
               </CardHeader>
-              <CardContent className="space-y-6 text-right">
+              <CardContent className="space-y-6">
                 <div className="grid gap-6 md:grid-cols-2">
                   <div className="space-y-2">
                     <Label className="font-bold">שם מלא</Label>
@@ -163,7 +163,7 @@ export default function SettingsPage() {
                     <select 
                       value={settings.currency}
                       onChange={(e) => updateSettings({ currency: e.target.value })}
-                      className="w-full h-12 rounded-xl bg-muted/30 px-4 font-bold border-none text-right"
+                      className="w-full h-12 rounded-xl bg-muted/30 px-4 font-bold border-none text-right appearance-none"
                     >
                       <option value="₪">₪ - שקל חדש</option>
                       <option value="$">$ - דולר אמריקאי</option>
@@ -176,8 +176,8 @@ export default function SettingsPage() {
           </TabsContent>
 
           <TabsContent value="display" className="space-y-6">
-            <Card className="card-shadow border-none rounded-3xl overflow-hidden bg-white">
-              <CardHeader className="text-right items-start">
+            <Card className="card-shadow border-none rounded-3xl overflow-hidden bg-white dark:bg-zinc-900">
+              <CardHeader className="text-right">
                 <CardTitle className="text-xl">נראות וממשק</CardTitle>
                 <CardDescription>התאם את חוויית השימוש שלך</CardDescription>
               </CardHeader>
@@ -204,8 +204,8 @@ export default function SettingsPage() {
           </TabsContent>
 
           <TabsContent value="notifications" className="space-y-6">
-            <Card className="card-shadow border-none rounded-3xl overflow-hidden bg-white">
-              <CardHeader className="text-right items-start">
+            <Card className="card-shadow border-none rounded-3xl overflow-hidden bg-white dark:bg-zinc-900">
+              <CardHeader className="text-right">
                 <CardTitle className="text-xl">התראות ותזכורות</CardTitle>
                 <CardDescription>שלוט בדרך שבה PandaSub מתקשר איתך</CardDescription>
               </CardHeader>
@@ -253,11 +253,11 @@ export default function SettingsPage() {
           </TabsContent>
 
           <TabsContent value="data" className="space-y-6">
-            <Card className="card-shadow border-none rounded-3xl overflow-hidden bg-white">
-              <CardHeader className="text-right items-start">
-                <div className="flex items-center gap-3">
-                  <Shield className="h-6 w-6 text-primary" />
+            <Card className="card-shadow border-none rounded-3xl overflow-hidden bg-white dark:bg-zinc-900">
+              <CardHeader className="text-right">
+                <div className="flex items-center gap-3 justify-end">
                   <CardTitle className="text-xl">אבטחה ופרטיות</CardTitle>
+                  <Shield className="h-6 w-6 text-primary" />
                 </div>
                 <CardDescription>ניהול המידע האישי והגנה על החשבון</CardDescription>
               </CardHeader>

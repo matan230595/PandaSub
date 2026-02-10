@@ -39,7 +39,7 @@ export default function Home() {
     
     const subListText = activeSubs.map(s => `• ${s.name}: ${s.amount}${s.currency} (חידוש ב-${s.renewalDate})`).join('\n');
     
-    const subject = encodeURIComponent(`סיכום מינויים שבועי - PandaSub IL`);
+    const subject = encodeURIComponent("סיכום מינויים שבועי - PandaSub IL");
     const body = encodeURIComponent(
       `שלום ${settings.userName},\n\nלהלן סיכום המינויים הפעילים שלך:\n\n${subListText}\n\nסה"כ חודשי: ${total.toLocaleString()} ${settings.currency}\n\nנשלח מ-PandaSub IL`
     );
@@ -53,7 +53,7 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#F8F9FA]">
+    <div className="min-h-screen flex flex-col bg-[#F8F9FA] dark:bg-zinc-950">
       <SetupWizard />
       <TopNav />
       <main className="flex-1 container mx-auto p-4 md:p-8 space-y-8 animate-fade-in">
@@ -111,7 +111,7 @@ export default function Home() {
           <div className="lg:col-span-2 space-y-8">
             <DashboardCharts />
             <div className="flex items-center justify-between pt-4">
-              <h2 className="text-2xl font-bold">מינויים אחרונים</h2>
+              <h2 className="text-2xl font-bold text-right w-full">מינויים אחרונים</h2>
             </div>
             <SubscriptionList />
           </div>
@@ -124,7 +124,7 @@ export default function Home() {
         </div>
       </main>
 
-      <footer className="border-t bg-white py-10 text-center">
+      <footer className="border-t bg-white dark:bg-zinc-900 py-10 text-center mt-auto">
         <div className="container mx-auto">
           <div className="flex items-center justify-center gap-2 font-bold text-primary mb-4">
             <span className="bg-primary text-white h-8 w-8 rounded-lg flex items-center justify-center">🐼</span>
@@ -141,7 +141,7 @@ export default function Home() {
 
 function StatCard({ title, value, icon, trend, trendDesc, color }: any) {
   return (
-    <Card className="card-shadow border-none rounded-2xl overflow-hidden group transition-all animate-slide-in">
+    <Card className="card-shadow border-none rounded-2xl overflow-hidden group transition-all animate-slide-in dark:bg-zinc-900">
       <CardContent className="p-6 text-right">
         <div className="flex items-center justify-between mb-4 flex-row-reverse">
           <span className="text-sm font-medium text-muted-foreground">{title}</span>
