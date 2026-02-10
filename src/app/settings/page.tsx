@@ -27,7 +27,8 @@ import {
   Monitor,
   Volume2,
   Eye,
-  Type
+  Type,
+  Mail
 } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { 
@@ -43,59 +44,35 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 export default function SettingsPage() {
-  const { exportData } = useSubscriptions()
+  const { exportData, settings, updateSettings } = useSubscriptions()
   const { toast } = useToast()
   const [loading, setLoading] = React.useState(false)
   const [showDeleteAllAlert, setShowDeleteAllAlert] = React.useState(false)
   
-  // הגדרות פרופיל
-  const [userName, setUserName] = React.useState("ישראל ישראלי")
-  const [userEmail, setUserEmail] = React.useState("israel@example.com")
-  const [userPhone, setUserPhone] = React.useState("050-1234567")
-
-  // הגדרות תצוגה ומצב כהה
-  const [darkMode, setDarkMode] = React.useState(false)
-  const [compactMode, setCompactMode] = React.useState(false)
-  const [fontSize, setFontSize] = React.useState("medium")
-
-  // הגדרות התראות
-  const [pushNotifications, setPushNotifications] = React.useState(true)
-  const [emailDigest, setEmailDigest] = React.useState(true)
-  const [soundEnabled, setSoundEnabled] = React.useState(true)
-
-  // הגדרות אזוריות
-  const [currency, setCurrency] = React.useState("₪")
-  const [language, setLanguage] = React.useState("he")
-
-  // לוגיקה למצב כהה
-  React.useEffect(() => {
-    const isDark = localStorage.getItem('theme') === 'dark'
-    setDarkMode(isDark)
-    if (isDark) {
-      document.documentElement.classList.add('dark')
-    }
-  }, [])
-
-  const toggleDarkMode = (checked: boolean) => {
-    setDarkMode(checked)
-    if (checked) {
-      document.documentElement.classList.add('dark')
-      localStorage.setItem('theme', 'dark')
-    } else {
-      document.documentElement.classList.remove('dark')
-      localStorage.setItem('theme', 'light')
-    }
-  }
+  // מצב מקומי לטופס כדי לא לעדכן את ה-Context על כל הקשה
+  const [localProfile, setLocalProfile] = React.useState({
+    userName: settings.userName,
+    userEmail: settings.userEmail,
+    userPhone: settings.userPhone
+  });
 
   const handleSave = () => {
     setLoading(true)
     setTimeout(() => {
+      updateSettings(localProfile);
       setLoading(false)
       toast({
         title: "הגדרות נשמרו",
         description: "כל השינויים עודכנו בהצלחה במערכת.",
       })
-    }, 1200)
+    }, 1000)
+  }
+
+  const handleSendTestEmail = () => {
+    toast({
+      title: "אימייל נשלח",
+      description: `סיכום שבועי נשלח לכתובת ${settings.userEmail}`,
+    })
   }
 
   const handleDeleteAll = () => {
@@ -145,7 +122,6 @@ export default function SettingsPage() {
             </TabsTrigger>
           </TabsList>
 
-          {/* טאב פרופיל */}
           <TabsContent value="profile" className="space-y-6">
             <Card className="card-shadow border-none rounded-3xl overflow-hidden bg-white dark:bg-zinc-900">
               <CardHeader className="bg-muted/10 dark:bg-zinc-800/50 p-6 border-b">
@@ -156,11 +132,8 @@ export default function SettingsPage() {
                 <div className="flex flex-col md:flex-row gap-10 items-center">
                   <div className="relative group">
                     <div className="h-32 w-32 rounded-3xl bg-primary/10 dark:bg-primary/20 flex items-center justify-center text-primary text-4xl font-black border-2 border-primary/20 shadow-inner group-hover:scale-105 transition-transform">
-                      {userName.charAt(0)}
+                      {localProfile.userName.charAt(0)}
                     </div>
-                    <button className="absolute -bottom-2 -right-2 bg-primary text-white p-2.5 rounded-2xl shadow-lg hover:rotate-12 transition-all">
-                      <Upload className="h-5 w-5" />
-                    </button>
                   </div>
                   
                   <div className="flex-1 grid gap-6 w-full">
@@ -168,8 +141,8 @@ export default function SettingsPage() {
                       <div className="space-y-2 text-right">
                         <Label className="font-bold text-sm">שם מלא</Label>
                         <Input 
-                          value={userName} 
-                          onChange={(e) => setUserName(e.target.value)}
+                          value={localProfile.userName} 
+                          onChange={(e) => setLocalProfile(prev => ({ ...prev, userName: e.target.value }))}
                           className="rounded-xl h-12 text-right bg-muted/30 dark:bg-zinc-800 border-none focus:ring-2 focus:ring-primary/20" 
                         />
                       </div>
@@ -177,24 +150,24 @@ export default function SettingsPage() {
                         <Label className="font-bold text-sm">כתובת אימייל</Label>
                         <Input 
                           type="email"
-                          value={userEmail} 
-                          onChange={(e) => setUserEmail(e.target.value)}
+                          value={localProfile.userEmail} 
+                          onChange={(e) => setLocalProfile(prev => ({ ...prev, userEmail: e.target.value }))}
                           className="rounded-xl h-12 text-right bg-muted/30 dark:bg-zinc-800 border-none focus:ring-2 focus:ring-primary/20" 
                         />
                       </div>
                       <div className="space-y-2 text-right">
                         <Label className="font-bold text-sm">מספר טלפון</Label>
                         <Input 
-                          value={userPhone} 
-                          onChange={(e) => setUserPhone(e.target.value)}
+                          value={localProfile.userPhone} 
+                          onChange={(e) => setLocalProfile(prev => ({ ...prev, userPhone: e.target.value }))}
                           className="rounded-xl h-12 text-right bg-muted/30 dark:bg-zinc-800 border-none focus:ring-2 focus:ring-primary/20" 
                         />
                       </div>
                       <div className="space-y-2 text-right">
                         <Label className="font-bold text-sm">מטבע ברירת מחדל</Label>
                         <select 
-                          value={currency}
-                          onChange={(e) => setCurrency(e.target.value)}
+                          value={settings.currency}
+                          onChange={(e) => updateSettings({ currency: e.target.value })}
                           className="w-full h-12 rounded-xl bg-muted/30 dark:bg-zinc-800 px-4 font-bold outline-none border-none focus:ring-2 focus:ring-primary/20"
                         >
                           <option value="₪">₪ - שקל חדש</option>
@@ -209,7 +182,6 @@ export default function SettingsPage() {
             </Card>
           </TabsContent>
 
-          {/* טאב תצוגה */}
           <TabsContent value="display" className="space-y-6">
             <Card className="card-shadow border-none rounded-3xl overflow-hidden bg-white dark:bg-zinc-900">
               <CardHeader className="bg-muted/10 dark:bg-zinc-800/50 p-6 border-b">
@@ -225,7 +197,7 @@ export default function SettingsPage() {
                     </div>
                     <p className="text-sm text-muted-foreground">הפעל תצוגה כהה המותאמת לעבודה בלילה ולחיסכון בסוללה</p>
                   </div>
-                  <Switch checked={darkMode} onCheckedChange={toggleDarkMode} />
+                  <Switch checked={settings.darkMode} onCheckedChange={(checked) => updateSettings({ darkMode: checked })} />
                 </div>
                 
                 <div className="h-px bg-muted dark:bg-zinc-800 w-full" />
@@ -238,7 +210,7 @@ export default function SettingsPage() {
                     </div>
                     <p className="text-sm text-muted-foreground">צמצם את המרווחים בממשק כדי לראות יותר מידע במסך אחד</p>
                   </div>
-                  <Switch checked={compactMode} onCheckedChange={setCompactMode} />
+                  <Switch checked={settings.compactMode} onCheckedChange={(checked) => updateSettings({ compactMode: checked })} />
                 </div>
 
                 <div className="h-px bg-muted dark:bg-zinc-800 w-full" />
@@ -252,8 +224,8 @@ export default function SettingsPage() {
                     <p className="text-sm text-muted-foreground">בחר את גודל הטקסט הנוח ביותר עבורך</p>
                   </div>
                   <select 
-                    value={fontSize}
-                    onChange={(e) => setFontSize(e.target.value)}
+                    value={settings.fontSize}
+                    onChange={(e) => updateSettings({ fontSize: e.target.value as any })}
                     className="h-10 rounded-xl bg-muted/30 dark:bg-zinc-800 px-4 font-medium outline-none border-none"
                   >
                     <option value="small">קטן</option>
@@ -265,7 +237,6 @@ export default function SettingsPage() {
             </Card>
           </TabsContent>
 
-          {/* טאב התראות */}
           <TabsContent value="notifications" className="space-y-6">
             <Card className="card-shadow border-none rounded-3xl overflow-hidden bg-white dark:bg-zinc-900">
               <CardHeader className="bg-muted/10 dark:bg-zinc-800/50 p-6 border-b">
@@ -278,7 +249,7 @@ export default function SettingsPage() {
                     <Label className="text-lg font-bold">התראות דפדפן (Push)</Label>
                     <p className="text-sm text-muted-foreground">קבל התראות בזמן אמת על חיובים קרובים וסיום ניסיון</p>
                   </div>
-                  <Switch checked={pushNotifications} onCheckedChange={setPushNotifications} />
+                  <Switch checked={settings.pushNotifications} onCheckedChange={(checked) => updateSettings({ pushNotifications: checked })} />
                 </div>
                 
                 <div className="h-px bg-muted dark:bg-zinc-800 w-full" />
@@ -288,7 +259,12 @@ export default function SettingsPage() {
                     <Label className="text-lg font-bold">סיכום שבועי באימייל</Label>
                     <p className="text-sm text-muted-foreground">קבל אימייל מדי יום ראשון עם סיכום כל החיובים הצפויים השבוע</p>
                   </div>
-                  <Switch checked={emailDigest} onCheckedChange={setEmailDigest} />
+                  <div className="flex items-center gap-4">
+                    <Button variant="ghost" size="sm" onClick={handleSendTestEmail} className="text-xs h-8 gap-1">
+                      <Mail className="h-3 w-3" /> שלח דוגמה
+                    </Button>
+                    <Switch checked={settings.emailDigest} onCheckedChange={(checked) => updateSettings({ emailDigest: checked })} />
+                  </div>
                 </div>
 
                 <div className="h-px bg-muted dark:bg-zinc-800 w-full" />
@@ -299,15 +275,14 @@ export default function SettingsPage() {
                       <Label className="text-lg font-bold">התראות קוליות</Label>
                       <Volume2 className="h-5 w-5 text-primary" />
                     </div>
-                    <p className="text-sm text-muted-foreground">השמע צליל בעת קבלת התראה חדשה במערכת</p>
+                    <p className="text-sm text-muted-foreground">השמע צליל בעת קבלת התראה חדשה במערכת (נוסה בעת קבלת התראה)</p>
                   </div>
-                  <Switch checked={soundEnabled} onCheckedChange={setSoundEnabled} />
+                  <Switch checked={settings.soundEnabled} onCheckedChange={(checked) => updateSettings({ soundEnabled: checked })} />
                 </div>
               </CardContent>
             </Card>
           </TabsContent>
 
-          {/* טאב מידע ופרטיות */}
           <TabsContent value="data" className="space-y-6">
             <Card className="card-shadow border-none rounded-3xl overflow-hidden bg-white dark:bg-zinc-900">
               <CardHeader className="bg-destructive/5 dark:bg-destructive/10 p-6 border-b">
@@ -347,7 +322,6 @@ export default function SettingsPage() {
         </Tabs>
       </main>
 
-      {/* מודאל אישור מחיקה */}
       <AlertDialog open={showDeleteAllAlert} onOpenChange={setShowDeleteAllAlert}>
         <AlertDialogContent className="text-right rounded-3xl border-none shadow-2xl max-w-sm dark:bg-zinc-900">
           <AlertDialogHeader className="items-center">
