@@ -1,4 +1,3 @@
-
 "use client"
 
 import * as React from "react"
@@ -46,18 +45,17 @@ export default function SettingsPage() {
   const [userEmail, setUserEmail] = React.useState("israel@example.com")
   const [darkMode, setDarkMode] = React.useState(false)
   const [pushNotifications, setPushNotifications] = React.useState(true)
-  const [currency, setCurrency] = React.useState("₪ - שקל חדש")
+  const [currency, setCurrency] = React.useState("₪")
 
   const handleSave = () => {
     setLoading(true)
-    // סימולציית שמירה
     setTimeout(() => {
       setLoading(false)
       toast({
         title: "הגדרות נשמרו",
         description: "השינויים עודכנו בהצלחה במערכת.",
       })
-    }, 1200)
+    }, 1000)
   }
 
   const handleDeleteAll = () => {
@@ -65,7 +63,7 @@ export default function SettingsPage() {
     toast({
       variant: "destructive",
       title: "המידע נמחק",
-      description: "כל הנתונים שלך נמחקו לצמיתות מהמערכת.",
+      description: "כל הנתונים שלך נמחקו לצמיתות.",
     })
     setShowDeleteAllAlert(false)
     setTimeout(() => {
@@ -74,56 +72,58 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#F8F9FA]">
+    <div className="min-h-screen flex flex-col bg-[#F8F9FA] text-right" dir="rtl">
       <TopNav />
       <main className="flex-1 container mx-auto p-4 md:p-8 space-y-8 animate-fade-in pb-20">
-        <div className="text-right">
-          <h1 className="text-3xl font-bold tracking-tight">הגדרות מערכת</h1>
-          <p className="text-muted-foreground">ניהול פרופיל, אבטחה והעדפות אפליקציה</p>
+        <div className="space-y-2">
+          <h1 className="text-3xl font-black tracking-tight text-foreground">הגדרות מערכת</h1>
+          <p className="text-muted-foreground text-lg">נהל את הפרופיל, ההעדפות והמידע שלך במקום אחד</p>
         </div>
 
         <div className="grid gap-8 lg:grid-cols-12">
-          {/* ניווט הגדרות */}
-          <div className="lg:col-span-3 space-y-2">
+          {/* ניווט פנימי - דסקטופ */}
+          <div className="lg:col-span-3 space-y-2 hidden lg:block">
             <SettingsNavItem icon={<User className="h-4 w-4" />} label="פרופיל אישי" active />
-            <SettingsNavItem icon={<Bell className="h-4 w-4" />} label="התראות ותזכורות" />
-            <SettingsNavItem icon={<Shield className="h-4 w-4" />} label="אבטחה ופרטיות" />
+            <SettingsNavItem icon={<Bell className="h-4 w-4" />} label="התראות" />
             <SettingsNavItem icon={<Globe className="h-4 w-4" />} label="שפה ומטבע" />
             <SettingsNavItem icon={<Database className="h-4 w-4" />} label="ניהול נתונים" />
           </div>
 
-          {/* תוכן הגדרות */}
           <div className="lg:col-span-9 space-y-6">
-            <Card className="card-shadow border-none rounded-3xl overflow-hidden">
-              <CardHeader className="border-b bg-muted/20 p-6">
-                <CardTitle className="text-xl text-right">פרופיל משתמש</CardTitle>
-                <CardDescription className="text-right">כיצד הפרטים שלך יופיעו במערכת</CardDescription>
+            {/* כרטיס פרופיל */}
+            <Card className="card-shadow border-none rounded-3xl overflow-hidden bg-white">
+              <CardHeader className="border-b bg-muted/20 p-6 text-right">
+                <CardTitle className="text-xl font-bold">פרופיל משתמש</CardTitle>
+                <CardDescription>פרטי המשתמש כפי שיופיעו במערכת</CardDescription>
               </CardHeader>
-              <CardContent className="p-8 space-y-6">
-                <div className="flex flex-col md:flex-row gap-8 items-center flex-row-reverse">
-                  <div className="relative group">
-                    <div className="h-28 w-28 rounded-full bg-primary/10 flex items-center justify-center text-primary text-4xl font-black border-4 border-white shadow-2xl">י</div>
-                    <button className="absolute bottom-1 right-1 bg-primary text-white p-2.5 rounded-full shadow-lg hover:scale-110 transition-transform">
+              <CardContent className="p-6 md:p-8">
+                <div className="flex flex-col md:flex-row gap-8 items-center">
+                  <div className="relative">
+                    <div className="h-24 w-24 rounded-full bg-primary/10 flex items-center justify-center text-primary text-3xl font-black border-2 border-primary/20 shadow-inner">
+                      {userName.charAt(0)}
+                    </div>
+                    <button className="absolute -bottom-1 -right-1 bg-primary text-white p-2 rounded-full shadow-lg hover:scale-110 transition-transform">
                       <Upload className="h-4 w-4" />
                     </button>
                   </div>
+                  
                   <div className="flex-1 grid gap-6 w-full">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div className="space-y-2 text-right">
-                        <Label className="font-bold">שם מלא</Label>
+                    <div className="grid gap-4 md:grid-cols-2">
+                      <div className="space-y-2">
+                        <Label className="font-bold text-sm">שם מלא</Label>
                         <Input 
                           value={userName} 
                           onChange={(e) => setUserName(e.target.value)}
-                          className="rounded-xl h-12 text-right focus:ring-primary/20" 
+                          className="rounded-xl h-11 text-right bg-muted/30 focus:bg-white transition-all" 
                         />
                       </div>
-                      <div className="space-y-2 text-right">
-                        <Label className="font-bold">אימייל</Label>
+                      <div className="space-y-2">
+                        <Label className="font-bold text-sm">כתובת אימייל</Label>
                         <Input 
                           type="email"
                           value={userEmail} 
                           onChange={(e) => setUserEmail(e.target.value)}
-                          className="rounded-xl h-12 text-right focus:ring-primary/20" 
+                          className="rounded-xl h-11 text-right bg-muted/30 focus:bg-white transition-all" 
                         />
                       </div>
                     </div>
@@ -132,103 +132,114 @@ export default function SettingsPage() {
               </CardContent>
             </Card>
 
-            <Card className="card-shadow border-none rounded-3xl overflow-hidden">
-              <CardHeader className="border-b bg-muted/20 p-6">
-                <CardTitle className="text-xl text-right">העדפות מערכת</CardTitle>
-                <CardDescription className="text-right">התאמה אישית של חוויית המשתמש</CardDescription>
+            {/* העדפות מערכת */}
+            <Card className="card-shadow border-none rounded-3xl overflow-hidden bg-white">
+              <CardHeader className="border-b bg-muted/20 p-6 text-right">
+                <CardTitle className="text-xl font-bold">העדפות ותצוגה</CardTitle>
+                <CardDescription>התאם את PandaSub לסגנון העבודה שלך</CardDescription>
               </CardHeader>
-              <CardContent className="p-8 space-y-8">
-                <div className="flex items-center justify-between flex-row-reverse group">
-                  <div className="text-right">
-                    <div className="font-bold text-lg">מצב כהה (Dark Mode)</div>
-                    <div className="text-sm text-muted-foreground">מעבר אוטומטי בהתאם למערכת ההפעלה</div>
+              <CardContent className="p-6 md:p-8 space-y-6">
+                <div className="flex items-center justify-between py-2">
+                  <div className="space-y-0.5 text-right">
+                    <Label className="text-base font-bold">מצב כהה (Dark Mode)</Label>
+                    <p className="text-sm text-muted-foreground">הפעל תצוגה כהה לחיסכון בסוללה ונוחות העיניים</p>
                   </div>
                   <Switch checked={darkMode} onCheckedChange={setDarkMode} />
                 </div>
                 
                 <div className="h-px bg-muted w-full" />
 
-                <div className="flex items-center justify-between flex-row-reverse group">
-                  <div className="text-right">
-                    <div className="font-bold text-lg">התראות דחיפה (Push)</div>
-                    <div className="text-sm text-muted-foreground">קבל התראות על חיובים ישירות לדפדפן</div>
+                <div className="flex items-center justify-between py-2">
+                  <div className="space-y-0.5 text-right">
+                    <Label className="text-base font-bold">התראות דחיפה</Label>
+                    <p className="text-sm text-muted-foreground">קבל עדכונים על חיובים קרובים ישירות לדפדפן</p>
                   </div>
                   <Switch checked={pushNotifications} onCheckedChange={setPushNotifications} />
                 </div>
 
                 <div className="h-px bg-muted w-full" />
 
-                <div className="flex items-center justify-between flex-row-reverse group">
-                  <div className="text-right">
-                    <div className="font-bold text-lg">מטבע ברירת מחדל</div>
-                    <div className="text-sm text-muted-foreground">המטבע שבו יוצגו הסיכומים בדשבורד</div>
+                <div className="flex items-center justify-between py-2">
+                  <div className="space-y-0.5 text-right">
+                    <Label className="text-base font-bold">מטבע ברירת מחדל</Label>
+                    <p className="text-sm text-muted-foreground">המטבע העיקרי להצגת סיכומים</p>
                   </div>
                   <select 
                     value={currency}
                     onChange={(e) => setCurrency(e.target.value)}
-                    className="bg-muted/50 rounded-xl px-4 py-3 text-sm font-bold border-none outline-none focus:ring-2 focus:ring-primary/20 cursor-pointer"
+                    className="bg-muted/50 rounded-xl px-4 py-2 text-sm font-bold border-none outline-none focus:ring-2 focus:ring-primary/20"
                   >
-                    <option value="₪ - שקל חדש">₪ - שקל חדש</option>
-                    <option value="$ - דולר ארה&quot;ב">$ - דולר ארה&quot;ב</option>
-                    <option value="€ - אירו">€ - אירו</option>
+                    <option value="₪">₪ - שקל חדש</option>
+                    <option value="$">$ - דולר ארה"ב</option>
+                    <option value="€">€ - אירו</option>
                   </select>
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="card-shadow border-none rounded-3xl border-destructive/20 overflow-hidden">
-              <CardHeader className="border-b bg-destructive/5 p-6">
-                <CardTitle className="text-xl text-destructive flex items-center gap-2 flex-row-reverse text-right">
-                  <AlertTriangle className="h-5 w-5" />
-                  אזור רגיש
+            {/* ניהול נתונים */}
+            <Card className="card-shadow border-none rounded-3xl bg-white border-destructive/10 overflow-hidden">
+              <CardHeader className="border-b bg-destructive/5 p-6 text-right">
+                <CardTitle className="text-xl font-bold text-destructive flex items-center gap-2 justify-end">
+                  <Shield className="h-5 w-5" />
+                  ניהול מידע ופרטיות
                 </CardTitle>
-                <CardDescription className="text-right">ניהול מידע ומחיקת חשבון</CardDescription>
+                <CardDescription>פעולות רגישות הקשורות למידע שלך</CardDescription>
               </CardHeader>
-              <CardContent className="p-8 space-y-6">
-                <div className="flex flex-col md:flex-row gap-4 flex-row-reverse">
-                  <Button variant="outline" className="flex-1 gap-2 rounded-xl h-14 font-bold border-primary/20 hover:bg-primary/5 transition-all" onClick={exportData}>
-                    <Download className="h-4 w-4" /> ייצוא כל הנתונים (CSV)
+              <CardContent className="p-6 md:p-8">
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <Button 
+                    variant="outline" 
+                    onClick={exportData}
+                    className="flex-1 rounded-xl h-12 gap-2 font-bold border-primary/20 hover:bg-primary/5 text-primary"
+                  >
+                    <Download className="h-4 w-4" /> ייצוא נתונים (CSV)
                   </Button>
                   <Button 
                     variant="outline" 
-                    className="flex-1 gap-2 rounded-xl h-14 text-destructive border-destructive/20 hover:bg-destructive/5 font-bold transition-all"
                     onClick={() => setShowDeleteAllAlert(true)}
+                    className="flex-1 rounded-xl h-12 gap-2 font-bold text-destructive border-destructive/20 hover:bg-destructive/5"
                   >
-                    <Trash2 className="h-4 w-4" /> מחיקת כל המידע לצמיתות
+                    <Trash2 className="h-4 w-4" /> מחיקת כל המידע
                   </Button>
                 </div>
               </CardContent>
             </Card>
 
-            <div className="flex justify-end pt-6">
+            {/* כפתור שמירה מרכזי */}
+            <div className="flex justify-end pt-4">
               <Button 
                 onClick={handleSave} 
-                disabled={loading} 
-                className="gap-3 rounded-full px-16 h-16 bg-primary hover:bg-primary/90 shadow-2xl shadow-primary/30 text-xl font-black transition-all hover:-translate-y-1"
+                disabled={loading}
+                className="rounded-full px-12 h-14 bg-primary hover:bg-primary/90 shadow-xl shadow-primary/20 text-lg font-black transition-all"
               >
-                {loading ? <Loader2 className="h-6 w-6 animate-spin" /> : <><Save className="h-6 w-6" /> שמור שינויים</>}
+                {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : <><Save className="ml-2 h-5 w-5" /> שמור שינויים</>}
               </Button>
             </div>
           </div>
         </div>
       </main>
 
+      {/* מודאל אישור מחיקה */}
       <AlertDialog open={showDeleteAllAlert} onOpenChange={setShowDeleteAllAlert}>
-        <AlertDialogContent className="text-right rounded-3xl border-none shadow-2xl max-w-md">
+        <AlertDialogContent className="text-right rounded-3xl border-none shadow-2xl max-w-sm">
           <AlertDialogHeader className="items-center">
-            <div className="h-20 w-20 rounded-full bg-destructive/10 flex items-center justify-center text-destructive mb-4 animate-pulse">
-              <AlertTriangle className="h-10 w-10" />
+            <div className="h-16 w-16 rounded-full bg-destructive/10 flex items-center justify-center text-destructive mb-4">
+              <AlertTriangle className="h-8 w-8" />
             </div>
-            <AlertDialogTitle className="text-2xl font-black text-center">מחיקת כל הנתונים?</AlertDialogTitle>
-            <AlertDialogDescription className="text-center text-muted-foreground text-lg mt-2">
-              פעולה זו תנקה את כל המינויים, ההגדרות והיסטוריית החיובים שלך. **לא ניתן לשחזר פעולה זו.**
+            <AlertDialogTitle className="text-xl font-bold text-center w-full">למחוק את כל המידע?</AlertDialogTitle>
+            <AlertDialogDescription className="text-center">
+              פעולה זו תנקה את כל המינויים וההגדרות שלך לצמיתות. לא ניתן יהיה לשחזר את הנתונים לאחר מכן.
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter className="sm:justify-center flex-row-reverse gap-4 mt-8">
-            <AlertDialogAction onClick={handleDeleteAll} className="bg-destructive hover:bg-destructive/90 rounded-full px-10 h-14 font-black text-lg shadow-lg shadow-destructive/20">
+          <AlertDialogFooter className="flex-row-reverse sm:justify-center gap-3 mt-6">
+            <AlertDialogAction 
+              onClick={handleDeleteAll}
+              className="bg-destructive hover:bg-destructive/90 rounded-full px-8 h-12 font-bold flex-1"
+            >
               כן, מחק הכל
             </AlertDialogAction>
-            <AlertDialogCancel className="rounded-full h-14 px-10 font-bold text-lg">ביטול</AlertDialogCancel>
+            <AlertDialogCancel className="rounded-full h-12 px-8 font-medium flex-1">ביטול</AlertDialogCancel>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
@@ -238,11 +249,11 @@ export default function SettingsPage() {
 
 function SettingsNavItem({ icon, label, active }: { icon: React.ReactNode, label: string, active?: boolean }) {
   return (
-    <button className={`w-full flex items-center gap-4 px-6 py-4 rounded-2xl transition-all flex-row-reverse group ${active ? 'bg-primary text-white shadow-xl shadow-primary/20' : 'text-muted-foreground hover:bg-primary/5 hover:text-primary'}`}>
-      <span className="flex-1 text-right font-black text-sm tracking-tight">{label}</span>
+    <button className={`w-full flex items-center gap-3 px-5 py-3 rounded-2xl transition-all flex-row-reverse group ${active ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'text-muted-foreground hover:bg-primary/5 hover:text-primary'}`}>
       <div className={`transition-transform group-hover:scale-110 ${active ? 'text-white' : 'text-muted-foreground'}`}>
         {icon}
       </div>
+      <span className="flex-1 text-right font-bold text-sm">{label}</span>
       {active && <CheckCircle2 className="h-4 w-4" />}
     </button>
   )
