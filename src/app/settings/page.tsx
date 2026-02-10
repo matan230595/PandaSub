@@ -29,7 +29,8 @@ import {
   Eye,
   Type,
   Mail,
-  Send
+  Send,
+  FileText
 } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { 
@@ -70,10 +71,29 @@ export default function SettingsPage() {
     }, 1000)
   }
 
+  // פונקציה ליצירת טיוטת מייל (Mailto)
+  const handleGenerateDraft = () => {
+    const activeSubs = subscriptions.filter(s => s.status === 'active' || s.status === 'trial');
+    const total = activeSubs.reduce((sum, s) => sum + s.amount, 0);
+    
+    const subListText = activeSubs.map(s => `• ${s.name}: ${s.amount}${s.currency} (חידוש ב-${s.renewalDate})`).join('\n');
+    
+    const subject = encodeURIComponent(`סיכום מינויים שבועי - PandaSub IL עבור ${settings.userName}`);
+    const body = encodeURIComponent(
+      `שלום ${settings.userName},\n\nלהלן סיכום המינויים הפעילים שלך לשבוע זה:\n\n${subListText}\n\nסה"כ חודשי: ${total.toLocaleString()} ${settings.currency}\n\nנשלח מ-PandaSub IL - ניהול מינויים חכם`
+    );
+
+    window.location.href = `mailto:${settings.userEmail}?subject=${subject}&body=${body}`;
+    
+    toast({
+      title: "טיוטת מייל נוצרה",
+      description: "אפליקציית המייל נפתחה עם הנתונים שלך.",
+    })
+  }
+
   const handleSendRealEmail = async () => {
     setEmailLoading(true)
     try {
-      // שליחת המיייל האמיתי דרך Server Action
       const result = await sendWeeklyDigestAction({
         email: settings.userEmail,
         userName: settings.userName,
@@ -92,7 +112,7 @@ export default function SettingsPage() {
       toast({
         variant: "destructive",
         title: "שגיאה בשליחת המייל",
-        description: "ודא שהגדרת API Key עבור שירות המיילים.",
+        description: "ודא שהגדרת API Key עבור שירות המיילים או השתמש באופציית הטיוטה.",
       })
     } finally {
       setEmailLoading(false)
@@ -281,19 +301,30 @@ export default function SettingsPage() {
                 <div className="flex items-center justify-between flex-row-reverse">
                   <div className="space-y-1 text-right">
                     <Label className="text-lg font-bold">סיכום שבועי באימייל</Label>
-                    <p className="text-sm text-muted-foreground">קבל אימייל עם סיכום כל החיובים הצפויים השבוע (שליחה אמיתית)</p>
+                    <p className="text-sm text-muted-foreground">קבל אימייל עם סיכום כל החיובים הצפויים השבוע</p>
                   </div>
-                  <div className="flex items-center gap-4 flex-row-reverse">
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      onClick={handleSendRealEmail} 
-                      disabled={emailLoading}
-                      className="rounded-full gap-2 border-primary/20 text-primary hover:bg-primary/5"
-                    >
-                      {emailLoading ? <Loader2 className="h-3 w-3 animate-spin" /> : <Send className="h-3 w-3" />}
-                      שלח עכשיו
-                    </Button>
+                  <div className="flex flex-col md:flex-row items-end gap-3 flex-row-reverse">
+                    <div className="flex items-center gap-2 flex-row-reverse">
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        onClick={handleGenerateDraft} 
+                        className="rounded-full gap-2 border-primary/20 text-primary hover:bg-primary/5"
+                      >
+                        <FileText className="h-3 w-3" />
+                        צור טיוטת מייל
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        onClick={handleSendRealEmail} 
+                        disabled={emailLoading}
+                        className="rounded-full gap-2 text-muted-foreground hover:bg-muted"
+                      >
+                        {emailLoading ? <Loader2 className="h-3 w-3 animate-spin" /> : <Send className="h-3 w-3" />}
+                        שליחה ישירה
+                      </Button>
+                    </div>
                     <Switch checked={settings.emailDigest} onCheckedChange={(checked) => updateSettings({ emailDigest: checked })} />
                   </div>
                 </div>
@@ -317,9 +348,9 @@ export default function SettingsPage() {
           <TabsContent value="data" className="space-y-6">
             <Card className="card-shadow border-none rounded-3xl overflow-hidden bg-white dark:bg-zinc-900">
               <CardHeader className="bg-destructive/5 dark:bg-destructive/10 p-6 border-b">
-                <div className="flex items-center gap-2 justify-start flex-row-reverse">
+                <div className="flex items-center gap-2 justify-start flex-row-reverse w-full">
                   <Shield className="h-6 w-6 text-destructive" />
-                  <CardTitle className="text-xl text-destructive text-right">אבטחה ופרטיות</CardTitle>
+                  <CardTitle className="text-xl text-destructive text-right flex-1">אבטחה ופרטיות</CardTitle>
                 </div>
                 <CardDescription className="text-right">ניהול המידע האישי שלך והגנה על החשבון</CardDescription>
               </CardHeader>
