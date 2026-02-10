@@ -1,4 +1,3 @@
-
 "use client"
 
 import * as React from "react"
@@ -24,7 +23,8 @@ import {
   Trash2,
   Copy,
   Filter,
-  Check
+  Check,
+  AlertTriangle
 } from "lucide-react"
 import { 
   DropdownMenu, 
@@ -35,6 +35,16 @@ import {
   DropdownMenuContent,
   DropdownMenuItem
 } from "@/components/ui/dropdown-menu"
+import { 
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 import { CATEGORY_METADATA, STATUS_METADATA, Subscription, SubscriptionCategory, SubscriptionStatus } from "@/app/lib/subscription-store"
 import { useSubscriptions } from "@/context/subscriptions-context"
 import { useToast } from "@/hooks/use-toast"
@@ -56,6 +66,7 @@ export function SubscriptionList() {
   const [searchTerm, setSearchTerm] = React.useState("")
   const [categoryFilter, setCategoryFilter] = React.useState<SubscriptionCategory | 'all'>('all')
   const [statusFilter, setStatusFilter] = React.useState<SubscriptionStatus | 'all'>('all')
+  const [deleteConfirmId, setDeleteConfirmId] = React.useState<string | null>(null)
   
   const [visibleColumns, setVisibleColumns] = React.useState<Record<ColumnKey, boolean>>({
     name: true,
@@ -81,10 +92,17 @@ export function SubscriptionList() {
     setIsModalOpen(true)
   }
 
-  const handleDelete = (e: React.MouseEvent, id: string) => {
+  const handleDeleteTrigger = (e: React.MouseEvent, id: string) => {
     e.stopPropagation()
-    deleteSubscription(id)
-    toast({ title: "המינוי נמחק", variant: "destructive" })
+    setDeleteConfirmId(id)
+  }
+
+  const handleConfirmDelete = () => {
+    if (deleteConfirmId) {
+      deleteSubscription(deleteConfirmId)
+      toast({ title: "המינוי נמחק", variant: "destructive" })
+      setDeleteConfirmId(null)
+    }
   }
 
   const handleDuplicate = (e: React.MouseEvent, id: string) => {
@@ -162,9 +180,9 @@ export function SubscriptionList() {
               {visibleColumns.actions && (
                 <TableCell onClick={(e) => e.stopPropagation()} className="text-center">
                   <div className="flex items-center justify-center gap-1">
-                    <Button variant="ghost" size="icon" className="h-7 w-7 rounded-full" onClick={(e) => handleEdit(e, sub)}><Edit2 className="h-3.5 w-3.5" /></Button>
-                    <Button variant="ghost" size="icon" className="h-7 w-7 rounded-full" onClick={(e) => handleDuplicate(e, sub.id)}><Copy className="h-3.5 w-3.5" /></Button>
-                    <Button variant="ghost" size="icon" className="h-7 w-7 rounded-full text-destructive" onClick={(e) => handleDelete(e, sub.id)}><Trash2 className="h-3.5 w-3.5" /></Button>
+                    <Button variant="ghost" size="icon" className="h-7 w-7 rounded-full" onClick={(e) => handleEdit(e, sub)} title="ערוך"><Edit2 className="h-3.5 w-3.5" /></Button>
+                    <Button variant="ghost" size="icon" className="h-7 w-7 rounded-full" onClick={(e) => handleDuplicate(e, sub.id)} title="שכפל"><Copy className="h-3.5 w-3.5" /></Button>
+                    <Button variant="ghost" size="icon" className="h-7 w-7 rounded-full text-destructive" onClick={(e) => handleDeleteTrigger(e, sub.id)} title="מחק"><Trash2 className="h-3.5 w-3.5" /></Button>
                   </div>
                 </TableCell>
               )}
@@ -190,7 +208,7 @@ export function SubscriptionList() {
             <Button variant="secondary" size="icon" className="h-7 w-7 rounded-full bg-white/80 shadow-sm opacity-60 group-hover:opacity-100" onClick={(e) => handleEdit(e, sub)}>
               <Edit2 className="h-3.5 w-3.5" />
             </Button>
-            <Button variant="secondary" size="icon" className="h-7 w-7 rounded-full bg-white/80 shadow-sm text-destructive opacity-60 group-hover:opacity-100" onClick={(e) => handleDelete(e, sub.id)}>
+            <Button variant="secondary" size="icon" className="h-7 w-7 rounded-full bg-white/80 shadow-sm text-destructive opacity-60 group-hover:opacity-100" onClick={(e) => handleDeleteTrigger(e, sub.id)}>
               <Trash2 className="h-3.5 w-3.5" />
             </Button>
           </div>
@@ -288,7 +306,27 @@ export function SubscriptionList() {
             <DropdownMenuContent align="end" className="text-right">
               <DropdownMenuItem onClick={() => setCategoryFilter('all')} className="text-right">הכל</DropdownMenuItem>
               {Object.entries(CATEGORY_METADATA).map(([key, val]) => (
-                <DropdownMenuItem key={key} onClick={() => setCategoryFilter(key as any)} className="text-right">{val.label}</DropdownMenuItem>
+                <DropdownMenuItem key={key} onClick={() => setCategoryFilter(key as any)} className="text-right">
+                  {categoryFilter === key && <Check className="h-3 w-3 ml-1" />}
+                  {val.label}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm" className="h-9 gap-1 text-[11px] font-bold">
+                <Filter className="h-3 w-3" /> סטטוס
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="text-right">
+              <DropdownMenuItem onClick={() => setStatusFilter('all')} className="text-right">הכל</DropdownMenuItem>
+              {Object.entries(STATUS_METADATA).map(([key, val]) => (
+                <DropdownMenuItem key={key} onClick={() => setStatusFilter(key as any)} className="text-right">
+                  {statusFilter === key && <Check className="h-3 w-3 ml-1" />}
+                  {val.label}
+                </DropdownMenuItem>
               ))}
             </DropdownMenuContent>
           </DropdownMenu>
@@ -325,6 +363,26 @@ export function SubscriptionList() {
         onOpenChange={(val) => { setIsModalOpen(val); if (!val) setSelectedSub(null); }} 
         subscription={selectedSub} 
       />
+
+      <AlertDialog open={!!deleteConfirmId} onOpenChange={(open) => !open && setDeleteConfirmId(null)}>
+        <AlertDialogContent className="text-right rounded-3xl border-none shadow-2xl">
+          <AlertDialogHeader className="items-center">
+            <div className="h-16 w-16 rounded-full bg-destructive/10 flex items-center justify-center text-destructive mb-4">
+              <AlertTriangle className="h-8 w-8" />
+            </div>
+            <AlertDialogTitle className="text-2xl font-bold">האם אתה בטוח?</AlertDialogTitle>
+            <AlertDialogDescription className="text-center text-muted-foreground text-base">
+              פעולה זו תמחוק את המינוי לצמיתות. לא ניתן יהיה לשחזר את פרטי ההתחברות וההערות שנשמרו.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="sm:justify-center flex-row-reverse gap-3 mt-6">
+            <AlertDialogAction onClick={handleConfirmDelete} className="bg-destructive hover:bg-destructive/90 rounded-full px-8 h-12 font-bold shadow-lg shadow-destructive/20">
+              כן, מחק מינוי
+            </AlertDialogAction>
+            <AlertDialogCancel className="rounded-full h-12 px-8 font-medium">ביטול</AlertDialogCancel>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }

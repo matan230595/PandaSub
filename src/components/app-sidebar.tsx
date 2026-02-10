@@ -33,10 +33,12 @@ import {
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { Button } from "@/components/ui/button"
+import { useToast } from "@/hooks/use-toast"
 
 export function AppSidebar() {
   const pathname = usePathname()
   const { setOpenMobile, state } = useSidebar()
+  const { toast } = useToast()
   const isCollapsed = state === "collapsed"
 
   const mainNav = [
@@ -46,8 +48,8 @@ export function AppSidebar() {
   ]
 
   const toolNav = [
-    { href: "#", label: "ניתוח הוצאות", icon: PieChart },
-    { href: "#", label: "תובנות AI", icon: Sparkles },
+    { href: "#", label: "ניתוח הוצאות", icon: PieChart, action: () => toast({ title: "בקרוב!", description: "מודול ניתוח הוצאות מתקדם נמצא בפיתוח." }) },
+    { href: "#", label: "תובנות AI", icon: Sparkles, action: () => toast({ title: "תובנות AI", description: "ה-AI שלנו מתאמן על הנתונים שלך כרגע." }) },
   ]
 
   return (
@@ -101,6 +103,7 @@ export function AppSidebar() {
                 <SidebarMenuItem key={item.label}>
                   <SidebarMenuButton 
                     tooltip={item.label}
+                    onClick={item.action}
                     className="w-full flex-row-reverse gap-3 rounded-xl h-12 px-4 hover:bg-primary/5 hover:text-primary transition-all"
                   >
                     <item.icon className="h-5 w-5 min-w-[20px] text-muted-foreground" />
@@ -116,7 +119,11 @@ export function AppSidebar() {
       <SidebarFooter className="p-4 border-t">
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton tooltip="הגדרות" className="w-full flex-row-reverse gap-3 rounded-xl h-10 px-4 hover:bg-primary/5 transition-all text-muted-foreground hover:text-primary">
+            <SidebarMenuButton 
+              tooltip="הגדרות" 
+              onClick={() => toast({ title: "הגדרות", description: "עמוד ההגדרות יפתח בקרוב." })}
+              className="w-full flex-row-reverse gap-3 rounded-xl h-10 px-4 hover:bg-primary/5 transition-all text-muted-foreground hover:text-primary"
+            >
               <Settings className="h-4 w-4 min-w-[16px]" />
               {!isCollapsed && <span className="flex-1 text-right">הגדרות</span>}
             </SidebarMenuButton>
