@@ -14,22 +14,12 @@ import {
   Bell, 
   Shield, 
   Database, 
-  Globe, 
   Download, 
-  Upload, 
   Trash2,
   Save,
-  CheckCircle2,
   AlertTriangle,
   Loader2,
-  Moon,
-  Sun,
-  Monitor,
-  Volume2,
   Eye,
-  Type,
-  Mail,
-  Send,
   FileText
 } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
@@ -44,13 +34,11 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { sendWeeklyDigestAction } from "@/app/actions/email-actions"
 
 export default function SettingsPage() {
   const { exportData, settings, updateSettings, subscriptions } = useSubscriptions()
   const { toast } = useToast()
   const [loading, setLoading] = React.useState(false)
-  const [emailLoading, setEmailLoading] = React.useState(false)
   const [showDeleteAllAlert, setShowDeleteAllAlert] = React.useState(false)
   
   const [localProfile, setLocalProfile] = React.useState({
@@ -107,7 +95,7 @@ export default function SettingsPage() {
     <div className="min-h-screen flex flex-col bg-[#F8F9FA] dark:bg-zinc-950">
       <TopNav />
       <main className="flex-1 container mx-auto p-4 md:p-8 space-y-8 animate-fade-in pb-24 max-w-5xl">
-        <div className="flex flex-col md:flex-row items-center justify-between gap-4 border-b pb-6">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-4 border-b pb-6 flex-row-reverse">
           <div className="text-right">
             <h1 className="text-4xl font-black tracking-tight">הגדרות</h1>
             <p className="text-muted-foreground text-lg">ניהול החשבון והעדפות המערכת</p>
@@ -266,10 +254,10 @@ export default function SettingsPage() {
 
           <TabsContent value="data" className="space-y-6">
             <Card className="card-shadow border-none rounded-3xl overflow-hidden bg-white">
-              <CardHeader className="text-right">
-                <div className="flex items-center gap-3 justify-end">
-                  <CardTitle className="text-xl">אבטחה ופרטיות</CardTitle>
+              <CardHeader className="text-right flex flex-col items-end">
+                <div className="flex items-center gap-3 justify-end flex-row-reverse">
                   <Shield className="h-6 w-6 text-primary" />
+                  <CardTitle className="text-xl">אבטחה ופרטיות</CardTitle>
                 </div>
                 <CardDescription>ניהול המידע האישי והגנה על החשבון</CardDescription>
               </CardHeader>
@@ -298,7 +286,7 @@ export default function SettingsPage() {
       </main>
 
       <AlertDialog open={showDeleteAllAlert} onOpenChange={setShowDeleteAllAlert}>
-        <AlertDialogContent className="text-right rounded-3xl border-none shadow-2xl">
+        <AlertDialogContent className="text-right rounded-3xl border-none shadow-2xl" dir="rtl">
           <AlertDialogHeader className="items-center">
             <div className="h-20 w-20 rounded-full bg-destructive/10 flex items-center justify-center text-destructive mb-4">
               <AlertTriangle className="h-10 w-10" />
@@ -308,7 +296,7 @@ export default function SettingsPage() {
               פעולה זו תנקה את כל המינויים וההגדרות שלך לצמיתות. לא ניתן יהיה לשחזר את המידע.
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter className="flex-row-reverse sm:justify-center gap-3 mt-8">
+          <AlertDialogFooter className="flex flex-row-reverse justify-center gap-3 mt-8">
             <AlertDialogAction onClick={handleDeleteAll} className="bg-destructive hover:bg-destructive/90 rounded-full px-10 h-12 font-black">
               כן, מחק הכל
             </AlertDialogAction>
