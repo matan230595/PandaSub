@@ -7,13 +7,8 @@ import {
   Calendar as CalendarIcon, 
   PieChart, 
   Settings, 
-  PlusCircle, 
   Sparkles,
-  HelpCircle,
-  LogOut,
-  ChevronRight,
-  ChevronLeft,
-  PanelRight
+  LogOut
 } from "lucide-react"
 import {
   Sidebar,
@@ -32,13 +27,10 @@ import {
 } from "@/components/ui/sidebar"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { useToast } from "@/hooks/use-toast"
 
 export function AppSidebar() {
   const pathname = usePathname()
   const { setOpenMobile, state } = useSidebar()
-  const { toast } = useToast()
   const isCollapsed = state === "collapsed"
 
   const mainNav = [
@@ -48,8 +40,8 @@ export function AppSidebar() {
   ]
 
   const toolNav = [
-    { href: "#", label: "ניתוח הוצאות", icon: PieChart, action: () => toast({ title: "בקרוב!", description: "מודול ניתוח הוצאות מתקדם נמצא בפיתוח." }) },
-    { href: "#", label: "תובנות AI", icon: Sparkles, action: () => toast({ title: "תובנות AI", description: "ה-AI שלנו מתאמן על הנתונים שלך כרגע." }) },
+    { href: "/analysis", label: "ניתוח הוצאות", icon: PieChart },
+    { href: "/insights", label: "תובנות AI", icon: Sparkles },
   ]
 
   return (
@@ -100,15 +92,21 @@ export function AppSidebar() {
           <SidebarGroupContent>
             <SidebarMenu>
               {toolNav.map((item) => (
-                <SidebarMenuItem key={item.label}>
-                  <SidebarMenuButton 
-                    tooltip={item.label}
-                    onClick={item.action}
-                    className="w-full flex-row-reverse gap-3 rounded-xl h-12 px-4 hover:bg-primary/5 hover:text-primary transition-all"
-                  >
-                    <item.icon className="h-5 w-5 min-w-[20px] text-muted-foreground" />
-                    {!isCollapsed && <span className="flex-1 text-right">{item.label}</span>}
-                  </SidebarMenuButton>
+                <SidebarMenuItem key={item.href}>
+                  <Link href={item.href} onClick={() => setOpenMobile(false)}>
+                    <SidebarMenuButton 
+                      isActive={pathname === item.href}
+                      tooltip={item.label}
+                      className={`w-full flex-row-reverse gap-3 rounded-xl h-12 px-4 transition-all ${
+                        pathname === item.href 
+                        ? 'bg-primary/10 text-primary font-bold shadow-sm' 
+                        : 'hover:bg-primary/5 hover:text-primary'
+                      }`}
+                    >
+                      <item.icon className={`h-5 w-5 min-w-[20px] ${pathname === item.href ? 'text-primary' : 'text-muted-foreground'}`} />
+                      {!isCollapsed && <span className="flex-1 text-right">{item.label}</span>}
+                    </SidebarMenuButton>
+                  </Link>
                 </SidebarMenuItem>
               ))}
             </SidebarMenu>
@@ -119,14 +117,20 @@ export function AppSidebar() {
       <SidebarFooter className="p-4 border-t">
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton 
-              tooltip="הגדרות" 
-              onClick={() => toast({ title: "הגדרות", description: "עמוד ההגדרות יפתח בקרוב." })}
-              className="w-full flex-row-reverse gap-3 rounded-xl h-10 px-4 hover:bg-primary/5 transition-all text-muted-foreground hover:text-primary"
-            >
-              <Settings className="h-4 w-4 min-w-[16px]" />
-              {!isCollapsed && <span className="flex-1 text-right">הגדרות</span>}
-            </SidebarMenuButton>
+            <Link href="/settings" onClick={() => setOpenMobile(false)}>
+              <SidebarMenuButton 
+                isActive={pathname === "/settings"}
+                tooltip="הגדרות" 
+                className={`w-full flex-row-reverse gap-3 rounded-xl h-10 px-4 transition-all ${
+                  pathname === "/settings" 
+                  ? 'bg-primary/10 text-primary font-bold' 
+                  : 'text-muted-foreground hover:text-primary hover:bg-primary/5'
+                }`}
+              >
+                <Settings className="h-4 w-4 min-w-[16px]" />
+                {!isCollapsed && <span className="flex-1 text-right">הגדרות</span>}
+              </SidebarMenuButton>
+            </Link>
           </SidebarMenuItem>
           <SidebarMenuItem>
             <SidebarMenuButton tooltip="התנתקות" className="w-full flex-row-reverse gap-3 rounded-xl h-10 px-4 hover:bg-destructive/5 transition-all text-muted-foreground hover:text-destructive">
