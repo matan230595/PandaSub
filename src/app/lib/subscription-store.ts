@@ -17,9 +17,11 @@ export interface Subscription {
   amount: number;
   currency: string;
   renewalDate: string;
+  billingCycle: 'monthly' | 'yearly';
+  paymentMethod?: string;
+  reminderDays: number[]; // רשימת ימים להתראה מראש, למשל [10, 3, 0]
   trialEndsAt?: string;
   autoCancelDate?: string;
-  cancelLeadDays?: number; // ימים מראש להתראת ביטול יזום
   status: SubscriptionStatus;
   atRisk?: boolean;
   usageCount?: number;
@@ -54,10 +56,10 @@ export const STATUS_METADATA: Record<SubscriptionStatus, { label: string; color:
 };
 
 export const PRIORITY_CONFIG = {
-  critical: { label: 'קריטי (3 ימים)', color: '#F44336', days: 3 },
-  high: { label: 'גבוה (7 ימים)', color: '#FF9800', days: 7 },
-  medium: { label: 'בינוני (30 יום)', color: '#FFEB3B', days: 30 },
-  none: { label: 'ללא', color: '#E0E0E0', days: 999 }
+  critical: { label: 'קריטי', color: '#F44336' },
+  high: { label: 'גבוה', color: '#FF9800' },
+  medium: { label: 'בינוני', color: '#FFEB3B' },
+  none: { label: 'ללא', color: '#E0E0E0' }
 };
 
 export const SAMPLE_SUBSCRIPTIONS: Subscription[] = [
@@ -68,6 +70,9 @@ export const SAMPLE_SUBSCRIPTIONS: Subscription[] = [
     amount: 54.9,
     currency: '₪',
     renewalDate: '2025-06-15',
+    billingCycle: 'monthly',
+    paymentMethod: 'Visa 4242',
+    reminderDays: [7, 3, 1],
     status: 'active',
     usageCount: 12,
     lastUsed: '2024-05-20',
@@ -81,10 +86,11 @@ export const SAMPLE_SUBSCRIPTIONS: Subscription[] = [
     amount: 199,
     currency: '₪',
     renewalDate: '2025-05-28',
+    billingCycle: 'yearly',
+    paymentMethod: 'Mastercard 8899',
+    reminderDays: [14, 7, 0],
     status: 'trial',
     trialEndsAt: '2025-05-28',
-    autoCancelDate: '2025-05-27',
-    cancelLeadDays: 5,
     usageCount: 8,
     lastUsed: '2024-05-18',
     priority: 'critical'

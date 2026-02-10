@@ -1,4 +1,3 @@
-
 "use client"
 
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
@@ -76,9 +75,8 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
   const [settings, setSettings] = useState<UserSettings>(DEFAULT_SETTINGS);
   const audioContextRef = useRef<AudioContext | null>(null);
 
-  // טעינת מידע ראשוני
   useEffect(() => {
-    const saved = localStorage.getItem('panda_subs_v5');
+    const saved = localStorage.getItem('panda_subs_v6');
     const wizardState = localStorage.getItem('panda_wizard');
     const savedSettings = localStorage.getItem('panda_settings');
     
@@ -104,7 +102,6 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
     }
   }, []);
 
-  // שמירת הגדרות ויישום Dark Mode
   useEffect(() => {
     localStorage.setItem('panda_settings', JSON.stringify(settings));
     if (settings.darkMode) {
@@ -116,14 +113,13 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
 
   useEffect(() => {
     if (subscriptions.length > 0) {
-      localStorage.setItem('panda_subs_v5', encrypt(JSON.stringify(subscriptions)));
+      localStorage.setItem('panda_subs_v6', encrypt(JSON.stringify(subscriptions)));
     }
     checkReminders();
   }, [subscriptions]);
 
   const playNotificationSound = () => {
     if (!settings.soundEnabled) return;
-    
     try {
       if (!audioContextRef.current) {
         audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
@@ -131,17 +127,13 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
       const ctx = audioContextRef.current;
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
-      
       osc.type = 'sine';
       osc.frequency.setValueAtTime(880, ctx.currentTime);
       osc.frequency.exponentialRampToValueAtTime(440, ctx.currentTime + 0.1);
-      
       gain.gain.setValueAtTime(0.1, ctx.currentTime);
       gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1);
-      
       osc.connect(gain);
       gain.connect(ctx.destination);
-      
       osc.start();
       osc.stop(ctx.currentTime + 0.1);
     } catch (e) {
@@ -157,15 +149,17 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
       const renewalDate = new Date(sub.renewalDate);
       const diffDays = Math.ceil((renewalDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
       
-      if (diffDays <= 3 && diffDays >= 0) {
+      // בדיקת תזכורות מרובות
+      const activeReminders = sub.reminderDays || [3];
+      if (activeReminders.includes(diffDays)) {
         newNotifications.push({
-          id: `renewal-crit-${sub.id}-${today.getDate()}`,
-          title: `דחוף: חיוב עבור ${sub.name}`,
-          message: `המינוי מתחדש בעוד ${diffDays} ימים. סכום: ${sub.amount} ${sub.currency}`,
+          id: `renewal-rem-${sub.id}-${diffDays}-${today.getDate()}`,
+          title: diffDays === 0 ? `היום: חיוב עבור ${sub.name}` : `תזכורת: חיוב עבור ${sub.name} בעוד ${diffDays} ימים`,
+          message: `סכום לחיוב: ${sub.amount} ${sub.currency}. שיטת תשלום: ${sub.paymentMethod || 'לא צוינה'}`,
           date: today.toISOString(),
           read: false,
-          type: 'critical',
-          priority: 'critical'
+          type: diffDays <= 1 ? 'critical' : 'warning',
+          priority: diffDays <= 1 ? 'critical' : 'high'
         });
       }
 
@@ -176,7 +170,7 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
           newNotifications.push({
             id: `trial-end-${sub.id}-${today.getDate()}`,
             title: `תקופת ניסיון מסתיימת: ${sub.name}`,
-            message: `שים לב, תקופת הניסיון מסתיימת בעוד ${trialDiff} ימים.`,
+            message: `שים לב, תקופת הניסיון מסתיימת בעוד ${trialDiff} ימים. אל תשכח לבטל אם אינך מעוניין להמשיך.`,
             date: today.toISOString(),
             read: false,
             type: 'critical',
@@ -189,11 +183,7 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
     setNotifications(prev => {
       const existingIds = new Set(prev.map(n => n.id));
       const added = newNotifications.filter(n => !existingIds.has(n.id));
-      
-      if (added.length > 0) {
-        playNotificationSound();
-      }
-      
+      if (added.length > 0) playNotificationSound();
       return [...added, ...prev].slice(0, 30);
     });
   };
@@ -219,10 +209,7 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
     const subToCopy = subscriptions.find(s => s.id === id);
     if (subToCopy) {
       const { id: _, name, ...rest } = subToCopy;
-      addSubscription({
-        ...rest,
-        name: `${name} (עותק)`,
-      });
+      addSubscription({ ...rest, name: `${name} (עותק)` });
     }
   };
 
@@ -239,20 +226,11 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
   };
 
   const exportData = () => {
-    const headers = ['Name', 'Category', 'Amount', 'Currency', 'Renewal Date', 'Status', 'Priority', 'Username', 'Email'];
+    const headers = ['Name', 'Category', 'Amount', 'Currency', 'Renewal Date', 'Billing Cycle', 'Payment Method', 'Status'];
     const rows = subscriptions.map(s => [
-      s.name, 
-      s.category, 
-      s.amount, 
-      s.currency, 
-      s.renewalDate, 
-      s.status, 
-      s.priority || 'none',
-      s.credentials?.username || '',
-      s.credentials?.email || ''
+      s.name, s.category, s.amount, s.currency, s.renewalDate, s.billingCycle, s.paymentMethod || '', s.status
     ]);
-    const csvContent = "data:text/csv;charset=utf-8,\uFEFF" 
-      + [headers, ...rows].map(e => e.join(",")).join("\n");
+    const csvContent = "data:text/csv;charset=utf-8,\uFEFF" + [headers, ...rows].map(e => e.join(",")).join("\n");
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
     link.setAttribute("href", encodedUri);
@@ -268,19 +246,9 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
 
   return (
     <SubscriptionsContext.Provider value={{ 
-      subscriptions, 
-      addSubscription, 
-      updateSubscription, 
-      deleteSubscription,
-      duplicateSubscription,
-      markAsUsed,
-      isWizardComplete,
-      completeWizard,
-      exportData,
-      notifications,
-      markNotificationAsRead,
-      settings,
-      updateSettings
+      subscriptions, addSubscription, updateSubscription, deleteSubscription,
+      duplicateSubscription, markAsUsed, isWizardComplete, completeWizard,
+      exportData, notifications, markNotificationAsRead, settings, updateSettings
     }}>
       {children}
     </SubscriptionsContext.Provider>
@@ -289,8 +257,6 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
 
 export function useSubscriptions() {
   const context = useContext(SubscriptionsContext);
-  if (context === undefined) {
-    throw new Error('useSubscriptions must be used within a SubscriptionsProvider');
-  }
+  if (context === undefined) throw new Error('useSubscriptions must be used within a SubscriptionsProvider');
   return context;
 }

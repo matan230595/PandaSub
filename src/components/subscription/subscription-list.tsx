@@ -24,7 +24,11 @@ import {
   Copy,
   Filter,
   Check,
-  AlertTriangle
+  AlertTriangle,
+  CreditCard,
+  Bell,
+  RefreshCw,
+  MoreVertical
 } from "lucide-react"
 import { 
   DropdownMenu, 
@@ -45,14 +49,16 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
-import { CATEGORY_METADATA, STATUS_METADATA, Subscription, SubscriptionCategory, SubscriptionStatus } from "@/app/lib/subscription-store"
+import { CATEGORY_METADATA, STATUS_METADATA, Subscription, SubscriptionCategory, SubscriptionStatus, PRIORITY_CONFIG } from "@/app/lib/subscription-store"
 import { useSubscriptions } from "@/context/subscriptions-context"
 import { useToast } from "@/hooks/use-toast"
-import { Card, CardContent } from "@/components/ui/card"
+import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import { Input } from "@/components/ui/input"
 import { AddSubscriptionModal } from "./add-subscription-modal"
 import { cn } from "@/lib/utils"
+import { format } from "date-fns"
+import { he } from "date-fns/locale"
 
 type ColumnKey = 'name' | 'category' | 'amount' | 'renewal' | 'status' | 'actions';
 
@@ -60,7 +66,7 @@ export function SubscriptionList() {
   const { subscriptions, deleteSubscription, duplicateSubscription } = useSubscriptions()
   const { toast } = useToast()
   
-  const [viewMode, setViewMode] = React.useState<'table' | 'cards' | 'kanban'>('table')
+  const [viewMode, setViewMode] = React.useState<'table' | 'cards' | 'kanban'>('cards')
   const [selectedSub, setSelectedSub] = React.useState<Subscription | null>(null)
   const [isModalOpen, setIsModalOpen] = React.useState(false)
   const [searchTerm, setSearchTerm] = React.useState("")
@@ -86,33 +92,9 @@ export function SubscriptionList() {
     return matchesSearch && matchesCategory && matchesStatus;
   })
 
-  const handleEdit = (e: React.MouseEvent, sub: Subscription) => {
-    e.stopPropagation()
+  const handleEdit = (sub: Subscription) => {
     setSelectedSub(sub)
     setIsModalOpen(true)
-  }
-
-  const handleDeleteTrigger = (e: React.MouseEvent, id: string) => {
-    e.stopPropagation()
-    setDeleteConfirmId(id)
-  }
-
-  const handleConfirmDelete = () => {
-    if (deleteConfirmId) {
-      deleteSubscription(deleteConfirmId)
-      toast({ title: "המינוי נמחק", variant: "destructive" })
-      setDeleteConfirmId(null)
-    }
-  }
-
-  const handleDuplicate = (e: React.MouseEvent, id: string) => {
-    e.stopPropagation()
-    duplicateSubscription(id)
-    toast({ title: "המינוי שוכפל" })
-  }
-
-  const toggleColumn = (col: ColumnKey) => {
-    setVisibleColumns(prev => ({ ...prev, [col]: !prev[col] }))
   }
 
   const calculateDaysLeft = (date: string) => {
@@ -121,71 +103,182 @@ export function SubscriptionList() {
   }
 
   const renderCountdown = (sub: Subscription) => {
-    const targetDate = sub.status === 'trial' ? sub.trialEndsAt : sub.renewalDate
-    if (!targetDate) return null
-    const daysLeft = calculateDaysLeft(targetDate)
-    const colorClass = daysLeft <= 3 ? "text-destructive" : daysLeft <= 7 ? "text-orange-500" : "text-primary"
+    const daysLeft = calculateDaysLeft(sub.renewalDate)
+    if (daysLeft < 0) return <span className="text-destructive font-black">פג תוקף</span>
+    if (daysLeft === 0) return <span className="text-primary font-black animate-pulse">היום!</span>
+    
+    const colorClass = daysLeft <= 3 ? "text-destructive" : daysLeft <= 7 ? "text-orange-500" : "text-green-600"
     return (
-      <div className={cn("flex items-center gap-1 font-bold text-[10px] justify-end", colorClass)}>
+      <div className={cn("flex items-center gap-1 font-black text-xs", colorClass)}>
         <Clock className="h-3 w-3" />
-        {daysLeft < 0 ? "פג תוקף" : `עוד ${daysLeft} ימים`}
+        עוד {daysLeft} ימים
       </div>
     )
   }
 
+  const renderCards = () => (
+    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 animate-fade-in mb-12">
+      {filteredSubs.map(sub => (
+        <Card 
+          key={sub.id} 
+          className="group relative border-none card-shadow rounded-[2rem] bg-white overflow-hidden transition-all hover:scale-[1.02] cursor-pointer"
+          onClick={() => handleEdit(sub)}
+        >
+          {/* בורדר צבעוני עליון לפי קטגוריה */}
+          <div className="h-2 w-full" style={{ backgroundColor: CATEGORY_METADATA[sub.category].color }} />
+          
+          <CardContent className="p-6">
+            <div className="flex justify-between items-start mb-6 flex-row-reverse">
+              <div className="flex items-center gap-4 flex-row-reverse">
+                <div 
+                  className="h-14 w-14 rounded-2xl flex items-center justify-center text-3xl shadow-sm" 
+                  style={{ backgroundColor: `${CATEGORY_METADATA[sub.category].color}15` }}
+                >
+                  {CATEGORY_METADATA[sub.category].icon}
+                </div>
+                <div className="text-right">
+                  <h3 className="text-xl font-black text-foreground truncate max-w-[150px]">{sub.name}</h3>
+                  <div className="flex items-center gap-2 flex-row-reverse justify-start">
+                    <Badge variant="outline" className="text-[10px] px-2 border-primary/20 bg-primary/5 text-primary">
+                      {sub.billingCycle === 'monthly' ? 'חודשי' : 'שנתי'}
+                    </Badge>
+                    {sub.priority && sub.priority !== 'none' && (
+                      <div className="h-2 w-2 rounded-full" style={{ backgroundColor: PRIORITY_CONFIG[sub.priority].color }} />
+                    )}
+                  </div>
+                </div>
+              </div>
+              
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+                  <Button variant="ghost" size="icon" className="rounded-full h-10 w-10 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <MoreVertical className="h-5 w-5" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="rounded-2xl p-2 text-right">
+                  <DropdownMenuItem onClick={() => handleEdit(sub)} className="flex-row-reverse gap-2 rounded-xl">
+                    <Edit2 className="h-4 w-4" /> ערוך פרטים
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => duplicateSubscription(sub.id)} className="flex-row-reverse gap-2 rounded-xl">
+                    <Copy className="h-4 w-4" /> שכפל מינוי
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => { setDeleteConfirmId(sub.id); }} className="flex-row-reverse gap-2 rounded-xl text-destructive">
+                    <Trash2 className="h-4 w-4" /> מחק מינוי
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4 mb-6">
+              <div className="bg-muted/30 p-4 rounded-2xl text-right">
+                <div className="text-[10px] font-bold text-muted-foreground uppercase mb-1 flex items-center gap-1 flex-row-reverse">
+                   סכום חיוב <CreditCard className="h-3 w-3" />
+                </div>
+                <div className="text-2xl font-black text-primary">
+                  {sub.amount} <span className="text-sm font-bold">{sub.currency}</span>
+                </div>
+              </div>
+              <div className="bg-muted/30 p-4 rounded-2xl text-right">
+                <div className="text-[10px] font-bold text-muted-foreground uppercase mb-1 flex items-center gap-1 flex-row-reverse">
+                   חידוש קרוב <RefreshCw className="h-3 w-3" />
+                </div>
+                <div className="text-base font-bold text-foreground">
+                  {format(new Date(sub.renewalDate), 'd בMMMM', { locale: he })}
+                </div>
+                {renderCountdown(sub)}
+              </div>
+            </div>
+
+            {/* שדה אמצעי תשלום ותזכורות */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between flex-row-reverse text-xs">
+                <span className="font-bold text-muted-foreground">שיטת תשלום:</span>
+                <span className="font-black text-foreground">{sub.paymentMethod || 'לא הוגדר'}</span>
+              </div>
+              <div className="flex items-center justify-between flex-row-reverse text-xs">
+                <span className="font-bold text-muted-foreground">תזכורות פעילות:</span>
+                <div className="flex gap-1 flex-row-reverse">
+                  {(sub.reminderDays || [3]).map(day => (
+                    <Badge key={day} variant="secondary" className="text-[9px] px-1.5 rounded-md">
+                      {day === 0 ? 'היום' : `${day} ימים`}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </CardContent>
+          
+          <CardFooter className="bg-muted/10 border-t p-4 flex justify-between items-center flex-row-reverse">
+            <Badge 
+              style={{ backgroundColor: STATUS_METADATA[sub.status].color, color: 'white' }} 
+              className="rounded-full px-3 py-0.5 text-[10px] font-black border-none"
+            >
+              {STATUS_METADATA[sub.status].label}
+            </Badge>
+            <div className="text-[10px] font-bold text-muted-foreground italic">
+              עודכן לאחרונה: {sub.lastUsed ? format(new Date(sub.lastUsed), 'dd/MM/yy') : 'מעולם לא'}
+            </div>
+          </CardFooter>
+        </Card>
+      ))}
+    </div>
+  )
+
   const renderTable = () => (
-    <div className="rounded-xl border bg-white shadow-sm overflow-hidden animate-fade-in mb-8">
+    <div className="rounded-[2rem] border-none card-shadow bg-white overflow-hidden animate-fade-in mb-12">
       <Table>
-        <TableHeader>
-          <TableRow className="bg-muted/30">
-            {visibleColumns.name && <TableHead className="text-right py-3">מינוי</TableHead>}
-            {visibleColumns.category && <TableHead className="text-right py-3">קטגוריה</TableHead>}
-            {visibleColumns.amount && <TableHead className="text-right py-3">מחיר</TableHead>}
-            {visibleColumns.renewal && <TableHead className="text-right py-3">חידוש</TableHead>}
-            {visibleColumns.status && <TableHead className="text-right py-3">סטטוס</TableHead>}
-            {visibleColumns.actions && <TableHead className="text-center py-3">פעולות</TableHead>}
+        <TableHeader className="bg-muted/30 h-14">
+          <TableRow>
+            <TableHead className="text-right font-black">מינוי</TableHead>
+            <TableHead className="text-right font-black">קטגוריה</TableHead>
+            <TableHead className="text-right font-black">סכום</TableHead>
+            <TableHead className="text-right font-black">שיטת תשלום</TableHead>
+            <TableHead className="text-right font-black">חידוש</TableHead>
+            <TableHead className="text-right font-black">סטטוס</TableHead>
+            <TableHead className="text-center font-black">פעולות</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {filteredSubs.map((sub) => (
             <TableRow 
               key={sub.id} 
-              className="cursor-pointer hover:bg-primary/[0.02]"
-              onClick={() => { setSelectedSub(sub); setIsModalOpen(true); }}
+              className="cursor-pointer hover:bg-primary/[0.02] h-16 border-b border-border/50"
+              onClick={() => handleEdit(sub)}
             >
-              {visibleColumns.name && (
-                <TableCell className="py-2 text-right">
-                  <div className="flex items-center gap-2 flex-row-reverse justify-end">
-                    <span className="text-lg">{CATEGORY_METADATA[sub.category].icon}</span>
-                    <span className="font-bold text-sm text-right">{sub.name}</span>
+              <TableCell className="text-right">
+                <div className="flex items-center gap-3 flex-row-reverse justify-end">
+                  <span className="text-xl">{CATEGORY_METADATA[sub.category].icon}</span>
+                  <div className="flex flex-col text-right">
+                    <span className="font-black text-sm">{sub.name}</span>
+                    <span className="text-[10px] text-muted-foreground">{sub.billingCycle === 'monthly' ? 'חודשי' : 'שנתי'}</span>
                   </div>
-                </TableCell>
-              )}
-              {visibleColumns.category && (
-                <TableCell className="text-right">
-                  <Badge variant="outline" className="text-[10px] px-2 py-0" style={{ color: CATEGORY_METADATA[sub.category].color, borderColor: `${CATEGORY_METADATA[sub.category].color}30` }}>
-                    {CATEGORY_METADATA[sub.category].label}
-                  </Badge>
-                </TableCell>
-              )}
-              {visibleColumns.amount && <TableCell className="text-right font-bold text-sm">{sub.amount} {sub.currency}</TableCell>}
-              {visibleColumns.renewal && <TableCell className="text-right text-xs">{new Date(sub.renewalDate).toLocaleDateString('he-IL')}</TableCell>}
-              {visibleColumns.status && (
-                <TableCell className="text-right">
-                  <Badge className="text-[10px] px-2" style={{ backgroundColor: STATUS_METADATA[sub.status].color, color: 'white' }}>
-                    {STATUS_METADATA[sub.status].label}
-                  </Badge>
-                </TableCell>
-              )}
-              {visibleColumns.actions && (
-                <TableCell onClick={(e) => e.stopPropagation()} className="text-center">
-                  <div className="flex items-center justify-center gap-1">
-                    <Button variant="ghost" size="icon" className="h-7 w-7 rounded-full" onClick={(e) => handleEdit(e, sub)} title="ערוך"><Edit2 className="h-3.5 w-3.5" /></Button>
-                    <Button variant="ghost" size="icon" className="h-7 w-7 rounded-full" onClick={(e) => handleDuplicate(e, sub.id)} title="שכפל"><Copy className="h-3.5 w-3.5" /></Button>
-                    <Button variant="ghost" size="icon" className="h-7 w-7 rounded-full text-destructive" onClick={(e) => handleDeleteTrigger(e, sub.id)} title="מחק"><Trash2 className="h-3.5 w-3.5" /></Button>
-                  </div>
-                </TableCell>
-              )}
+                </div>
+              </TableCell>
+              <TableCell className="text-right">
+                <Badge variant="outline" className="text-[10px] px-2 py-0.5 rounded-lg border-primary/20 text-primary">
+                  {CATEGORY_METADATA[sub.category].label}
+                </Badge>
+              </TableCell>
+              <TableCell className="text-right font-black text-primary">{sub.amount} {sub.currency}</TableCell>
+              <TableCell className="text-right text-xs font-bold text-muted-foreground">{sub.paymentMethod || '-'}</TableCell>
+              <TableCell className="text-right">
+                <div className="flex flex-col text-right">
+                  <span className="text-xs font-bold">{new Date(sub.renewalDate).toLocaleDateString('he-IL')}</span>
+                  {renderCountdown(sub)}
+                </div>
+              </TableCell>
+              <TableCell className="text-right">
+                <Badge className="text-[10px] px-2 rounded-full border-none font-black" style={{ backgroundColor: STATUS_METADATA[sub.status].color, color: 'white' }}>
+                  {STATUS_METADATA[sub.status].label}
+                </Badge>
+              </TableCell>
+              <TableCell onClick={(e) => e.stopPropagation()} className="text-center">
+                <div className="flex items-center justify-center gap-2">
+                  <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl hover:bg-primary/5 hover:text-primary" onClick={() => handleEdit(sub)}><Edit2 className="h-4 w-4" /></Button>
+                  <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl hover:bg-destructive/5 hover:text-destructive text-destructive" onClick={() => setDeleteConfirmId(sub.id)}><Trash2 className="h-4 w-4" /></Button>
+                </div>
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>
@@ -193,88 +286,40 @@ export function SubscriptionList() {
     </div>
   )
 
-  const renderCards = () => (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 p-2 animate-fade-in mb-8">
-      {filteredSubs.map(sub => (
-        <Card 
-          key={sub.id} 
-          className="border-none shadow-md rounded-2xl overflow-hidden cursor-pointer bg-white group transition-all hover:-translate-y-1 relative"
-          onClick={() => { setSelectedSub(sub); setIsModalOpen(true); }}
-        >
-          <div className="absolute top-2 left-2 flex gap-1 z-10">
-            <Button variant="secondary" size="icon" className="h-7 w-7 rounded-full bg-white/80 shadow-sm opacity-60 group-hover:opacity-100" onClick={(e) => handleDuplicate(e, sub.id)}>
-              <Copy className="h-3.5 w-3.5" />
-            </Button>
-            <Button variant="secondary" size="icon" className="h-7 w-7 rounded-full bg-white/80 shadow-sm opacity-60 group-hover:opacity-100" onClick={(e) => handleEdit(e, sub)}>
-              <Edit2 className="h-3.5 w-3.5" />
-            </Button>
-            <Button variant="secondary" size="icon" className="h-7 w-7 rounded-full bg-white/80 shadow-sm text-destructive opacity-60 group-hover:opacity-100" onClick={(e) => handleDeleteTrigger(e, sub.id)}>
-              <Trash2 className="h-3.5 w-3.5" />
-            </Button>
-          </div>
-
-          <CardContent className="p-4">
-            <div className="flex justify-between items-start mb-3 flex-row-reverse">
-              <div className="flex items-center gap-2 flex-row-reverse">
-                <div className="h-8 w-8 rounded-lg flex items-center justify-center text-lg" style={{ backgroundColor: `${CATEGORY_METADATA[sub.category].color}15` }}>
-                  {CATEGORY_METADATA[sub.category].icon}
-                </div>
-                <div className="text-right">
-                  <h3 className="font-bold text-sm truncate text-right">{sub.name}</h3>
-                  <div className="text-[10px] font-bold text-right" style={{ color: CATEGORY_METADATA[sub.category].color }}>{CATEGORY_METADATA[sub.category].label}</div>
-                </div>
-              </div>
-              <Badge style={{ backgroundColor: STATUS_METADATA[sub.status].color, color: 'white' }} className="text-[9px] px-1.5 h-4">
-                {STATUS_METADATA[sub.status].label}
-              </Badge>
-            </div>
-            
-            <div className="flex justify-between items-end mb-3 flex-row-reverse">
-              <div className="text-right">
-                <span className="text-xl font-black">{sub.amount}</span>
-                <span className="text-[10px] font-bold text-muted-foreground mr-0.5">{sub.currency}</span>
-              </div>
-              <div className="text-left">
-                <p className="text-[10px] font-bold text-primary">{new Date(sub.renewalDate).toLocaleDateString('he-IL')}</p>
-              </div>
-            </div>
-
-            <div className="space-y-1">
-               <div className="flex justify-between items-center flex-row-reverse">
-                <span className="text-[9px] font-bold text-muted-foreground">חידוש:</span>
-                {renderCountdown(sub)}
-              </div>
-              {sub.status === 'trial' && (
-                <Progress value={70} className="h-1 bg-muted/30" />
-              )}
-            </div>
-          </CardContent>
-        </Card>
-      ))}
-    </div>
-  )
-
   const renderKanban = () => {
-    const statuses: (keyof typeof STATUS_METADATA)[] = ['trial', 'active', 'frozen', 'cancelled']
+    const statuses: SubscriptionStatus[] = ['trial', 'active', 'frozen', 'cancelled']
     return (
-      <div className="flex gap-4 overflow-x-auto pb-4 flex-row-reverse">
+      <div className="flex gap-6 overflow-x-auto pb-8 flex-row-reverse snap-x">
         {statuses.map(status => {
           const items = filteredSubs.filter(s => s.status === status)
           return (
-            <div key={status} className="flex-shrink-0 w-56 flex flex-col gap-2">
-              <div className="flex items-center justify-between px-2 flex-row-reverse">
-                <h3 className="font-bold text-xs">{STATUS_METADATA[status].label} ({items.length})</h3>
+            <div key={status} className="flex-shrink-0 w-80 flex flex-col gap-4 snap-center">
+              <div className="flex items-center justify-between px-4 py-3 bg-white rounded-2xl shadow-sm border-r-4" style={{ borderRightColor: STATUS_METADATA[status].color }}>
+                <h3 className="font-black text-sm">{STATUS_METADATA[status].label}</h3>
+                <Badge variant="secondary" className="rounded-full bg-muted/50">{items.length}</Badge>
               </div>
-              <div className="bg-muted/10 rounded-xl p-2 space-y-2 min-h-[400px]">
+              <div className="bg-muted/20 rounded-[2rem] p-3 space-y-4 min-h-[600px] border-2 border-dashed border-muted">
                 {items.map(sub => (
-                  <Card key={sub.id} className="p-2.5 rounded-lg bg-white shadow-sm cursor-pointer" onClick={() => { setSelectedSub(sub); setIsModalOpen(true); }}>
-                    <div className="flex justify-between items-center flex-row-reverse mb-1">
-                      <span className="font-bold text-xs truncate text-right">{sub.name}</span>
-                      <span className="text-[10px]">{sub.amount}₪</span>
+                  <Card key={sub.id} className="p-4 rounded-2xl bg-white shadow-md border-none cursor-pointer transition-all hover:scale-[1.03]" onClick={() => handleEdit(sub)}>
+                    <div className="flex justify-between items-center flex-row-reverse mb-3">
+                      <div className="flex items-center gap-2 flex-row-reverse">
+                         <span className="text-lg">{CATEGORY_METADATA[sub.category].icon}</span>
+                         <span className="font-black text-xs truncate max-w-[100px] text-right">{sub.name}</span>
+                      </div>
+                      <span className="text-xs font-black text-primary">{sub.amount}₪</span>
                     </div>
-                    {renderCountdown(sub)}
+                    <div className="flex justify-between items-center flex-row-reverse">
+                       <span className="text-[10px] text-muted-foreground font-bold">{sub.paymentMethod || 'ללא שיטה'}</span>
+                       {renderCountdown(sub)}
+                    </div>
                   </Card>
                 ))}
+                {items.length === 0 && (
+                  <div className="flex flex-col items-center justify-center py-20 text-muted-foreground/30 italic text-center">
+                    <div className="text-5xl mb-2 opacity-20">📭</div>
+                    אין מינויים בסטטוס זה
+                  </div>
+                )}
               </div>
             </div>
           )
@@ -284,31 +329,33 @@ export function SubscriptionList() {
   }
 
   return (
-    <div className="space-y-4">
-      <div className="bg-white p-2.5 rounded-xl shadow-sm border flex flex-col md:flex-row gap-2 items-center">
+    <div className="space-y-6">
+      <div className="bg-white p-4 rounded-[2rem] shadow-lg border border-border/50 flex flex-col lg:flex-row gap-4 items-center">
         <div className="relative flex-1 w-full">
-          <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Search className="absolute right-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
           <Input 
-            placeholder="חיפוש..." 
+            placeholder="חפש מינוי, קטגוריה או שיטת תשלום..." 
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pr-9 h-9 text-xs text-right bg-muted/30 border-none" 
+            className="pr-12 h-12 text-base text-right bg-muted/30 border-none rounded-2xl focus:ring-primary/20" 
           />
         </div>
         
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3 w-full lg:w-auto overflow-x-auto pb-2 lg:pb-0 scrollbar-hide">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="sm" className="h-9 gap-1 text-[11px] font-bold">
-                <Filter className="h-3 w-3" /> קטגוריה
+              <Button variant="outline" className="rounded-2xl h-12 gap-2 border-primary/10 bg-primary/5 text-primary font-bold px-6">
+                <Filter className="h-4 w-4" /> 
+                {categoryFilter === 'all' ? 'כל הקטגוריות' : CATEGORY_METADATA[categoryFilter].label}
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="text-right">
-              <DropdownMenuItem onClick={() => setCategoryFilter('all')} className="text-right">הכל</DropdownMenuItem>
+            <DropdownMenuContent align="end" className="text-right rounded-2xl p-2 w-56">
+              <DropdownMenuItem onClick={() => setCategoryFilter('all')} className="text-right rounded-xl">כל הקטגוריות</DropdownMenuItem>
+              <DropdownMenuSeparator />
               {Object.entries(CATEGORY_METADATA).map(([key, val]) => (
-                <DropdownMenuItem key={key} onClick={() => setCategoryFilter(key as any)} className="text-right">
-                  {categoryFilter === key && <Check className="h-3 w-3 ml-1" />}
-                  {val.label}
+                <DropdownMenuItem key={key} onClick={() => setCategoryFilter(key as any)} className="text-right flex-row-reverse gap-3 rounded-xl">
+                  {val.icon} {val.label}
+                  {categoryFilter === key && <Check className="h-4 w-4 mr-auto text-primary" />}
                 </DropdownMenuItem>
               ))}
             </DropdownMenuContent>
@@ -316,43 +363,33 @@ export function SubscriptionList() {
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="sm" className="h-9 gap-1 text-[11px] font-bold">
-                <Filter className="h-3 w-3" /> סטטוס
+              <Button variant="outline" className="rounded-2xl h-12 gap-2 border-primary/10 bg-primary/5 text-primary font-bold px-6">
+                <Filter className="h-4 w-4" /> 
+                {statusFilter === 'all' ? 'כל הסטטוסים' : STATUS_METADATA[statusFilter].label}
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="text-right">
-              <DropdownMenuItem onClick={() => setStatusFilter('all')} className="text-right">הכל</DropdownMenuItem>
+            <DropdownMenuContent align="end" className="text-right rounded-2xl p-2 w-48">
+              <DropdownMenuItem onClick={() => setStatusFilter('all')} className="text-right rounded-xl">כל הסטטוסים</DropdownMenuItem>
+              <DropdownMenuSeparator />
               {Object.entries(STATUS_METADATA).map(([key, val]) => (
-                <DropdownMenuItem key={key} onClick={() => setStatusFilter(key as any)} className="text-right">
-                  {statusFilter === key && <Check className="h-3 w-3 ml-1" />}
+                <DropdownMenuItem key={key} onClick={() => setStatusFilter(key as any)} className="text-right flex-row-reverse gap-3 rounded-xl">
+                  <div className="h-2 w-2 rounded-full" style={{ backgroundColor: val.color }} />
                   {val.label}
+                  {statusFilter === key && <Check className="h-4 w-4 mr-auto text-primary" />}
                 </DropdownMenuItem>
               ))}
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <div className="flex p-1 bg-muted/50 rounded-lg h-9">
-            <Button variant={viewMode === 'table' ? 'default' : 'ghost'} size="sm" onClick={() => setViewMode('table')} className="h-7 px-2"><ListIcon className="h-3.5 w-3.5" /></Button>
-            <Button variant={viewMode === 'cards' ? 'default' : 'ghost'} size="sm" onClick={() => setViewMode('cards')} className="h-7 px-2"><LayoutGrid className="h-3.5 w-3.5" /></Button>
-            <Button variant={viewMode === 'kanban' ? 'default' : 'ghost'} size="sm" onClick={() => setViewMode('kanban')} className="h-7 px-2"><Columns className="h-3.5 w-3.5" /></Button>
+          <div className="flex p-1.5 bg-muted/50 rounded-2xl h-12">
+            <Button variant={viewMode === 'table' ? 'default' : 'ghost'} size="icon" onClick={() => setViewMode('table')} className="h-9 w-9 rounded-xl"><ListIcon className="h-4 w-4" /></Button>
+            <Button variant={viewMode === 'cards' ? 'default' : 'ghost'} size="icon" onClick={() => setViewMode('cards')} className="h-9 w-9 rounded-xl"><LayoutGrid className="h-4 w-4" /></Button>
+            <Button variant={viewMode === 'kanban' ? 'default' : 'ghost'} size="icon" onClick={() => setViewMode('kanban')} className="h-9 w-9 rounded-xl"><Columns className="h-4 w-4" /></Button>
           </div>
-
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="icon" className="h-9 w-9"><Settings2 className="h-4 w-4" /></Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="text-right">
-              {Object.keys(visibleColumns).map(col => (
-                <DropdownMenuCheckboxItem key={col} checked={visibleColumns[col as ColumnKey]} onCheckedChange={() => toggleColumn(col as ColumnKey)} className="text-right flex-row-reverse">
-                  {col === 'name' ? 'שם' : col === 'category' ? 'קטגוריה' : col === 'amount' ? 'סכום' : col === 'renewal' ? 'חידוש' : col === 'status' ? 'סטטוס' : 'פעולות'}
-                </DropdownMenuCheckboxItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
         </div>
       </div>
 
-      <div className="min-h-[300px]">
+      <div className="min-h-[400px]">
         {viewMode === 'table' && renderTable()}
         {viewMode === 'cards' && renderCards()}
         {viewMode === 'kanban' && renderKanban()}
@@ -365,21 +402,21 @@ export function SubscriptionList() {
       />
 
       <AlertDialog open={!!deleteConfirmId} onOpenChange={(open) => !open && setDeleteConfirmId(null)}>
-        <AlertDialogContent className="text-right rounded-3xl border-none shadow-2xl">
+        <AlertDialogContent className="text-right rounded-[2.5rem] border-none shadow-2xl p-10" dir="rtl">
           <AlertDialogHeader className="items-center">
-            <div className="h-16 w-16 rounded-full bg-destructive/10 flex items-center justify-center text-destructive mb-4">
-              <AlertTriangle className="h-8 w-8" />
+            <div className="h-24 w-24 rounded-full bg-destructive/10 flex items-center justify-center text-destructive mb-6 animate-pulse">
+              <AlertTriangle className="h-12 w-12" />
             </div>
-            <AlertDialogTitle className="text-2xl font-bold">האם אתה בטוח?</AlertDialogTitle>
-            <AlertDialogDescription className="text-center text-muted-foreground text-base">
-              פעולה זו תמחוק את המינוי לצמיתות. לא ניתן יהיה לשחזר את פרטי ההתחברות וההערות שנשמרו.
+            <AlertDialogTitle className="text-3xl font-black">מחיקת מינוי סופית?</AlertDialogTitle>
+            <AlertDialogDescription className="text-center text-muted-foreground text-lg leading-relaxed">
+              פעולה זו לא ניתנת לביטול. כל ההיסטוריה והתזכורות של המינוי יימחקו לנצח.
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter className="sm:justify-center flex-row-reverse gap-3 mt-6">
-            <AlertDialogAction onClick={handleConfirmDelete} className="bg-destructive hover:bg-destructive/90 rounded-full px-8 h-12 font-bold shadow-lg shadow-destructive/20">
+          <AlertDialogFooter className="sm:justify-center flex-row-reverse gap-4 mt-10">
+            <AlertDialogAction onClick={() => { if (deleteConfirmId) deleteSubscription(deleteConfirmId); setDeleteConfirmId(null); toast({ title: "המינוי נמחק בהצלחה", variant: "destructive" }); }} className="bg-destructive hover:bg-destructive/90 rounded-full px-12 h-14 text-lg font-black shadow-xl shadow-destructive/20">
               כן, מחק מינוי
             </AlertDialogAction>
-            <AlertDialogCancel className="rounded-full h-12 px-8 font-medium">ביטול</AlertDialogCancel>
+            <AlertDialogCancel className="rounded-full h-14 px-12 text-lg font-bold">ביטול</AlertDialogCancel>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
