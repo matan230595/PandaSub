@@ -59,7 +59,6 @@ const formSchema = z.object({
   reminderDays: z.array(z.number()),
   status: z.string(),
   priority: z.string(),
-  trialEndsAt: z.string().optional(),
   notes: z.string().optional(),
   username: z.string().optional(),
   email: z.string().optional(),
@@ -101,7 +100,6 @@ export function AddSubscriptionModal({ open, onOpenChange, subscription }: AddSu
       reminderDays: [3],
       status: "active",
       priority: "none",
-      trialEndsAt: "",
       notes: "",
       username: "",
       email: "",
@@ -122,7 +120,6 @@ export function AddSubscriptionModal({ open, onOpenChange, subscription }: AddSu
         reminderDays: subscription.reminderDays || [3],
         status: subscription.status,
         priority: subscription.priority || "none",
-        trialEndsAt: subscription.trialEndsAt || "",
         notes: subscription.notes || "",
         username: subscription.credentials?.username || "",
         email: subscription.credentials?.email || "",
@@ -140,7 +137,6 @@ export function AddSubscriptionModal({ open, onOpenChange, subscription }: AddSu
         reminderDays: [3],
         status: "active",
         priority: "none",
-        trialEndsAt: "",
         notes: "",
         username: "",
         email: "",
@@ -162,7 +158,6 @@ export function AddSubscriptionModal({ open, onOpenChange, subscription }: AddSu
       reminderDays: values.reminderDays,
       status: values.status as SubscriptionStatus,
       priority: values.priority as any,
-      trialEndsAt: values.trialEndsAt || undefined,
       notes: values.notes || undefined,
       credentials: {
         username: values.username,
@@ -359,7 +354,7 @@ export function AddSubscriptionModal({ open, onOpenChange, subscription }: AddSu
                         <Bell className="h-5 w-5 text-primary" />
                         <FormLabel className="text-lg font-black">התראות ותזכורות</FormLabel>
                       </div>
-                      <FormDescription className="mb-6">בחר מתי תרצה ש-PandaSub יזכיר לך על החיוב הקרוב:</FormDescription>
+                      <FormDescription className="mb-6">בחר מתי תרצה ש-PandaSub יזכיר לך על החיוב הקרוב (ניתן לבחור יותר מאחד):</FormDescription>
                       
                       <FormField
                         control={form.control}

@@ -19,9 +19,8 @@ export interface Subscription {
   renewalDate: string;
   billingCycle: 'monthly' | 'yearly';
   paymentMethod?: string;
-  reminderDays: number[]; // Array of days to notify in advance, e.g., [10, 3, 0]
+  reminderDays: number[]; // Array of days to notify in advance, e.g., [14, 7, 3, 0]
   trialEndsAt?: string;
-  autoCancelDate?: string;
   status: SubscriptionStatus;
   atRisk?: boolean;
   usageCount?: number;
@@ -103,7 +102,6 @@ export const SAMPLE_SUBSCRIPTIONS: Subscription[] = [
     paymentMethod: 'Mastercard 8899',
     reminderDays: [14, 7, 0],
     status: 'trial',
-    trialEndsAt: '2025-05-28',
     usageCount: 8,
     lastUsed: '2024-05-18',
     priority: 'critical'
