@@ -96,8 +96,8 @@ export default function SettingsPage() {
           <div className="lg:col-span-9 space-y-6">
             <Card className="card-shadow border-none rounded-3xl overflow-hidden">
               <CardHeader className="border-b bg-muted/20 p-6">
-                <CardTitle className="text-xl">פרופיל משתמש</CardTitle>
-                <CardDescription>כיצד הפרטים שלך יופיעו במערכת</CardDescription>
+                <CardTitle className="text-xl text-right">פרופיל משתמש</CardTitle>
+                <CardDescription className="text-right">כיצד הפרטים שלך יופיעו במערכת</CardDescription>
               </CardHeader>
               <CardContent className="p-8 space-y-6">
                 <div className="flex flex-col md:flex-row gap-8 items-center flex-row-reverse">
@@ -134,8 +134,8 @@ export default function SettingsPage() {
 
             <Card className="card-shadow border-none rounded-3xl overflow-hidden">
               <CardHeader className="border-b bg-muted/20 p-6">
-                <CardTitle className="text-xl">העדפות מערכת</CardTitle>
-                <CardDescription>התאמה אישית של חוויית המשתמש</CardDescription>
+                <CardTitle className="text-xl text-right">העדפות מערכת</CardTitle>
+                <CardDescription className="text-right">התאמה אישית של חוויית המשתמש</CardDescription>
               </CardHeader>
               <CardContent className="p-8 space-y-8">
                 <div className="flex items-center justify-between flex-row-reverse group">
@@ -169,7 +169,7 @@ export default function SettingsPage() {
                     className="bg-muted/50 rounded-xl px-4 py-3 text-sm font-bold border-none outline-none focus:ring-2 focus:ring-primary/20 cursor-pointer"
                   >
                     <option value="₪ - שקל חדש">₪ - שקל חדש</option>
-                    <option value='$ - דולר ארה"ב'>$ - דולר ארה"ב</option>
+                    <option value="$ - דולר ארה&quot;ב">$ - דולר ארה&quot;ב</option>
                     <option value="€ - אירו">€ - אירו</option>
                   </select>
                 </div>
@@ -178,11 +178,11 @@ export default function SettingsPage() {
 
             <Card className="card-shadow border-none rounded-3xl border-destructive/20 overflow-hidden">
               <CardHeader className="border-b bg-destructive/5 p-6">
-                <CardTitle className="text-xl text-destructive flex items-center gap-2 flex-row-reverse">
+                <CardTitle className="text-xl text-destructive flex items-center gap-2 flex-row-reverse text-right">
                   <AlertTriangle className="h-5 w-5" />
                   אזור רגיש
                 </CardTitle>
-                <CardDescription>ניהול מידע ומחיקת חשבון</CardDescription>
+                <CardDescription className="text-right">ניהול מידע ומחיקת חשבון</CardDescription>
               </CardHeader>
               <CardContent className="p-8 space-y-6">
                 <div className="flex flex-col md:flex-row gap-4 flex-row-reverse">
@@ -219,7 +219,7 @@ export default function SettingsPage() {
             <div className="h-20 w-20 rounded-full bg-destructive/10 flex items-center justify-center text-destructive mb-4 animate-pulse">
               <AlertTriangle className="h-10 w-10" />
             </div>
-            <AlertDialogTitle className="text-2xl font-black">מחיקת כל הנתונים?</AlertDialogTitle>
+            <AlertDialogTitle className="text-2xl font-black text-center">מחיקת כל הנתונים?</AlertDialogTitle>
             <AlertDialogDescription className="text-center text-muted-foreground text-lg mt-2">
               פעולה זו תנקה את כל המינויים, ההגדרות והיסטוריית החיובים שלך. **לא ניתן לשחזר פעולה זו.**
             </AlertDialogDescription>
@@ -236,7 +236,7 @@ export default function SettingsPage() {
   )
 }
 
-function SettingsNavItem({ icon, label, active }: any) {
+function SettingsNavItem({ icon, label, active }: { icon: React.ReactNode, label: string, active?: boolean }) {
   return (
     <button className={`w-full flex items-center gap-4 px-6 py-4 rounded-2xl transition-all flex-row-reverse group ${active ? 'bg-primary text-white shadow-xl shadow-primary/20' : 'text-muted-foreground hover:bg-primary/5 hover:text-primary'}`}>
       <span className="flex-1 text-right font-black text-sm tracking-tight">{label}</span>
