@@ -22,6 +22,7 @@ export interface Subscription {
   atRisk?: boolean;
   usageCount?: number;
   lastUsed?: string;
+  priority?: 'critical' | 'high' | 'medium' | 'none';
 }
 
 export const CATEGORY_METADATA: Record<SubscriptionCategory, { label: string; icon: string; color: string }> = {
@@ -41,6 +42,13 @@ export const STATUS_METADATA: Record<SubscriptionStatus, { label: string; color:
   cancelled: { label: 'בוטל', color: '#9E9E9E' },
   frozen: { label: 'מוקפא', color: '#03A9F4' },
   not_in_use: { label: 'לא בשימוש', color: '#FFC107' },
+};
+
+export const PRIORITY_COLORS = {
+  critical: '#F44336', // 3 days
+  high: '#FF9800',     // 7 days
+  medium: '#FFEB3B',   // 30 days
+  none: '#E0E0E0'
 };
 
 export const SAMPLE_SUBSCRIPTIONS: Subscription[] = [
@@ -88,17 +96,5 @@ export const SAMPLE_SUBSCRIPTIONS: Subscription[] = [
     status: 'active',
     usageCount: 8,
     lastUsed: '2024-05-18',
-  },
-  {
-    id: '5',
-    name: 'YouTube Premium',
-    category: 'streaming',
-    amount: 31.9,
-    currency: '₪',
-    trialEndsAt: '2025-06-05',
-    renewalDate: '2025-06-05',
-    status: 'trial',
-    usageCount: 20,
-    lastUsed: '2024-05-21',
   },
 ];

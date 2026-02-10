@@ -1,0 +1,16 @@
+{
+  "placeholderImages": [
+    {
+      "id": "welcome-panda",
+      "description": "Friendly Panda Illustration",
+      "imageUrl": "https://picsum.photos/seed/panda/600/400",
+      "imageHint": "friendly panda"
+    },
+    {
+      "id": "financial-success",
+      "description": "Savings growth",
+      "imageUrl": "https://picsum.photos/seed/savings/600/400",
+      "imageHint": "savings growth"
+    }
+  ]
+}
