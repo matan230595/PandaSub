@@ -1,4 +1,3 @@
-
 "use client"
 
 import * as React from "react"
@@ -36,7 +35,7 @@ import { useSubscriptions } from "@/context/subscriptions-context"
 import { CATEGORY_METADATA, SubscriptionCategory, SubscriptionStatus, PRIORITY_CONFIG, Subscription } from "@/app/lib/subscription-store"
 import { useToast } from "@/hooks/use-toast"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { User, Key, Mail, Phone, AlertCircle, Copy, Trash2, Save, X } from "lucide-react"
+import { User, Key, Mail, Phone, Copy, Trash2, Save, FileText } from "lucide-react"
 
 const formSchema = z.object({
   name: z.string().min(2, { message: "שם המינוי חייב להכיל לפחות 2 תווים" }),
@@ -58,7 +57,7 @@ const formSchema = z.object({
 interface AddSubscriptionModalProps {
   open: boolean
   onOpenChange: (open: boolean) => void
-  subscription?: Subscription | null // null for Add mode
+  subscription?: Subscription | null
 }
 
 export function AddSubscriptionModal({ open, onOpenChange, subscription }: AddSubscriptionModalProps) {
@@ -68,23 +67,62 @@ export function AddSubscriptionModal({ open, onOpenChange, subscription }: AddSu
   
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    values: {
-      name: subscription?.name || "",
-      category: subscription?.category || "streaming",
-      amount: subscription?.amount || 0,
-      renewalDate: subscription?.renewalDate || new Date().toISOString().split('T')[0],
-      status: subscription?.status || "active",
-      priority: subscription?.priority || "none",
-      trialEndsAt: subscription?.trialEndsAt || "",
-      autoCancelDate: subscription?.autoCancelDate || "",
-      cancelLeadDays: subscription?.cancelLeadDays || 3,
-      notes: subscription?.notes || "",
-      username: subscription?.credentials?.username || "",
-      email: subscription?.credentials?.email || "",
-      password: subscription?.credentials?.password || "",
-      phone: subscription?.credentials?.phone || "",
+    defaultValues: {
+      name: "",
+      category: "streaming",
+      amount: 0,
+      renewalDate: new Date().toISOString().split('T')[0],
+      status: "active",
+      priority: "none",
+      trialEndsAt: "",
+      autoCancelDate: "",
+      cancelLeadDays: 3,
+      notes: "",
+      username: "",
+      email: "",
+      password: "",
+      phone: "",
     },
   })
+
+  // טעינת נתונים בעת עריכה
+  React.useEffect(() => {
+    if (open && subscription) {
+      form.reset({
+        name: subscription.name,
+        category: subscription.category,
+        amount: subscription.amount,
+        renewalDate: subscription.renewalDate,
+        status: subscription.status,
+        priority: subscription.priority || "none",
+        trialEndsAt: subscription.trialEndsAt || "",
+        autoCancelDate: subscription.autoCancelDate || "",
+        cancelLeadDays: subscription.cancelLeadDays || 3,
+        notes: subscription.notes || "",
+        username: subscription.credentials?.username || "",
+        email: subscription.credentials?.email || "",
+        password: subscription.credentials?.password || "",
+        phone: subscription.credentials?.phone || "",
+      })
+    } else if (open && !subscription) {
+      form.reset({
+        name: "",
+        category: "streaming",
+        amount: 0,
+        renewalDate: new Date().toISOString().split('T')[0],
+        status: "active",
+        priority: "none",
+        trialEndsAt: "",
+        autoCancelDate: "",
+        cancelLeadDays: 3,
+        notes: "",
+        username: "",
+        email: "",
+        password: "",
+        phone: "",
+      })
+    }
+  }, [open, subscription, form])
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     const data = {
@@ -116,7 +154,6 @@ export function AddSubscriptionModal({ open, onOpenChange, subscription }: AddSu
     }
     
     onOpenChange(false)
-    form.reset()
   }
 
   const handleDuplicate = () => {
@@ -137,22 +174,22 @@ export function AddSubscriptionModal({ open, onOpenChange, subscription }: AddSu
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[650px] text-right p-0 overflow-hidden border-none card-shadow">
+      <DialogContent className="sm:max-w-[600px] text-right p-0 overflow-hidden border-none shadow-2xl">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
-            <div className="p-6 bg-primary/5 border-b flex items-center justify-between flex-row-reverse">
-              <DialogHeader className="p-0">
+            <div className="p-6 bg-primary/5 border-b flex items-center justify-between">
+              <div className="text-right">
                 <DialogTitle className="text-xl font-bold">{isEdit ? "פרטי מינוי" : "הוסף מינוי חדש"}</DialogTitle>
-                <DialogDescription className="text-right">
-                  {isEdit ? "נהל את פרטי המינוי, התראות ופרטי גישה" : "הזן את פרטי המינוי כדי להתחיל לעקוב"}
+                <DialogDescription className="text-right mt-1">
+                  {isEdit ? "ניהול הגדרות, התראות ופרטי גישה" : "הזן את פרטי המינוי כדי להתחיל לעקוב"}
                 </DialogDescription>
-              </DialogHeader>
+              </div>
               {isEdit && (
                 <div className="flex items-center gap-2">
-                  <Button type="button" variant="outline" size="icon" className="rounded-full h-9 w-9" onClick={handleDuplicate} title="שכפל מינוי">
+                  <Button type="button" variant="outline" size="icon" className="rounded-full h-9 w-9" onClick={handleDuplicate}>
                     <Copy className="h-4 w-4" />
                   </Button>
-                  <Button type="button" variant="outline" size="icon" className="rounded-full h-9 w-9 text-destructive hover:bg-destructive/10" onClick={handleDelete} title="מחק מינוי">
+                  <Button type="button" variant="outline" size="icon" className="rounded-full h-9 w-9 text-destructive hover:bg-destructive/10" onClick={handleDelete}>
                     <Trash2 className="h-4 w-4" />
                   </Button>
                 </div>
@@ -161,13 +198,13 @@ export function AddSubscriptionModal({ open, onOpenChange, subscription }: AddSu
 
             <div className="p-6">
               <Tabs defaultValue="basic" className="w-full">
-                <TabsList className="grid w-full grid-cols-3 mb-6 bg-muted/50 p-1 rounded-xl">
+                <TabsList className="grid w-full grid-cols-3 mb-6 bg-muted/50 p-1 rounded-xl h-12">
                   <TabsTrigger value="basic" className="rounded-lg">בסיסי</TabsTrigger>
                   <TabsTrigger value="advanced" className="rounded-lg">ניהול חכם</TabsTrigger>
                   <TabsTrigger value="credentials" className="rounded-lg">התחברות</TabsTrigger>
                 </TabsList>
                 
-                <TabsContent value="basic" className="space-y-4 animate-fade-in">
+                <TabsContent value="basic" className="space-y-4">
                   <FormField
                     control={form.control}
                     name="name"
@@ -175,7 +212,7 @@ export function AddSubscriptionModal({ open, onOpenChange, subscription }: AddSu
                       <FormItem>
                         <FormLabel>שם המינוי</FormLabel>
                         <FormControl>
-                          <Input placeholder="לדוגמה: Netflix" className="rounded-xl h-12" {...field} />
+                          <Input placeholder="לדוגמה: Netflix" className="rounded-xl h-11" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -189,9 +226,8 @@ export function AddSubscriptionModal({ open, onOpenChange, subscription }: AddSu
                         <FormItem>
                           <FormLabel>סכום (₪)</FormLabel>
                           <FormControl>
-                            <Input type="number" step="0.01" className="rounded-xl h-12" {...field} />
+                            <Input type="number" step="0.01" className="rounded-xl h-11" {...field} />
                           </FormControl>
-                          <FormMessage />
                         </FormItem>
                       )}
                     />
@@ -202,9 +238,8 @@ export function AddSubscriptionModal({ open, onOpenChange, subscription }: AddSu
                         <FormItem>
                           <FormLabel>תאריך חידוש</FormLabel>
                           <FormControl>
-                            <Input type="date" className="rounded-xl h-12" {...field} />
+                            <Input type="date" className="rounded-xl h-11" {...field} />
                           </FormControl>
-                          <FormMessage />
                         </FormItem>
                       )}
                     />
@@ -215,15 +250,15 @@ export function AddSubscriptionModal({ open, onOpenChange, subscription }: AddSu
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>קטגוריה</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <Select onValueChange={field.onChange} value={field.value}>
                           <FormControl>
-                            <SelectTrigger className="rounded-xl h-12">
+                            <SelectTrigger className="rounded-xl h-11">
                               <SelectValue placeholder="בחר קטגוריה" />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent className="rounded-xl">
                             {Object.entries(CATEGORY_METADATA).map(([key, value]) => (
-                              <SelectItem key={key} value={key} className="text-right py-3">
+                              <SelectItem key={key} value={key} className="text-right">
                                 {value.icon} {value.label}
                               </SelectItem>
                             ))}
@@ -234,7 +269,7 @@ export function AddSubscriptionModal({ open, onOpenChange, subscription }: AddSu
                   />
                 </TabsContent>
 
-                <TabsContent value="advanced" className="space-y-4 animate-fade-in">
+                <TabsContent value="advanced" className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                     <FormField
                       control={form.control}
@@ -242,9 +277,9 @@ export function AddSubscriptionModal({ open, onOpenChange, subscription }: AddSu
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>סטטוס</FormLabel>
-                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <Select onValueChange={field.onChange} value={field.value}>
                             <FormControl>
-                              <SelectTrigger className="rounded-xl h-12">
+                              <SelectTrigger className="rounded-xl h-11">
                                 <SelectValue placeholder="סטטוס" />
                               </SelectTrigger>
                             </FormControl>
@@ -264,9 +299,9 @@ export function AddSubscriptionModal({ open, onOpenChange, subscription }: AddSu
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>עדיפות תזכורות</FormLabel>
-                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <Select onValueChange={field.onChange} value={field.value}>
                             <FormControl>
-                              <SelectTrigger className="rounded-xl h-12">
+                              <SelectTrigger className="rounded-xl h-11">
                                 <SelectValue placeholder="עדיפות" />
                               </SelectTrigger>
                             </FormControl>
@@ -294,7 +329,7 @@ export function AddSubscriptionModal({ open, onOpenChange, subscription }: AddSu
                         <FormItem>
                           <FormLabel>סיום תקופת ניסיון</FormLabel>
                           <FormControl>
-                            <Input type="date" className="rounded-xl h-12" {...field} />
+                            <Input type="date" className="rounded-xl h-11" {...field} />
                           </FormControl>
                         </FormItem>
                       )}
@@ -306,40 +341,23 @@ export function AddSubscriptionModal({ open, onOpenChange, subscription }: AddSu
                         <FormItem>
                           <FormLabel>ביטול יזום (ימים מראש)</FormLabel>
                           <FormControl>
-                            <Input type="number" className="rounded-xl h-12" {...field} />
+                            <Input type="number" className="rounded-xl h-11" {...field} />
                           </FormControl>
-                          <FormDescription>מתי להזכיר לך לבטל?</FormDescription>
                         </FormItem>
                       )}
                     />
                   </div>
-                  <FormField
-                    control={form.control}
-                    name="autoCancelDate"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>תאריך ביטול אוטומטי מתוכנן</FormLabel>
-                        <FormControl>
-                          <Input type="date" className="rounded-xl h-12" {...field} />
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
                 </TabsContent>
 
-                <TabsContent value="credentials" className="space-y-4 animate-fade-in">
+                <TabsContent value="credentials" className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                     <FormField
                       control={form.control}
                       name="username"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="flex items-center gap-2">
-                            <User className="h-3 w-3" /> שם משתמש
-                          </FormLabel>
-                          <FormControl>
-                            <Input className="rounded-xl h-12" {...field} />
-                          </FormControl>
+                          <FormLabel className="flex items-center gap-1.5"><User className="h-3 w-3" /> שם משתמש</FormLabel>
+                          <FormControl><Input className="rounded-xl h-11" {...field} /></FormControl>
                         </FormItem>
                       )}
                     />
@@ -348,12 +366,8 @@ export function AddSubscriptionModal({ open, onOpenChange, subscription }: AddSu
                       name="email"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="flex items-center gap-2">
-                            <Mail className="h-3 w-3" /> אימייל
-                          </FormLabel>
-                          <FormControl>
-                            <Input type="email" className="rounded-xl h-12" {...field} />
-                          </FormControl>
+                          <FormLabel className="flex items-center gap-1.5"><Mail className="h-3 w-3" /> אימייל</FormLabel>
+                          <FormControl><Input type="email" className="rounded-xl h-11" {...field} /></FormControl>
                         </FormItem>
                       )}
                     />
@@ -364,12 +378,8 @@ export function AddSubscriptionModal({ open, onOpenChange, subscription }: AddSu
                       name="password"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="flex items-center gap-2">
-                            <Key className="h-3 w-3" /> סיסמה
-                          </FormLabel>
-                          <FormControl>
-                            <Input type="password" placeholder="••••••••" className="rounded-xl h-12 text-left" {...field} />
-                          </FormControl>
+                          <FormLabel className="flex items-center gap-1.5"><Key className="h-3 w-3" /> סיסמה</FormLabel>
+                          <FormControl><Input type="password" placeholder="••••••••" className="rounded-xl h-11 text-left" {...field} /></FormControl>
                         </FormItem>
                       )}
                     />
@@ -378,12 +388,8 @@ export function AddSubscriptionModal({ open, onOpenChange, subscription }: AddSu
                       name="phone"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="flex items-center gap-2">
-                            <Phone className="h-3 w-3" /> נייד
-                          </FormLabel>
-                          <FormControl>
-                            <Input className="rounded-xl h-12" {...field} />
-                          </FormControl>
+                          <FormLabel className="flex items-center gap-1.5"><Phone className="h-3 w-3" /> נייד</FormLabel>
+                          <FormControl><Input className="rounded-xl h-11" {...field} /></FormControl>
                         </FormItem>
                       )}
                     />
@@ -393,9 +399,9 @@ export function AddSubscriptionModal({ open, onOpenChange, subscription }: AddSu
                     name="notes"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>הערות ומידע נוסף</FormLabel>
+                        <FormLabel className="flex items-center gap-1.5"><FileText className="h-3 w-3" /> הערות נוספות</FormLabel>
                         <FormControl>
-                          <Textarea placeholder="למשל: תנאי ביטול, קוד קופון וכו'..." className="rounded-xl min-h-[100px] text-right" {...field} />
+                          <Textarea placeholder="כתוב כאן הערות, קוד קופון או תנאי ביטול..." className="rounded-xl min-h-[80px]" {...field} />
                         </FormControl>
                       </FormItem>
                     )}
@@ -404,8 +410,8 @@ export function AddSubscriptionModal({ open, onOpenChange, subscription }: AddSu
               </Tabs>
             </div>
 
-            <DialogFooter className="p-6 bg-muted/20 flex-row-reverse gap-3">
-              <Button type="submit" className="bg-primary hover:bg-primary/90 rounded-full px-8 h-12 gap-2 shadow-lg shadow-primary/20">
+            <DialogFooter className="p-6 bg-muted/20 gap-3 flex-row-reverse">
+              <Button type="submit" className="bg-primary hover:bg-primary/90 rounded-full px-8 h-12 gap-2 shadow-lg">
                 <Save className="h-4 w-4" /> {isEdit ? "שמור שינויים" : "שמור מינוי"}
               </Button>
               <Button type="button" variant="ghost" onClick={() => onOpenChange(false)} className="rounded-full h-12 px-6">
