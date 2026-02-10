@@ -5,19 +5,20 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Sparkles, ArrowLeft, RefreshCcw, CheckCircle2 } from "lucide-react"
 import { subscriptionRecommendation } from "@/ai/flows/ai-subscription-recommendations"
-import { SAMPLE_SUBSCRIPTIONS } from "@/app/lib/subscription-store"
+import { useSubscriptions } from "@/context/subscriptions-context"
 import { Skeleton } from "@/components/ui/skeleton"
 
 export function AIRecommendations() {
+  const { subscriptions } = useSubscriptions()
   const [loading, setLoading] = React.useState(false)
   const [results, setResults] = React.useState<string | null>(null)
 
   const getRecommendations = async () => {
     setLoading(true)
     try {
-      const subListStr = SAMPLE_SUBSCRIPTIONS.map(s => 
-        `${s.name}: ${s.amount}${s.currency} (${s.category}), מחדש ב-${s.renewalDate}`
-      ).join('\n')
+      const subListStr = subscriptions.length > 0 
+        ? subscriptions.map(s => `${s.name}: ${s.amount}${s.currency} (${s.category}), מחדש ב-${s.renewalDate}`).join('\n')
+        : "אין מינויים כרגע"
       
       const { recommendations } = await subscriptionRecommendation({ subscriptionList: subListStr })
       setResults(recommendations)
@@ -29,54 +30,58 @@ export function AIRecommendations() {
   }
 
   return (
-    <Card className="overflow-hidden border-accent/20">
-      <CardHeader className="bg-accent/5 border-b border-accent/10">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Sparkles className="h-5 w-5 text-accent" />
-            <CardTitle>תובנות AI מותאמות אישית</CardTitle>
+    <Card className="overflow-hidden border-none card-shadow rounded-3xl bg-white">
+      <CardHeader className="bg-primary/5 border-b p-6">
+        <div className="flex items-center justify-between flex-row-reverse">
+          <div className="flex items-center gap-3 flex-row-reverse">
+            <div className="bg-primary/10 p-2 rounded-xl">
+              <Sparkles className="h-5 w-5 text-primary" />
+            </div>
+            <div className="text-right">
+              <CardTitle className="text-xl font-bold">תובנות Panda AI</CardTitle>
+              <CardDescription className="text-xs">ניתוח חכם של הרגלי הצריכה שלך</CardDescription>
+            </div>
           </div>
           <Button 
             variant="ghost" 
             size="sm" 
             onClick={getRecommendations} 
             disabled={loading}
-            className="text-accent hover:text-accent hover:bg-accent/10"
+            className="text-primary hover:text-primary hover:bg-primary/10 rounded-full"
           >
-            {loading ? <RefreshCcw className="h-4 w-4 animate-spin" /> : "נתח מחדש"}
+            {loading ? <RefreshCcw className="h-4 w-4 animate-spin" /> : <RefreshCcw className="h-4 w-4" />}
           </Button>
         </div>
-        <CardDescription>הבינה המלאכותית שלנו תעזור לך לחסוך כסף ולמצוא כפילויות</CardDescription>
       </CardHeader>
       <CardContent className="p-0">
         {!results && !loading ? (
-          <div className="p-12 text-center space-y-4">
-            <div className="mx-auto h-16 w-16 rounded-full bg-accent/10 flex items-center justify-center text-accent">
-              <Sparkles className="h-8 w-8" />
+          <div className="p-12 text-center space-y-6">
+            <div className="mx-auto h-20 w-20 rounded-full bg-primary/10 flex items-center justify-center text-primary animate-pulse">
+              <Sparkles className="h-10 w-10" />
             </div>
             <div className="space-y-2">
-              <h4 className="font-semibold">מוכן לחיסכון?</h4>
-              <p className="text-sm text-muted-foreground">לחץ על הכפתור כדי לקבל המלצות לשיפור ניהול המינויים שלך</p>
+              <h4 className="font-bold text-xl">מוכן לחיסכון חכם?</h4>
+              <p className="text-sm text-muted-foreground max-w-xs mx-auto">ה-AI שלנו יסרוק את המינויים שלך וימצא עבורך כפילויות, חלופות זולות יותר וטיפים לניהול תקציב נכון.</p>
             </div>
-            <Button onClick={getRecommendations} className="bg-accent hover:bg-accent/90">צור המלצות</Button>
+            <Button onClick={getRecommendations} className="bg-primary hover:bg-primary/90 rounded-full px-8 h-12 shadow-lg shadow-primary/20 font-bold">צור המלצות עכשיו</Button>
           </div>
         ) : loading ? (
-          <div className="p-6 space-y-4">
-            <Skeleton className="h-4 w-3/4" />
-            <Skeleton className="h-4 w-full" />
-            <Skeleton className="h-4 w-5/6" />
-            <Skeleton className="h-4 w-2/3" />
+          <div className="p-8 space-y-4">
+            <Skeleton className="h-4 w-3/4 ml-auto" />
+            <Skeleton className="h-4 w-full ml-auto" />
+            <Skeleton className="h-4 w-5/6 ml-auto" />
+            <Skeleton className="h-4 w-2/3 ml-auto" />
           </div>
         ) : (
-          <div className="p-6 space-y-4">
-            <div className="prose prose-sm max-w-none text-right">
-              <div className="whitespace-pre-wrap text-sm leading-relaxed text-foreground/80">
+          <div className="p-8 space-y-6">
+            <div className="text-right">
+              <div className="whitespace-pre-wrap text-base leading-relaxed text-foreground font-medium">
                 {results}
               </div>
             </div>
-            <div className="pt-4 flex gap-2">
-              <Button size="sm" variant="outline" className="flex-1 gap-2">
-                <CheckCircle2 className="h-4 w-4" /> קבל המלצות
+            <div className="pt-4 flex gap-4">
+              <Button size="lg" className="flex-1 gap-2 rounded-full font-bold shadow-lg shadow-primary/20">
+                <CheckCircle2 className="h-5 w-5" /> יישם המלצות
               </Button>
             </div>
           </div>

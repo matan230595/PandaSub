@@ -43,13 +43,13 @@ export default function InsightsPage() {
         </div>
 
         <div className="grid gap-8 lg:grid-cols-3">
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-2 text-right">
             <AIRecommendations />
           </div>
           <div className="space-y-6">
             <Card className="card-shadow border-none rounded-3xl bg-white overflow-hidden">
               <CardHeader className="bg-primary/5 border-b">
-                <div className="flex items-center gap-2 flex-row-reverse">
+                <div className="flex items-center gap-2 flex-row-reverse justify-start">
                   <Lightbulb className="h-5 w-5 text-primary" />
                   <CardTitle className="text-lg">טיפ Panda חכם</CardTitle>
                 </div>
