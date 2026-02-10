@@ -102,11 +102,11 @@ export function SubscriptionList() {
   }
 
   const renderTable = () => (
-    <div className="rounded-2xl border bg-white shadow-sm overflow-hidden animate-fade-in">
+    <div className="rounded-3xl border bg-white shadow-sm overflow-hidden animate-fade-in">
       <Table>
         <TableHeader>
-          <TableRow className="bg-muted/30 hover:bg-muted/30">
-            {visibleColumns.name && <TableHead>מינוי</TableHead>}
+          <TableRow className="bg-muted/30 hover:bg-muted/30 border-none">
+            {visibleColumns.name && <TableHead className="py-6">מינוי</TableHead>}
             {visibleColumns.category && <TableHead>קטגוריה</TableHead>}
             {visibleColumns.amount && <TableHead>מחיר</TableHead>}
             {visibleColumns.renewal && <TableHead>חידוש</TableHead>}
@@ -123,29 +123,29 @@ export function SubscriptionList() {
               onClick={() => handleRowClick(sub)}
             >
               {visibleColumns.name && (
-                <TableCell className="py-4">
-                  <div className="flex items-center gap-3">
+                <TableCell className="py-5">
+                  <div className="flex items-center gap-4">
                     <div 
-                      className="flex h-10 w-10 items-center justify-center rounded-xl text-xl shrink-0"
+                      className="flex h-12 w-12 items-center justify-center rounded-2xl text-2xl shrink-0 shadow-sm transition-transform group-hover:scale-110"
                       style={{ backgroundColor: `${CATEGORY_METADATA[sub.category].color}15`, color: CATEGORY_METADATA[sub.category].color }}
                     >
                       {CATEGORY_METADATA[sub.category].icon}
                     </div>
                     <div className="overflow-hidden">
-                      <div className="font-bold text-sm truncate">{sub.name}</div>
-                      <div className="text-[10px] text-muted-foreground truncate">{sub.credentials?.email || "ללא פרטי גישה"}</div>
+                      <div className="font-bold text-base truncate">{sub.name}</div>
+                      <div className="text-[11px] text-muted-foreground truncate">{sub.credentials?.email || "ללא פרטי גישה"}</div>
                     </div>
                   </div>
                 </TableCell>
               )}
               {visibleColumns.category && (
                 <TableCell>
-                  <Badge variant="outline" className="rounded-full border-none text-[10px]" style={{ backgroundColor: `${CATEGORY_METADATA[sub.category].color}10`, color: CATEGORY_METADATA[sub.category].color }}>
+                  <Badge variant="outline" className="rounded-full border-none text-[11px] px-3 py-1" style={{ backgroundColor: `${CATEGORY_METADATA[sub.category].color}15`, color: CATEGORY_METADATA[sub.category].color }}>
                     {CATEGORY_METADATA[sub.category].label}
                   </Badge>
                 </TableCell>
               )}
-              {visibleColumns.amount && <TableCell className="font-bold">{sub.amount.toLocaleString()} {sub.currency}</TableCell>}
+              {visibleColumns.amount && <TableCell className="font-bold text-lg">{sub.amount.toLocaleString()} {sub.currency}</TableCell>}
               {visibleColumns.renewal && (
                 <TableCell className="text-sm">
                   {new Date(sub.status === 'trial' ? sub.trialEndsAt! : sub.renewalDate).toLocaleDateString('he-IL')}
@@ -154,7 +154,7 @@ export function SubscriptionList() {
               {visibleColumns.countdown && <TableCell>{renderCountdown(sub)}</TableCell>}
               {visibleColumns.status && (
                 <TableCell>
-                  <Badge className="rounded-full text-[10px] border-none" style={{ backgroundColor: STATUS_METADATA[sub.status].color, color: 'white' }}>
+                  <Badge className="rounded-full text-[11px] border-none px-3 py-1" style={{ backgroundColor: STATUS_METADATA[sub.status].color, color: 'white' }}>
                     {STATUS_METADATA[sub.status].label}
                   </Badge>
                 </TableCell>
@@ -164,10 +164,10 @@ export function SubscriptionList() {
                   <Button 
                     variant="ghost" 
                     size="icon" 
-                    className="h-8 w-8 rounded-full hover:text-green-600"
+                    className="h-10 w-10 rounded-full hover:text-green-600 hover:bg-green-50"
                     onClick={(e) => handleMarkUsed(e, sub.id, sub.name)}
                   >
-                    <CheckCircle2 className="h-4 w-4" />
+                    <CheckCircle2 className="h-5 w-5" />
                   </Button>
                 </TableCell>
               )}
@@ -179,58 +179,61 @@ export function SubscriptionList() {
   )
 
   const renderCards = () => (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 animate-fade-in">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 animate-fade-in p-2">
       {filteredSubs.map(sub => (
         <Card 
           key={sub.id} 
-          className="card-shadow border-none rounded-2xl overflow-hidden cursor-pointer"
+          className="card-shadow border-none rounded-3xl overflow-visible cursor-pointer bg-white"
           onClick={() => handleRowClick(sub)}
         >
-          <CardContent className="p-6">
-            <div className="flex justify-between items-start mb-4">
-              <div className="flex items-center gap-3">
-                <div className="h-12 w-12 rounded-xl flex items-center justify-center text-2xl" style={{ backgroundColor: `${CATEGORY_METADATA[sub.category].color}15` }}>
+          <CardContent className="p-8 pb-4">
+            <div className="flex justify-between items-start mb-6">
+              <div className="flex items-center gap-4">
+                <div className="h-16 w-16 rounded-3xl flex items-center justify-center text-3xl shadow-sm" style={{ backgroundColor: `${CATEGORY_METADATA[sub.category].color}15` }}>
                   {CATEGORY_METADATA[sub.category].icon}
                 </div>
                 <div>
-                  <h3 className="font-bold text-lg">{sub.name}</h3>
-                  <p className="text-xs text-muted-foreground">{CATEGORY_METADATA[sub.category].label}</p>
+                  <h3 className="font-bold text-xl tracking-tight">{sub.name}</h3>
+                  <p className="text-sm text-muted-foreground">{CATEGORY_METADATA[sub.category].label}</p>
                 </div>
               </div>
-              <Badge style={{ backgroundColor: STATUS_METADATA[sub.status].color, color: 'white' }} className="border-none rounded-full text-[10px]">
+              <Badge style={{ backgroundColor: STATUS_METADATA[sub.status].color, color: 'white' }} className="border-none rounded-full text-[11px] px-3 py-1 shadow-sm">
                 {STATUS_METADATA[sub.status].label}
               </Badge>
             </div>
             
-            <div className="flex justify-between items-end mb-6">
-              <div className="text-2xl font-bold">{sub.amount} {sub.currency}</div>
-              <div className="text-right">
-                <p className="text-[10px] text-muted-foreground">חיוב הבא</p>
-                <p className="text-sm font-bold">{new Date(sub.renewalDate).toLocaleDateString('he-IL')}</p>
+            <div className="flex justify-between items-end mb-8">
+              <div>
+                <span className="text-4xl font-black text-foreground">{sub.amount}</span>
+                <span className="text-xl font-bold text-muted-foreground mr-1">{sub.currency}</span>
+              </div>
+              <div className="text-left">
+                <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold">חיוב הבא</p>
+                <p className="text-base font-bold text-primary">{new Date(sub.renewalDate).toLocaleDateString('he-IL')}</p>
               </div>
             </div>
 
             {sub.status === 'trial' && (
-              <div className="space-y-2 mb-2">
-                <div className="flex justify-between text-[10px] font-bold">
-                  <span>תקופת ניסיון</span>
+              <div className="space-y-3 mb-4">
+                <div className="flex justify-between text-xs font-bold">
+                  <span className="text-muted-foreground">תקופת ניסיון</span>
                   {renderCountdown(sub)}
                 </div>
-                <Progress value={Math.max(10, 100 - (calculateDaysLeft(sub.trialEndsAt!) * 3))} className="h-1.5" />
+                <Progress value={Math.max(15, 100 - (calculateDaysLeft(sub.trialEndsAt!) * 4))} className="h-2 rounded-full" />
               </div>
             )}
           </CardContent>
-          <CardFooter className="bg-muted/20 px-6 py-3 flex justify-between border-t">
+          <CardFooter className="bg-muted/10 px-8 py-4 flex justify-between border-t rounded-b-3xl">
             <Button 
               variant="ghost" 
               size="sm" 
-              className="text-xs gap-2 font-bold hover:text-green-600 rounded-full"
+              className="text-sm gap-2 font-black hover:text-green-600 rounded-full h-10 px-4 transition-colors"
               onClick={(e) => handleMarkUsed(e, sub.id, sub.name)}
             >
-              <CheckCircle2 className="h-3 w-3" /> השתמשתי היום
+              <CheckCircle2 className="h-4 w-4" /> השתמשתי היום
             </Button>
-            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full">
-              <Edit2 className="h-3.5 w-3.5" />
+            <Button variant="ghost" size="icon" className="h-10 w-10 rounded-full hover:bg-white shadow-sm transition-all">
+              <Edit2 className="h-4 w-4" />
             </Button>
           </CardFooter>
         </Card>
@@ -241,35 +244,45 @@ export function SubscriptionList() {
   const renderKanban = () => {
     const statuses: (keyof typeof STATUS_METADATA)[] = ['trial', 'active', 'frozen', 'cancelled', 'not_in_use']
     return (
-      <div className="flex gap-6 overflow-x-auto pb-6 -mx-4 px-4 h-[600px] animate-fade-in">
+      <div className="flex gap-8 overflow-x-auto pb-8 -mx-4 px-4 h-[700px] animate-fade-in scrollbar-hide">
         {statuses.map(status => {
           const items = filteredSubs.filter(s => s.status === status)
           return (
-            <div key={status} className="flex-shrink-0 w-72 flex flex-col gap-3">
-              <div className="flex items-center gap-2 px-2">
-                <div className="h-2 w-2 rounded-full" style={{ backgroundColor: STATUS_METADATA[status].color }} />
-                <h3 className="font-bold text-sm">{STATUS_METADATA[status].label}</h3>
-                <Badge variant="secondary" className="rounded-full text-[10px] h-5">{items.length}</Badge>
+            <div key={status} className="flex-shrink-0 w-80 flex flex-col gap-4">
+              <div className="flex items-center justify-between px-3">
+                <div className="flex items-center gap-3">
+                  <div className="h-3 w-3 rounded-full shadow-sm" style={{ backgroundColor: STATUS_METADATA[status].color }} />
+                  <h3 className="font-bold text-base">{STATUS_METADATA[status].label}</h3>
+                </div>
+                <Badge variant="secondary" className="rounded-full text-[11px] h-6 px-2.5 font-bold bg-muted/50 border-none">{items.length}</Badge>
               </div>
-              <div className="flex-1 bg-muted/30 rounded-2xl p-3 space-y-3 overflow-y-auto">
+              <div className="flex-1 bg-muted/20 rounded-[2rem] p-4 space-y-4 overflow-y-auto border-2 border-dashed border-muted/50">
                 {items.map(sub => (
                   <Card 
                     key={sub.id} 
-                    className="border shadow-sm hover:shadow-md transition-shadow cursor-pointer rounded-xl bg-white"
+                    className="border-none shadow-sm hover:shadow-md transition-all cursor-pointer rounded-2xl bg-white group"
                     onClick={() => handleRowClick(sub)}
                   >
-                    <CardContent className="p-3 space-y-2 text-right">
-                      <div className="flex items-center gap-2">
-                        <span>{CATEGORY_METADATA[sub.category].icon}</span>
-                        <div className="font-bold text-sm truncate">{sub.name}</div>
+                    <CardContent className="p-5 space-y-4 text-right">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3 overflow-hidden">
+                          <span className="text-2xl h-10 w-10 flex items-center justify-center rounded-xl bg-muted/30 group-hover:scale-110 transition-transform">{CATEGORY_METADATA[sub.category].icon}</span>
+                          <div className="font-bold text-sm truncate">{sub.name}</div>
+                        </div>
+                        {renderCountdown(sub)}
                       </div>
-                      <div className="flex justify-between items-end">
-                        <div className="text-base font-bold">{sub.amount} ₪</div>
-                        <div className="text-[9px] text-muted-foreground">{new Date(sub.renewalDate).toLocaleDateString('he-IL', { month: 'short', day: 'numeric' })}</div>
+                      <div className="flex justify-between items-end pt-2 border-t border-muted/30">
+                        <div className="text-xl font-black text-primary">{sub.amount} ₪</div>
+                        <div className="text-[10px] text-muted-foreground font-medium">{new Date(sub.renewalDate).toLocaleDateString('he-IL', { month: 'short', day: 'numeric' })}</div>
                       </div>
                     </CardContent>
                   </Card>
                 ))}
+                {items.length === 0 && (
+                  <div className="h-full flex flex-col items-center justify-center text-muted-foreground text-xs opacity-50 py-10">
+                    גרור לכאן מינויים
+                  </div>
+                )}
               </div>
             </div>
           )
@@ -279,24 +292,24 @@ export function SubscriptionList() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="bg-white p-3 rounded-2xl card-shadow flex flex-col md:flex-row gap-4 items-center">
+    <div className="space-y-8">
+      <div className="bg-white p-4 rounded-3xl shadow-sm flex flex-col md:flex-row gap-4 items-center border">
         <div className="relative flex-1 w-full">
-          <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Search className="absolute right-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
           <Input 
-            placeholder="חיפוש חופשי..." 
+            placeholder="חיפוש חופשי (שם, קטגוריה...)" 
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pr-10 rounded-full border-none bg-muted/50 focus:bg-white h-11" 
+            className="pr-12 rounded-2xl border-none bg-muted/40 focus:bg-white h-12 text-lg shadow-inner" 
           />
         </div>
         
-        <div className="flex items-center p-1 bg-muted/50 rounded-full h-11">
+        <div className="flex items-center p-1.5 bg-muted/40 rounded-2xl h-12 shadow-inner">
           <Button 
             variant={viewMode === 'table' ? 'default' : 'ghost'} 
             size="sm" 
             onClick={() => setViewMode('table')}
-            className="rounded-full gap-2 px-4 h-9"
+            className={`rounded-xl gap-2 px-5 h-9 font-bold transition-all ${viewMode === 'table' ? 'shadow-lg bg-primary text-white' : 'text-muted-foreground hover:text-primary'}`}
           >
             <ListIcon className="h-4 w-4" /> טבלה
           </Button>
@@ -304,7 +317,7 @@ export function SubscriptionList() {
             variant={viewMode === 'cards' ? 'default' : 'ghost'} 
             size="sm" 
             onClick={() => setViewMode('cards')}
-            className="rounded-full gap-2 px-4 h-9"
+            className={`rounded-xl gap-2 px-5 h-9 font-bold transition-all ${viewMode === 'cards' ? 'shadow-lg bg-primary text-white' : 'text-muted-foreground hover:text-primary'}`}
           >
             <LayoutGrid className="h-4 w-4" /> כרטיסים
           </Button>
@@ -312,7 +325,7 @@ export function SubscriptionList() {
             variant={viewMode === 'kanban' ? 'default' : 'ghost'} 
             size="sm" 
             onClick={() => setViewMode('kanban')}
-            className="rounded-full gap-2 px-4 h-9"
+            className={`rounded-xl gap-2 px-5 h-9 font-bold transition-all ${viewMode === 'kanban' ? 'shadow-lg bg-primary text-white' : 'text-muted-foreground hover:text-primary'}`}
           >
             <Columns className="h-4 w-4" /> קאנבן
           </Button>
@@ -320,41 +333,43 @@ export function SubscriptionList() {
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" size="icon" className="rounded-full h-11 w-11 border-none bg-muted/50 hover:bg-muted shrink-0">
-              <Settings2 className="h-5 w-5" />
+            <Button variant="outline" size="icon" className="rounded-2xl h-12 w-12 border-none bg-muted/40 hover:bg-muted shrink-0 shadow-sm">
+              <Settings2 className="h-6 w-6 text-muted-foreground" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-56 rounded-2xl p-2 shadow-xl">
-            <DropdownMenuLabel className="text-right">שדות להצגה</DropdownMenuLabel>
+          <DropdownMenuContent align="end" className="w-64 rounded-3xl p-3 shadow-2xl border-none mt-2">
+            <DropdownMenuLabel className="text-right font-bold text-lg mb-2">הגדרות תצוגה</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            {Object.keys(visibleColumns).map((col) => (
-              col !== 'actions' && (
-                <DropdownMenuCheckboxItem 
-                  key={col}
-                  checked={visibleColumns[col as ColumnKey]} 
-                  onCheckedChange={() => toggleColumn(col as ColumnKey)} 
-                  className="flex-row-reverse text-right"
-                >
-                  {col === 'name' ? 'שם' : col === 'category' ? 'קטגוריה' : col === 'amount' ? 'מחיר' : col === 'renewal' ? 'חידוש' : col === 'countdown' ? 'ספירה לאחור' : 'סטטוס'}
-                </DropdownMenuCheckboxItem>
-              )
-            ))}
+            <div className="space-y-1 mt-2">
+              {Object.keys(visibleColumns).map((col) => (
+                col !== 'actions' && (
+                  <DropdownMenuCheckboxItem 
+                    key={col}
+                    checked={visibleColumns[col as ColumnKey]} 
+                    onCheckedChange={() => toggleColumn(col as ColumnKey)} 
+                    className="flex-row-reverse text-right rounded-xl h-10 cursor-pointer"
+                  >
+                    {col === 'name' ? 'שם המינוי' : col === 'category' ? 'קטגוריה' : col === 'amount' ? 'מחיר חודשי' : col === 'renewal' ? 'תאריך חידוש' : col === 'countdown' ? 'ספירה לאחור' : 'סטטוס'}
+                  </DropdownMenuCheckboxItem>
+                )
+              ))}
+            </div>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
 
-      <div className="min-h-[400px]">
+      <div className="min-h-[500px] relative">
         {viewMode === 'table' && renderTable()}
         {viewMode === 'cards' && renderCards()}
         {viewMode === 'kanban' && renderKanban()}
         
         {filteredSubs.length === 0 && (
-          <div className="text-center py-24 bg-white rounded-3xl border-2 border-dashed">
-            <div className="text-6xl mb-4">🔍</div>
-            <h2 className="text-xl font-bold mb-1 text-foreground">לא מצאנו תוצאות</h2>
-            <p className="text-sm text-muted-foreground">נסה לשנות את מונחי החיפוש או הוסף מינוי חדש</p>
-            <Button onClick={() => { setSelectedSub(null); setIsModalOpen(true); }} className="mt-6 rounded-full px-8 bg-primary h-11 gap-2">
-              <Plus className="h-4 w-4" /> הוסף מינוי ראשון
+          <div className="text-center py-32 bg-white/50 rounded-[3rem] border-4 border-dashed border-muted/30 animate-pulse">
+            <div className="text-8xl mb-6">🔍</div>
+            <h2 className="text-2xl font-black mb-2 text-foreground">לא מצאנו תוצאות לחיפוש</h2>
+            <p className="text-muted-foreground">נסה לשנות את מונחי החיפוש או הוסף מינוי חדש בלחיצה על הכפתור</p>
+            <Button onClick={() => { setSelectedSub(null); setIsModalOpen(true); }} className="mt-8 rounded-full px-10 bg-primary hover:bg-primary/90 h-14 text-lg font-bold gap-3 shadow-xl shadow-primary/20">
+              <Plus className="h-6 w-6" /> הוסף מינוי ראשון
             </Button>
           </div>
         )}
