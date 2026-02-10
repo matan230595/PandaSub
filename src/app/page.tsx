@@ -26,8 +26,11 @@ export default function Home() {
     .reduce((sum, s) => sum + s.amount, 0)
 
   const upcomingRenewals = subscriptions.filter(s => {
-    const diff = new Date(s.renewalDate).getTime() - new Date().getTime()
-    return diff > 0 && diff < 7 * 24 * 60 * 60 * 1000
+    const renewal = new Date(s.renewalDate)
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    const diff = renewal.getTime() - today.getTime()
+    return diff >= 0 && diff < 7 * 24 * 60 * 60 * 1000
   }).length
 
   const trialCount = subscriptions.filter(s => s.status === 'trial').length
@@ -110,7 +113,7 @@ export default function Home() {
           <div className="lg:col-span-2 space-y-8">
             <DashboardCharts />
             <div className="flex items-center justify-between pt-4">
-              <h2 className="text-2xl font-bold text-right w-full">מינויים אחרונים</h2>
+              <h2 className="text-2xl font-bold text-right w-full text-foreground">מינויים אחרונים</h2>
             </div>
             <SubscriptionList />
           </div>

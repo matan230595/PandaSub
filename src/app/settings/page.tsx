@@ -253,12 +253,12 @@ export default function SettingsPage() {
 
           <TabsContent value="data" className="space-y-6">
             <Card className="card-shadow border-none rounded-3xl overflow-hidden bg-white dark:bg-zinc-900">
-              <CardHeader className="text-right">
-                <div className="flex items-center gap-3 justify-end">
-                  <CardTitle className="text-xl">אבטחה ופרטיות</CardTitle>
+              <CardHeader className="text-right p-6">
+                <div className="flex items-center gap-3 justify-end mb-2">
+                  <CardTitle className="text-xl text-right">אבטחה ופרטיות</CardTitle>
                   <Shield className="h-6 w-6 text-primary" />
                 </div>
-                <CardDescription>ניהול המידע האישי והגנה על החשבון</CardDescription>
+                <CardDescription className="text-right">ניהול המידע האישי והגנה על החשבון</CardDescription>
               </CardHeader>
               <CardContent className="space-y-8">
                 <div className="grid gap-6 md:grid-cols-2">

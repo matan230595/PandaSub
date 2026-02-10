@@ -46,7 +46,7 @@ import { useSubscriptions } from "@/context/subscriptions-context"
 import { CATEGORY_METADATA, SubscriptionCategory, SubscriptionStatus, PRIORITY_CONFIG, Subscription } from "@/app/lib/subscription-store"
 import { useToast } from "@/hooks/use-toast"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { User, Key, Mail, Phone, Copy, Trash2, Save, FileText, AlertTriangle, Bell, CreditCard, RefreshCw } from "lucide-react"
+import { User, Key, Mail, Phone, Copy, Trash2, Save, FileText, AlertTriangle, Bell, CreditCard } from "lucide-react"
 import { ScrollArea } from "@/components/ui/scroll-area"
 
 const formSchema = z.object({

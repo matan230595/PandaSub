@@ -17,25 +17,20 @@ import {
   List as ListIcon,
   Columns,
   Clock,
-  Settings2,
   Search,
-  Plus,
   Trash2,
   Copy,
   Filter,
   Check,
   AlertTriangle,
   CreditCard,
-  Bell,
   RefreshCw,
   MoreVertical
 } from "lucide-react"
 import { 
   DropdownMenu, 
-  DropdownMenuCheckboxItem, 
   DropdownMenuTrigger,
   DropdownMenuSeparator,
-  DropdownMenuLabel,
   DropdownMenuContent,
   DropdownMenuItem
 } from "@/components/ui/dropdown-menu"
@@ -53,14 +48,11 @@ import { CATEGORY_METADATA, STATUS_METADATA, Subscription, SubscriptionCategory,
 import { useSubscriptions } from "@/context/subscriptions-context"
 import { useToast } from "@/hooks/use-toast"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
-import { Progress } from "@/components/ui/progress"
 import { Input } from "@/components/ui/input"
 import { AddSubscriptionModal } from "./add-subscription-modal"
 import { cn } from "@/lib/utils"
 import { format } from "date-fns"
 import { he } from "date-fns/locale"
-
-type ColumnKey = 'name' | 'category' | 'amount' | 'renewal' | 'status' | 'actions';
 
 export function SubscriptionList() {
   const { subscriptions, deleteSubscription, duplicateSubscription } = useSubscriptions()
@@ -73,15 +65,6 @@ export function SubscriptionList() {
   const [categoryFilter, setCategoryFilter] = React.useState<SubscriptionCategory | 'all'>('all')
   const [statusFilter, setStatusFilter] = React.useState<SubscriptionStatus | 'all'>('all')
   const [deleteConfirmId, setDeleteConfirmId] = React.useState<string | null>(null)
-  
-  const [visibleColumns, setVisibleColumns] = React.useState<Record<ColumnKey, boolean>>({
-    name: true,
-    category: true,
-    amount: true,
-    renewal: true,
-    status: true,
-    actions: true
-  })
 
   const filteredSubs = subscriptions.filter(sub => {
     const matchesSearch = sub.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -98,7 +81,11 @@ export function SubscriptionList() {
   }
 
   const calculateDaysLeft = (date: string) => {
-    const diff = new Date(date).getTime() - new Date().getTime()
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    const renewal = new Date(date)
+    renewal.setHours(0, 0, 0, 0)
+    const diff = renewal.getTime() - today.getTime()
     return Math.ceil(diff / (1000 * 60 * 60 * 24))
   }
 
@@ -113,7 +100,7 @@ export function SubscriptionList() {
       </div>
     )
     
-    // סולם צבעים חכם
+    // סולם צבעים חכם ודינמי
     let colorClass = "text-green-600"
     if (daysLeft <= 3) colorClass = "text-destructive animate-bounce"
     else if (daysLeft <= 7) colorClass = "text-orange-500"
@@ -135,7 +122,6 @@ export function SubscriptionList() {
           className="group relative border-none card-shadow rounded-[2rem] bg-white overflow-hidden transition-all hover:scale-[1.02] cursor-pointer"
           onClick={() => handleEdit(sub)}
         >
-          {/* בורדר צבעוני עליון לפי קטגוריה */}
           <div className="h-2 w-full" style={{ backgroundColor: CATEGORY_METADATA[sub.category].color }} />
           
           <CardContent className="p-6">
@@ -331,12 +317,6 @@ export function SubscriptionList() {
                     </div>
                   </Card>
                 ))}
-                {items.length === 0 && (
-                  <div className="flex flex-col items-center justify-center py-20 text-muted-foreground/30 italic text-center">
-                    <div className="text-5xl mb-2 opacity-20">📭</div>
-                    אין מינויים בסטטוס זה
-                  </div>
-                )}
               </div>
             </div>
           )
@@ -358,7 +338,7 @@ export function SubscriptionList() {
           />
         </div>
         
-        <div className="flex items-center gap-3 w-full lg:w-auto overflow-x-auto pb-2 lg:pb-0 scrollbar-hide">
+        <div className="flex items-center gap-3 w-full lg:w-auto">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" className="rounded-2xl h-12 gap-2 border-primary/10 bg-primary/5 text-primary font-bold px-6">
@@ -373,26 +353,6 @@ export function SubscriptionList() {
                 <DropdownMenuItem key={key} onClick={() => setCategoryFilter(key as any)} className="text-right flex-row-reverse gap-3 rounded-xl">
                   {val.icon} {val.label}
                   {categoryFilter === key && <Check className="h-4 w-4 mr-auto text-primary" />}
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
-
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="rounded-2xl h-12 gap-2 border-primary/10 bg-primary/5 text-primary font-bold px-6">
-                <Filter className="h-4 w-4" /> 
-                {statusFilter === 'all' ? 'כל הסטטוסים' : STATUS_METADATA[statusFilter].label}
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="text-right rounded-2xl p-2 w-48">
-              <DropdownMenuItem onClick={() => setStatusFilter('all')} className="text-right rounded-xl">כל הסטטוסים</DropdownMenuItem>
-              <DropdownMenuSeparator />
-              {Object.entries(STATUS_METADATA).map(([key, val]) => (
-                <DropdownMenuItem key={key} onClick={() => setStatusFilter(key as any)} className="text-right flex-row-reverse gap-3 rounded-xl">
-                  <div className="h-2 w-2 rounded-full" style={{ backgroundColor: val.color }} />
-                  {val.label}
-                  {statusFilter === key && <Check className="h-4 w-4 mr-auto text-primary" />}
                 </DropdownMenuItem>
               ))}
             </DropdownMenuContent>
