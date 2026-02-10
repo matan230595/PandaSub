@@ -28,7 +28,10 @@ import {
   addMonths, 
   subMonths,
   startOfWeek,
-  endOfWeek
+  endOfWeek,
+  isSameMonth,
+  addDays,
+  startOfDay
 } from "date-fns"
 import { he } from "date-fns/locale"
 import { Button } from "@/components/ui/button"
@@ -39,16 +42,30 @@ import {
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu"
 import { cn } from "@/lib/utils"
+import { AddSubscriptionModal } from "@/components/subscription/add-subscription-modal"
+
+type ViewType = 'month' | 'week' | 'day'
 
 export default function CalendarPage() {
   const { subscriptions } = useSubscriptions()
   const [currentMonth, setCurrentMonth] = React.useState(new Date())
   const [selectedDate, setSelectedDate] = React.useState<Date>(new Date())
-  const [view, setView] = React.useState<'month' | 'week' | 'day'>('month')
+  const [view, setView] = React.useState<ViewType>('month')
+  const [isAddModalOpen, setIsAddModalOpen] = React.useState(false)
 
   // ניווט
-  const nextMonth = () => setCurrentMonth(addMonths(currentMonth, 1))
-  const prevMonth = () => setCurrentMonth(subMonths(currentMonth, 1))
+  const next = () => {
+    if (view === 'month') setCurrentMonth(addMonths(currentMonth, 1))
+    else if (view === 'week') setCurrentMonth(addDays(currentMonth, 7))
+    else setCurrentMonth(addDays(currentMonth, 1))
+  }
+  
+  const prev = () => {
+    if (view === 'month') setCurrentMonth(subMonths(currentMonth, 1))
+    else if (view === 'week') setCurrentMonth(addDays(currentMonth, -7))
+    else setCurrentMonth(addDays(currentMonth, -1))
+  }
+
   const goToToday = () => {
     const today = new Date()
     setCurrentMonth(today)
@@ -69,17 +86,27 @@ export default function CalendarPage() {
     return subscriptions.filter(sub => isSameDay(new Date(sub.renewalDate), day))
   }
 
-  // יצירת ימי החודש לתצוגה
-  const monthStart = startOfMonth(currentMonth)
-  const monthEnd = endOfMonth(monthStart)
-  const startDate = startOfWeek(monthStart, { weekStartsOn: 0 }) // יום ראשון
-  const endDate = endOfWeek(monthEnd, { weekStartsOn: 0 })
-  const calendarDays = eachDayOfInterval({ start: startDate, end: endDate })
+  // חישוב טווח הימים לתצוגה
+  const calendarDays = React.useMemo(() => {
+    if (view === 'month') {
+      const monthStart = startOfMonth(currentMonth)
+      const monthEnd = endOfMonth(monthStart)
+      const startDate = startOfWeek(monthStart, { weekStartsOn: 0 })
+      const endDate = endOfWeek(monthEnd, { weekStartsOn: 0 })
+      return eachDayOfInterval({ start: startDate, end: endDate })
+    } else if (view === 'week') {
+      const startDate = startOfWeek(currentMonth, { weekStartsOn: 0 })
+      const endDate = endOfWeek(currentMonth, { weekStartsOn: 0 })
+      return eachDayOfInterval({ start: startDate, end: endDate })
+    } else {
+      return [startOfDay(currentMonth)]
+    }
+  }, [currentMonth, view])
 
   return (
     <div className="min-h-screen flex flex-col bg-[#F8F9FA]">
       <TopNav />
-      <main className="flex-1 container mx-auto p-4 md:p-8 space-y-6 animate-fade-in">
+      <main className="flex-1 container mx-auto p-4 md:p-8 space-y-6 animate-fade-in pb-20">
         
         {/* כותרת וסרגל ניווט עליון בסגנון גוגל */}
         <div className="flex flex-col md:flex-row items-center justify-between gap-4 bg-white p-4 rounded-2xl shadow-sm border border-border/50">
@@ -92,15 +119,15 @@ export default function CalendarPage() {
             <div className="flex items-center gap-2">
               <Button variant="outline" onClick={goToToday} className="rounded-full px-6 font-bold hover:bg-primary/5">היום</Button>
               <div className="flex items-center gap-1">
-                <Button variant="ghost" size="icon" onClick={prevMonth} className="rounded-full">
+                <Button variant="ghost" size="icon" onClick={prev} className="rounded-full">
                   <ChevronRight className="h-5 w-5" />
                 </Button>
-                <Button variant="ghost" size="icon" onClick={nextMonth} className="rounded-full">
+                <Button variant="ghost" size="icon" onClick={next} className="rounded-full">
                   <ChevronLeft className="h-5 w-5" />
                 </Button>
               </div>
               <span className="text-xl font-bold min-w-[150px] text-center">
-                {format(currentMonth, "MMMM yyyy", { locale: he })}
+                {format(currentMonth, view === 'day' ? "d בMMMM yyyy" : "MMMM yyyy", { locale: he })}
               </span>
             </div>
           </div>
@@ -119,15 +146,15 @@ export default function CalendarPage() {
                 <DropdownMenuItem onClick={() => setView('day')} className="text-right">תצוגה יומית</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-            <Button className="rounded-full google-btn gap-2 shadow-lg h-10 px-5">
+            <Button onClick={() => setIsAddModalOpen(true)} className="rounded-full google-btn gap-2 shadow-lg h-10 px-5">
               <Plus className="h-4 w-4" /> הוסף חיוב
             </Button>
           </div>
         </div>
         
         <div className="grid lg:grid-cols-12 gap-6">
-          {/* לוח השנה המרכזי - גריד חודשי */}
-          <div className="lg:col-span-9 bg-white rounded-3xl shadow-xl border border-border/50 overflow-hidden">
+          {/* לוח השנה המרכזי */}
+          <div className="lg:col-span-9 bg-white rounded-3xl shadow-xl border border-border/50 overflow-hidden min-h-[700px]">
             {/* כותרות ימי השבוע */}
             <div className="grid grid-cols-7 border-b bg-muted/20">
               {['א', 'ב', 'ג', 'ד', 'ה', 'ו', 'ש'].map(day => (
@@ -137,21 +164,24 @@ export default function CalendarPage() {
               ))}
             </div>
 
-            {/* גריד הימים */}
-            <div className="grid grid-cols-7 min-h-[700px]">
+            {/* גריד הימים - משתנה לפי התצוגה */}
+            <div className={cn(
+              "grid min-h-[600px]",
+              view === 'month' ? "grid-cols-7" : view === 'week' ? "grid-cols-7" : "grid-cols-1"
+            )}>
               {calendarDays.map((day, idx) => {
                 const daySubs = getSubForDay(day)
                 const isSelected = isSameDay(day, selectedDate)
                 const isToday = isSameDay(day, new Date())
-                const isCurrentMonth = day.getMonth() === currentMonth.getMonth()
+                const isCurrentMonth = isSameMonth(day, currentMonth)
 
                 return (
                   <div 
                     key={idx}
-                    onClick={() => setSelectedDate(day)}
+                    onClick={() => { setSelectedDate(day); setCurrentMonth(day); }}
                     className={cn(
                       "min-h-[120px] p-2 border-l border-b last:border-l-0 transition-colors cursor-pointer hover:bg-muted/30 flex flex-col gap-1",
-                      !isCurrentMonth && "bg-muted/10 opacity-40",
+                      view === 'month' && !isCurrentMonth && "bg-muted/10 opacity-40",
                       isSelected && "bg-primary/5",
                       isToday && "bg-orange-50/30"
                     )}
@@ -172,7 +202,7 @@ export default function CalendarPage() {
                     </div>
 
                     <div className="flex-1 space-y-1 overflow-hidden">
-                      {daySubs.slice(0, 3).map(sub => (
+                      {daySubs.slice(0, 4).map(sub => (
                         <div 
                           key={sub.id} 
                           className="calendar-event-pill"
@@ -182,9 +212,9 @@ export default function CalendarPage() {
                           <span className="ml-auto font-mono text-[9px] opacity-80">{sub.amount}</span>
                         </div>
                       ))}
-                      {daySubs.length > 3 && (
+                      {daySubs.length > 4 && (
                         <div className="text-[10px] font-bold text-muted-foreground text-center pt-1">
-                          +{daySubs.length - 3} נוספים...
+                          +{daySubs.length - 4} נוספים...
                         </div>
                       )}
                     </div>
@@ -271,13 +301,15 @@ export default function CalendarPage() {
                   <h3 className="font-bold text-lg">תובנת פנדה 🐼</h3>
                 </div>
                 <p className="text-sm text-orange-50 leading-relaxed font-medium">
-                  שים לב: יש לך חיוב משמעותי של <span className="font-black">₪199</span> בעוד יומיים. וודא שיש מספיק יתרה בחשבון! 🚀
+                  ניהול היומן עוזר לך להבין את תזרים המזומנים הצפוי החודש. וודא שיש כיסוי לכל המינויים! 🚀
                 </p>
               </CardContent>
             </Card>
           </div>
         </div>
       </main>
+
+      <AddSubscriptionModal open={isAddModalOpen} onOpenChange={setIsAddModalOpen} />
 
       <style jsx global>{`
         .calendar-event-pill {

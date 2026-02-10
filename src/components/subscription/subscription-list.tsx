@@ -21,7 +21,10 @@ import {
   Clock,
   Settings2,
   Search,
-  Plus
+  Plus,
+  Trash2,
+  Copy,
+  MoreVertical
 } from "lucide-react"
 import { 
   DropdownMenu, 
@@ -29,7 +32,8 @@ import {
   DropdownMenuCheckboxItem, 
   DropdownMenuTrigger,
   DropdownMenuSeparator,
-  DropdownMenuLabel
+  DropdownMenuLabel,
+  DropdownMenuItem
 } from "@/components/ui/dropdown-menu"
 import { CATEGORY_METADATA, STATUS_METADATA, Subscription } from "@/app/lib/subscription-store"
 import { useSubscriptions } from "@/context/subscriptions-context"
@@ -38,11 +42,12 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import { Input } from "@/components/ui/input"
 import { AddSubscriptionModal } from "./add-subscription-modal"
+import { cn } from "@/lib/utils"
 
 type ColumnKey = 'name' | 'category' | 'amount' | 'renewal' | 'countdown' | 'status' | 'actions';
 
 export function SubscriptionList() {
-  const { subscriptions, markAsUsed } = useSubscriptions()
+  const { subscriptions, markAsUsed, deleteSubscription, duplicateSubscription } = useSubscriptions()
   const { toast } = useToast()
   
   const [viewMode, setViewMode] = React.useState<'table' | 'cards' | 'kanban'>('table')
@@ -65,9 +70,22 @@ export function SubscriptionList() {
     CATEGORY_METADATA[sub.category].label.includes(searchTerm)
   )
 
-  const handleRowClick = (sub: Subscription) => {
+  const handleEdit = (e: React.MouseEvent, sub: Subscription) => {
+    e.stopPropagation()
     setSelectedSub(sub)
     setIsModalOpen(true)
+  }
+
+  const handleDelete = (e: React.MouseEvent, id: string) => {
+    e.stopPropagation()
+    deleteSubscription(id)
+    toast({ title: "המינוי נמחק בהצלחה", variant: "destructive" })
+  }
+
+  const handleDuplicate = (e: React.MouseEvent, id: string) => {
+    e.stopPropagation()
+    duplicateSubscription(id)
+    toast({ title: "המינוי שוכפל" })
   }
 
   const handleMarkUsed = (e: React.MouseEvent, id: string, name: string) => {
@@ -94,7 +112,7 @@ export function SubscriptionList() {
     const colorClass = daysLeft <= 3 ? "text-destructive" : daysLeft <= 7 ? "text-orange-500" : "text-green-500"
 
     return (
-      <div className={`flex items-center gap-1.5 font-bold text-[11px] ${colorClass}`}>
+      <div className={cn("flex items-center gap-1.5 font-bold text-[11px]", colorClass)}>
         <Clock className="h-3.5 w-3.5" />
         {isOverdue ? "פג תוקף" : `עוד ${daysLeft} ימים`}
       </div>
@@ -102,7 +120,7 @@ export function SubscriptionList() {
   }
 
   const renderTable = () => (
-    <div className="rounded-3xl border bg-white shadow-sm overflow-hidden animate-fade-in">
+    <div className="rounded-3xl border bg-white shadow-sm overflow-hidden animate-fade-in mb-8">
       <Table>
         <TableHeader>
           <TableRow className="bg-muted/30 hover:bg-muted/30 border-none">
@@ -112,7 +130,7 @@ export function SubscriptionList() {
             {visibleColumns.renewal && <TableHead>חידוש</TableHead>}
             {visibleColumns.countdown && <TableHead>ימים שנותרו</TableHead>}
             {visibleColumns.status && <TableHead>סטטוס</TableHead>}
-            {visibleColumns.actions && <TableHead className="w-[80px]"></TableHead>}
+            {visibleColumns.actions && <TableHead className="w-[120px] text-left">פעולות</TableHead>}
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -120,7 +138,7 @@ export function SubscriptionList() {
             <TableRow 
               key={sub.id} 
               className="group cursor-pointer transition-colors hover:bg-primary/[0.02]"
-              onClick={() => handleRowClick(sub)}
+              onClick={() => { setSelectedSub(sub); setIsModalOpen(true); }}
             >
               {visibleColumns.name && (
                 <TableCell className="py-5">
@@ -161,14 +179,17 @@ export function SubscriptionList() {
               )}
               {visibleColumns.actions && (
                 <TableCell onClick={(e) => e.stopPropagation()}>
-                  <Button 
-                    variant="ghost" 
-                    size="icon" 
-                    className="h-10 w-10 rounded-full hover:text-green-600 hover:bg-green-50"
-                    onClick={(e) => handleMarkUsed(e, sub.id, sub.name)}
-                  >
-                    <CheckCircle2 className="h-5 w-5" />
-                  </Button>
+                  <div className="flex items-center justify-end gap-1">
+                    <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full hover:bg-primary/10 hover:text-primary" onClick={(e) => handleEdit(e, sub)}>
+                      <Edit2 className="h-4 w-4" />
+                    </Button>
+                    <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full hover:bg-destructive/10 hover:text-destructive" onClick={(e) => handleDelete(e, sub.id)}>
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                    <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full hover:bg-green-50 hover:text-green-600" onClick={(e) => handleMarkUsed(e, sub.id, sub.name)}>
+                      <CheckCircle2 className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </TableCell>
               )}
             </TableRow>
@@ -179,17 +200,17 @@ export function SubscriptionList() {
   )
 
   const renderCards = () => (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 animate-fade-in p-2">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 animate-fade-in p-4 mb-8">
       {filteredSubs.map(sub => (
         <Card 
           key={sub.id} 
-          className="card-shadow border-none rounded-3xl overflow-visible cursor-pointer bg-white"
-          onClick={() => handleRowClick(sub)}
+          className="card-shadow border-none rounded-3xl overflow-visible cursor-pointer bg-white group"
+          onClick={() => { setSelectedSub(sub); setIsModalOpen(true); }}
         >
           <CardContent className="p-8 pb-4">
             <div className="flex justify-between items-start mb-6">
               <div className="flex items-center gap-4">
-                <div className="h-16 w-16 rounded-3xl flex items-center justify-center text-3xl shadow-sm" style={{ backgroundColor: `${CATEGORY_METADATA[sub.category].color}15` }}>
+                <div className="h-16 w-16 rounded-3xl flex items-center justify-center text-3xl shadow-sm transition-transform group-hover:scale-110" style={{ backgroundColor: `${CATEGORY_METADATA[sub.category].color}15` }}>
                   {CATEGORY_METADATA[sub.category].icon}
                 </div>
                 <div>
@@ -197,9 +218,19 @@ export function SubscriptionList() {
                   <p className="text-sm text-muted-foreground">{CATEGORY_METADATA[sub.category].label}</p>
                 </div>
               </div>
-              <Badge style={{ backgroundColor: STATUS_METADATA[sub.status].color, color: 'white' }} className="border-none rounded-full text-[11px] px-3 py-1 shadow-sm">
-                {STATUS_METADATA[sub.status].label}
-              </Badge>
+              <div className="flex flex-col items-end gap-2">
+                <Badge style={{ backgroundColor: STATUS_METADATA[sub.status].color, color: 'white' }} className="border-none rounded-full text-[11px] px-3 py-1 shadow-sm">
+                  {STATUS_METADATA[sub.status].label}
+                </Badge>
+                <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <Button variant="secondary" size="icon" className="h-7 w-7 rounded-full shadow-sm" onClick={(e) => handleEdit(e, sub)}>
+                    <Edit2 className="h-3.5 w-3.5" />
+                  </Button>
+                  <Button variant="secondary" size="icon" className="h-7 w-7 rounded-full shadow-sm text-destructive" onClick={(e) => handleDelete(e, sub.id)}>
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </Button>
+                </div>
+              </div>
             </div>
             
             <div className="flex justify-between items-end mb-8">
@@ -232,9 +263,11 @@ export function SubscriptionList() {
             >
               <CheckCircle2 className="h-4 w-4" /> השתמשתי היום
             </Button>
-            <Button variant="ghost" size="icon" className="h-10 w-10 rounded-full hover:bg-white shadow-sm transition-all">
-              <Edit2 className="h-4 w-4" />
-            </Button>
+            <div className="flex gap-2">
+               <Button variant="ghost" size="icon" className="h-10 w-10 rounded-full hover:bg-white shadow-sm" onClick={(e) => handleDuplicate(e, sub.id)}>
+                <Copy className="h-4 w-4" />
+              </Button>
+            </div>
           </CardFooter>
         </Card>
       ))}
@@ -244,7 +277,7 @@ export function SubscriptionList() {
   const renderKanban = () => {
     const statuses: (keyof typeof STATUS_METADATA)[] = ['trial', 'active', 'frozen', 'cancelled', 'not_in_use']
     return (
-      <div className="flex gap-8 overflow-x-auto pb-8 -mx-4 px-4 h-[700px] animate-fade-in scrollbar-hide">
+      <div className="flex gap-8 overflow-x-auto pb-12 -mx-4 px-4 h-[750px] animate-fade-in scrollbar-hide">
         {statuses.map(status => {
           const items = filteredSubs.filter(s => s.status === status)
           return (
@@ -261,9 +294,14 @@ export function SubscriptionList() {
                   <Card 
                     key={sub.id} 
                     className="border-none shadow-sm hover:shadow-md transition-all cursor-pointer rounded-2xl bg-white group"
-                    onClick={() => handleRowClick(sub)}
+                    onClick={() => { setSelectedSub(sub); setIsModalOpen(true); }}
                   >
-                    <CardContent className="p-5 space-y-4 text-right">
+                    <CardContent className="p-5 space-y-4 text-right relative">
+                      <div className="absolute left-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
+                         <Button variant="secondary" size="icon" className="h-6 w-6 rounded-full" onClick={(e) => handleEdit(e, sub)}>
+                          <Edit2 className="h-3 w-3" />
+                        </Button>
+                      </div>
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3 overflow-hidden">
                           <span className="text-2xl h-10 w-10 flex items-center justify-center rounded-xl bg-muted/30 group-hover:scale-110 transition-transform">{CATEGORY_METADATA[sub.category].icon}</span>
@@ -278,11 +316,6 @@ export function SubscriptionList() {
                     </CardContent>
                   </Card>
                 ))}
-                {items.length === 0 && (
-                  <div className="h-full flex flex-col items-center justify-center text-muted-foreground text-xs opacity-50 py-10">
-                    גרור לכאן מינויים
-                  </div>
-                )}
               </div>
             </div>
           )
@@ -309,7 +342,7 @@ export function SubscriptionList() {
             variant={viewMode === 'table' ? 'default' : 'ghost'} 
             size="sm" 
             onClick={() => setViewMode('table')}
-            className={`rounded-xl gap-2 px-5 h-9 font-bold transition-all ${viewMode === 'table' ? 'shadow-lg bg-primary text-white' : 'text-muted-foreground hover:text-primary'}`}
+            className={cn("rounded-xl gap-2 px-5 h-9 font-bold transition-all", viewMode === 'table' ? 'shadow-lg bg-primary text-white' : 'text-muted-foreground hover:text-primary')}
           >
             <ListIcon className="h-4 w-4" /> טבלה
           </Button>
@@ -317,7 +350,7 @@ export function SubscriptionList() {
             variant={viewMode === 'cards' ? 'default' : 'ghost'} 
             size="sm" 
             onClick={() => setViewMode('cards')}
-            className={`rounded-xl gap-2 px-5 h-9 font-bold transition-all ${viewMode === 'cards' ? 'shadow-lg bg-primary text-white' : 'text-muted-foreground hover:text-primary'}`}
+            className={cn("rounded-xl gap-2 px-5 h-9 font-bold transition-all", viewMode === 'cards' ? 'shadow-lg bg-primary text-white' : 'text-muted-foreground hover:text-primary')}
           >
             <LayoutGrid className="h-4 w-4" /> כרטיסים
           </Button>
@@ -325,7 +358,7 @@ export function SubscriptionList() {
             variant={viewMode === 'kanban' ? 'default' : 'ghost'} 
             size="sm" 
             onClick={() => setViewMode('kanban')}
-            className={`rounded-xl gap-2 px-5 h-9 font-bold transition-all ${viewMode === 'kanban' ? 'shadow-lg bg-primary text-white' : 'text-muted-foreground hover:text-primary'}`}
+            className={cn("rounded-xl gap-2 px-5 h-9 font-bold transition-all", viewMode === 'kanban' ? 'shadow-lg bg-primary text-white' : 'text-muted-foreground hover:text-primary')}
           >
             <Columns className="h-4 w-4" /> קאנבן
           </Button>
@@ -358,7 +391,7 @@ export function SubscriptionList() {
         </DropdownMenu>
       </div>
 
-      <div className="min-h-[500px] relative">
+      <div className="min-h-[500px] pb-20">
         {viewMode === 'table' && renderTable()}
         {viewMode === 'cards' && renderCards()}
         {viewMode === 'kanban' && renderKanban()}
