@@ -28,7 +28,8 @@ import {
   Volume2,
   Eye,
   Type,
-  Mail
+  Mail,
+  Send
 } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { 
@@ -42,14 +43,15 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { sendWeeklyDigestAction } from "@/app/actions/email-actions"
 
 export default function SettingsPage() {
-  const { exportData, settings, updateSettings } = useSubscriptions()
+  const { exportData, settings, updateSettings, subscriptions } = useSubscriptions()
   const { toast } = useToast()
   const [loading, setLoading] = React.useState(false)
+  const [emailLoading, setEmailLoading] = React.useState(false)
   const [showDeleteAllAlert, setShowDeleteAllAlert] = React.useState(false)
   
-  // מצב מקומי לטופס כדי לא לעדכן את ה-Context על כל הקשה
   const [localProfile, setLocalProfile] = React.useState({
     userName: settings.userName,
     userEmail: settings.userEmail,
@@ -68,11 +70,33 @@ export default function SettingsPage() {
     }, 1000)
   }
 
-  const handleSendTestEmail = () => {
-    toast({
-      title: "אימייל נשלח",
-      description: `סיכום שבועי נשלח לכתובת ${settings.userEmail}`,
-    })
+  const handleSendRealEmail = async () => {
+    setEmailLoading(true)
+    try {
+      // שליחת המיייל האמיתי דרך Server Action
+      const result = await sendWeeklyDigestAction({
+        email: settings.userEmail,
+        userName: settings.userName,
+        subscriptions: subscriptions
+      })
+
+      if (result.success) {
+        toast({
+          title: "אימייל נשלח בהצלחה!",
+          description: `סיכום המינויים נשלח לכתובת ${settings.userEmail}`,
+        })
+      } else {
+        throw new Error(result.error)
+      }
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "שגיאה בשליחת המייל",
+        description: "ודא שהגדרת API Key עבור שירות המיילים.",
+      })
+    } finally {
+      setEmailLoading(false)
+    }
   }
 
   const handleDeleteAll = () => {
@@ -125,11 +149,11 @@ export default function SettingsPage() {
           <TabsContent value="profile" className="space-y-6">
             <Card className="card-shadow border-none rounded-3xl overflow-hidden bg-white dark:bg-zinc-900">
               <CardHeader className="bg-muted/10 dark:bg-zinc-800/50 p-6 border-b">
-                <CardTitle className="text-xl">מידע אישי</CardTitle>
-                <CardDescription>פרטי המשתמש המשמשים לניהול המינויים שלך</CardDescription>
+                <CardTitle className="text-xl text-right">מידע אישי</CardTitle>
+                <CardDescription className="text-right">פרטי המשתמש המשמשים לניהול המינויים שלך</CardDescription>
               </CardHeader>
               <CardContent className="p-8">
-                <div className="flex flex-col md:flex-row gap-10 items-center">
+                <div className="flex flex-col md:flex-row-reverse gap-10 items-center">
                   <div className="relative group">
                     <div className="h-32 w-32 rounded-3xl bg-primary/10 dark:bg-primary/20 flex items-center justify-center text-primary text-4xl font-black border-2 border-primary/20 shadow-inner group-hover:scale-105 transition-transform">
                       {localProfile.userName.charAt(0)}
@@ -185,13 +209,13 @@ export default function SettingsPage() {
           <TabsContent value="display" className="space-y-6">
             <Card className="card-shadow border-none rounded-3xl overflow-hidden bg-white dark:bg-zinc-900">
               <CardHeader className="bg-muted/10 dark:bg-zinc-800/50 p-6 border-b">
-                <CardTitle className="text-xl">נראות וממשק</CardTitle>
-                <CardDescription>התאם את חוויית השימוש שלך ב-PandaSub</CardDescription>
+                <CardTitle className="text-xl text-right">נראות וממשק</CardTitle>
+                <CardDescription className="text-right">התאם את חוויית השימוש שלך ב-PandaSub</CardDescription>
               </CardHeader>
               <CardContent className="p-8 space-y-8">
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between flex-row-reverse">
                   <div className="space-y-1 text-right">
-                    <div className="flex items-center gap-2 justify-end">
+                    <div className="flex items-center gap-2 justify-start flex-row-reverse">
                       <Label className="text-lg font-bold">מצב כהה (Dark Mode)</Label>
                       <Moon className="h-5 w-5 text-primary" />
                     </div>
@@ -202,9 +226,9 @@ export default function SettingsPage() {
                 
                 <div className="h-px bg-muted dark:bg-zinc-800 w-full" />
 
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between flex-row-reverse">
                   <div className="space-y-1 text-right">
-                    <div className="flex items-center gap-2 justify-end">
+                    <div className="flex items-center gap-2 justify-start flex-row-reverse">
                       <Label className="text-lg font-bold">תצוגה דחוסה (Compact)</Label>
                       <Monitor className="h-5 w-5 text-primary" />
                     </div>
@@ -215,9 +239,9 @@ export default function SettingsPage() {
 
                 <div className="h-px bg-muted dark:bg-zinc-800 w-full" />
 
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between flex-row-reverse">
                   <div className="space-y-1 text-right">
-                    <div className="flex items-center gap-2 justify-end">
+                    <div className="flex items-center gap-2 justify-start flex-row-reverse">
                       <Label className="text-lg font-bold">גודל גופן</Label>
                       <Type className="h-5 w-5 text-primary" />
                     </div>
@@ -240,11 +264,11 @@ export default function SettingsPage() {
           <TabsContent value="notifications" className="space-y-6">
             <Card className="card-shadow border-none rounded-3xl overflow-hidden bg-white dark:bg-zinc-900">
               <CardHeader className="bg-muted/10 dark:bg-zinc-800/50 p-6 border-b">
-                <CardTitle className="text-xl">התראות ותזכורות</CardTitle>
-                <CardDescription>שלוט בדרך שבה PandaSub מתקשר איתך</CardDescription>
+                <CardTitle className="text-xl text-right">התראות ותזכורות</CardTitle>
+                <CardDescription className="text-right">שלוט בדרך שבה PandaSub מתקשר איתך</CardDescription>
               </CardHeader>
               <CardContent className="p-8 space-y-8">
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between flex-row-reverse">
                   <div className="space-y-1 text-right">
                     <Label className="text-lg font-bold">התראות דפדפן (Push)</Label>
                     <p className="text-sm text-muted-foreground">קבל התראות בזמן אמת על חיובים קרובים וסיום ניסיון</p>
@@ -254,14 +278,21 @@ export default function SettingsPage() {
                 
                 <div className="h-px bg-muted dark:bg-zinc-800 w-full" />
 
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between flex-row-reverse">
                   <div className="space-y-1 text-right">
                     <Label className="text-lg font-bold">סיכום שבועי באימייל</Label>
-                    <p className="text-sm text-muted-foreground">קבל אימייל מדי יום ראשון עם סיכום כל החיובים הצפויים השבוע</p>
+                    <p className="text-sm text-muted-foreground">קבל אימייל עם סיכום כל החיובים הצפויים השבוע (שליחה אמיתית)</p>
                   </div>
-                  <div className="flex items-center gap-4">
-                    <Button variant="ghost" size="sm" onClick={handleSendTestEmail} className="text-xs h-8 gap-1">
-                      <Mail className="h-3 w-3" /> שלח דוגמה
+                  <div className="flex items-center gap-4 flex-row-reverse">
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={handleSendRealEmail} 
+                      disabled={emailLoading}
+                      className="rounded-full gap-2 border-primary/20 text-primary hover:bg-primary/5"
+                    >
+                      {emailLoading ? <Loader2 className="h-3 w-3 animate-spin" /> : <Send className="h-3 w-3" />}
+                      שלח עכשיו
                     </Button>
                     <Switch checked={settings.emailDigest} onCheckedChange={(checked) => updateSettings({ emailDigest: checked })} />
                   </div>
@@ -269,13 +300,13 @@ export default function SettingsPage() {
 
                 <div className="h-px bg-muted dark:bg-zinc-800 w-full" />
 
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between flex-row-reverse">
                   <div className="space-y-1 text-right">
-                    <div className="flex items-center gap-2 justify-end">
+                    <div className="flex items-center gap-2 justify-start flex-row-reverse">
                       <Label className="text-lg font-bold">התראות קוליות</Label>
                       <Volume2 className="h-5 w-5 text-primary" />
                     </div>
-                    <p className="text-sm text-muted-foreground">השמע צליל בעת קבלת התראה חדשה במערכת (נוסה בעת קבלת התראה)</p>
+                    <p className="text-sm text-muted-foreground">השמע צליל בעת קבלת התראה חדשה במערכת</p>
                   </div>
                   <Switch checked={settings.soundEnabled} onCheckedChange={(checked) => updateSettings({ soundEnabled: checked })} />
                 </div>
@@ -286,11 +317,11 @@ export default function SettingsPage() {
           <TabsContent value="data" className="space-y-6">
             <Card className="card-shadow border-none rounded-3xl overflow-hidden bg-white dark:bg-zinc-900">
               <CardHeader className="bg-destructive/5 dark:bg-destructive/10 p-6 border-b">
-                <CardTitle className="text-xl text-destructive flex items-center gap-2 justify-end">
-                  <Shield className="h-5 w-5" />
-                  אבטחה ופרטיות
-                </CardTitle>
-                <CardDescription>ניהול המידע האישי שלך והגנה על החשבון</CardDescription>
+                <div className="flex items-center gap-2 justify-start flex-row-reverse">
+                  <Shield className="h-6 w-6 text-destructive" />
+                  <CardTitle className="text-xl text-destructive text-right">אבטחה ופרטיות</CardTitle>
+                </div>
+                <CardDescription className="text-right">ניהול המידע האישי שלך והגנה על החשבון</CardDescription>
               </CardHeader>
               <CardContent className="p-8 space-y-8">
                 <div className="grid gap-6 md:grid-cols-2">
