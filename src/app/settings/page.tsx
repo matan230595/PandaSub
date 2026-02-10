@@ -14,7 +14,6 @@ import {
   Bell, 
   Shield, 
   Database, 
-  Download, 
   Trash2,
   Save,
   AlertTriangle,
@@ -264,7 +263,7 @@ export default function SettingsPage() {
               <CardContent className="space-y-8">
                 <div className="grid gap-6 md:grid-cols-2">
                   <div className="p-6 rounded-3xl border border-primary/20 bg-primary/5 space-y-4 text-right">
-                    <h4 className="font-bold flex items-center gap-2 justify-end">גיבוי נתונים <Download className="h-4 w-4" /></h4>
+                    <h4 className="font-bold flex items-center gap-2 justify-end">גיבוי נתונים <Trash2 className="h-4 w-4" /></h4>
                     <p className="text-xs text-muted-foreground">הורד את כל רשימת המינויים שלך לקובץ CSV.</p>
                     <Button variant="outline" onClick={exportData} className="w-full rounded-xl border-primary/20 text-primary font-bold">
                       ייצוא נתונים עכשיו
