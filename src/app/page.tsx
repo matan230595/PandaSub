@@ -36,21 +36,21 @@ export default function Home() {
       <TopNav />
       <main className="flex-1 container mx-auto p-4 md:p-8 space-y-8 animate-fade-in">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
+          <div className="text-right">
             <h1 className="text-4xl font-bold tracking-tight text-foreground">שלום, ישראל! 👋</h1>
             <p className="text-muted-foreground mt-1">המערכת מעודכנת. יש לך {subscriptions.length} מינויים פעילים.</p>
           </div>
-          <div className="flex items-center gap-3">
-            <Button variant="outline" onClick={exportData} className="rounded-full gap-2 border-primary/20 hover:bg-primary/5 text-primary ripple">
-              <Download className="h-4 w-4" /> ייצוא
-            </Button>
-            <Button onClick={() => setIsAddModalOpen(true)} className="rounded-full google-btn gap-2 shadow-lg bg-primary hover:bg-primary/90 ripple">
+          <div className="flex items-center gap-3 flex-row-reverse">
+            <Button onClick={() => setIsAddModalOpen(true)} className="rounded-full google-btn gap-2 shadow-lg bg-primary hover:bg-primary/90 ripple h-12 px-6">
               <Plus className="h-5 w-5" /> הוסף מינוי
+            </Button>
+            <Button variant="outline" onClick={exportData} className="rounded-full gap-2 border-primary/20 hover:bg-primary/5 text-primary ripple h-12">
+              <Download className="h-4 w-4" /> ייצוא
             </Button>
           </div>
         </div>
 
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           <StatCard 
             title='סה"כ חודשי' 
             value={`₪${totalMonthly.toLocaleString()}`} 
@@ -117,15 +117,15 @@ export default function Home() {
 function StatCard({ title, value, icon, trend, trendDesc, color }: any) {
   return (
     <Card className="card-shadow border-none rounded-2xl overflow-hidden group transition-all animate-slide-in">
-      <CardContent className="p-6">
-        <div className="flex items-center justify-between mb-4">
+      <CardContent className="p-6 text-right">
+        <div className="flex items-center justify-between mb-4 flex-row-reverse">
           <span className="text-sm font-medium text-muted-foreground">{title}</span>
           <div className={`p-2 rounded-xl ${color} group-hover:scale-110 transition-transform`}>
             {icon}
           </div>
         </div>
         <div className="text-3xl font-bold text-foreground">{value}</div>
-        <div className="mt-2 flex items-center gap-1">
+        <div className="mt-2 flex items-center gap-1 flex-row-reverse justify-end">
           {trend && <span className="text-sm font-bold text-green-500">{trend}</span>}
           <span className="text-xs text-muted-foreground">{trendDesc}</span>
         </div>

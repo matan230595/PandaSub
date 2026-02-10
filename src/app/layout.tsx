@@ -1,6 +1,8 @@
 import type {Metadata} from 'next';
 import './globals.css';
 import { SubscriptionsProvider } from '@/context/subscriptions-context';
+import { SidebarProvider } from '@/components/ui/sidebar';
+import { AppSidebar } from '@/components/app-sidebar';
 
 export const metadata: Metadata = {
   title: 'PandaSub IL - ניהול מינויים חכם',
@@ -19,9 +21,16 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&family=Heebo:wght@100..900&display=swap" rel="stylesheet" />
       </head>
-      <body className="font-body antialiased bg-background">
+      <body className="font-body antialiased bg-background overflow-x-hidden">
         <SubscriptionsProvider>
-          {children}
+          <SidebarProvider>
+            <div className="flex min-h-screen w-full flex-row-reverse">
+              <AppSidebar />
+              <div className="flex-1 flex flex-col w-full overflow-x-hidden">
+                {children}
+              </div>
+            </div>
+          </SidebarProvider>
         </SubscriptionsProvider>
       </body>
     </html>
