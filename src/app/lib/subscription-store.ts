@@ -19,12 +19,19 @@ export interface Subscription {
   renewalDate: string;
   trialEndsAt?: string;
   autoCancelDate?: string;
+  cancelLeadDays?: number; // ימים מראש להתראת ביטול יזום
   status: SubscriptionStatus;
   atRisk?: boolean;
   usageCount?: number;
   lastUsed?: string;
   priority?: 'critical' | 'high' | 'medium' | 'none';
   notes?: string;
+  credentials?: {
+    username?: string;
+    email?: string;
+    password?: string;
+    phone?: string;
+  };
 }
 
 export const CATEGORY_METADATA: Record<SubscriptionCategory, { label: string; icon: string; color: string }> = {
@@ -64,32 +71,8 @@ export const SAMPLE_SUBSCRIPTIONS: Subscription[] = [
     status: 'active',
     usageCount: 12,
     lastUsed: '2024-05-20',
-    priority: 'medium'
-  },
-  {
-    id: '2',
-    name: 'Spotify Family',
-    category: 'streaming',
-    amount: 39.9,
-    currency: '₪',
-    renewalDate: '2025-06-10',
-    status: 'active',
-    usageCount: 45,
-    lastUsed: '2024-05-22',
-    priority: 'none'
-  },
-  {
-    id: '3',
-    name: 'הולמס פלייס',
-    category: 'fitness',
-    amount: 299,
-    currency: '₪',
-    renewalDate: '2025-07-01',
-    status: 'active',
-    atRisk: true,
-    usageCount: 2,
-    lastUsed: '2024-04-15',
-    priority: 'high'
+    priority: 'medium',
+    credentials: { email: 'user@example.com', username: 'israel_n' }
   },
   {
     id: '4',
@@ -101,6 +84,7 @@ export const SAMPLE_SUBSCRIPTIONS: Subscription[] = [
     status: 'trial',
     trialEndsAt: '2025-05-28',
     autoCancelDate: '2025-05-27',
+    cancelLeadDays: 5,
     usageCount: 8,
     lastUsed: '2024-05-18',
     priority: 'critical'

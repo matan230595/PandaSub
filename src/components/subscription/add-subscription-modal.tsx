@@ -20,6 +20,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
+  FormDescription,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import {
@@ -33,6 +34,7 @@ import { useSubscriptions } from "@/context/subscriptions-context"
 import { CATEGORY_METADATA, SubscriptionCategory, SubscriptionStatus, PRIORITY_CONFIG } from "@/app/lib/subscription-store"
 import { useToast } from "@/hooks/use-toast"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { User, Key, Mail, Phone, AlertCircle } from "lucide-react"
 
 const formSchema = z.object({
   name: z.string().min(2, { message: "שם המינוי חייב להכיל לפחות 2 תווים" }),
@@ -43,7 +45,12 @@ const formSchema = z.object({
   priority: z.string(),
   trialEndsAt: z.string().optional(),
   autoCancelDate: z.string().optional(),
+  cancelLeadDays: z.coerce.number().min(0).max(30).optional(),
   notes: z.string().optional(),
+  username: z.string().optional(),
+  email: z.string().optional(),
+  password: z.string().optional(),
+  phone: z.string().optional(),
 })
 
 export function AddSubscriptionModal({ open, onOpenChange }: { open: boolean, onOpenChange: (open: boolean) => void }) {
@@ -61,7 +68,12 @@ export function AddSubscriptionModal({ open, onOpenChange }: { open: boolean, on
       priority: "none",
       trialEndsAt: "",
       autoCancelDate: "",
+      cancelLeadDays: 3,
       notes: "",
+      username: "",
+      email: "",
+      password: "",
+      phone: "",
     },
   })
 
@@ -76,7 +88,14 @@ export function AddSubscriptionModal({ open, onOpenChange }: { open: boolean, on
       priority: values.priority as any,
       trialEndsAt: values.trialEndsAt || undefined,
       autoCancelDate: values.autoCancelDate || undefined,
+      cancelLeadDays: values.cancelLeadDays,
       notes: values.notes || undefined,
+      credentials: {
+        username: values.username,
+        email: values.email,
+        password: values.password,
+        phone: values.phone,
+      }
     })
     
     toast({
@@ -90,7 +109,7 @@ export function AddSubscriptionModal({ open, onOpenChange }: { open: boolean, on
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[550px] text-right">
+      <DialogContent className="sm:max-w-[600px] text-right">
         <DialogHeader>
           <DialogTitle>הוסף מינוי חדש</DialogTitle>
           <DialogDescription>
@@ -100,9 +119,10 @@ export function AddSubscriptionModal({ open, onOpenChange }: { open: boolean, on
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <Tabs defaultValue="basic" className="w-full">
-              <TabsList className="grid w-full grid-cols-2 mb-4">
-                <TabsTrigger value="basic">פרטים בסיסיים</TabsTrigger>
-                <TabsTrigger value="advanced">הגדרות מתקדמות</TabsTrigger>
+              <TabsList className="grid w-full grid-cols-3 mb-4">
+                <TabsTrigger value="basic">בסיסי</TabsTrigger>
+                <TabsTrigger value="advanced">מתקדם</TabsTrigger>
+                <TabsTrigger value="credentials">התחברות</TabsTrigger>
               </TabsList>
               
               <TabsContent value="basic" className="space-y-4">
@@ -239,12 +259,94 @@ export function AddSubscriptionModal({ open, onOpenChange }: { open: boolean, on
                   />
                   <FormField
                     control={form.control}
-                    name="autoCancelDate"
+                    name="cancelLeadDays"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>תאריך ביטול אוטומטי</FormLabel>
+                        <FormLabel>התראת ביטול יזום (ימים מראש)</FormLabel>
                         <FormControl>
-                          <Input type="date" {...field} />
+                          <Input type="number" {...field} />
+                        </FormControl>
+                        <FormDescription>כמה ימים לפני החיוב להזכיר לך לבטל?</FormDescription>
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                <FormField
+                  control={form.control}
+                  name="notes"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>הערות</FormLabel>
+                      <FormControl>
+                        <Input placeholder="מידע נוסף..." {...field} />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+              </TabsContent>
+
+              <TabsContent value="credentials" className="space-y-4">
+                <div className="bg-primary/5 p-4 rounded-xl flex items-start gap-3 mb-4">
+                  <AlertCircle className="h-5 w-5 text-primary shrink-0" />
+                  <p className="text-xs text-muted-foreground leading-relaxed">
+                    כאן תוכל לשמור את פרטי ההתחברות לשירות. הנתונים נשמרים מקומית על המכשיר שלך בלבד.
+                  </p>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="username"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="flex items-center gap-2">
+                          <User className="h-3 w-3" /> שם משתמש
+                        </FormLabel>
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="flex items-center gap-2">
+                          <Mail className="h-3 w-3" /> אימייל
+                        </FormLabel>
+                        <FormControl>
+                          <Input type="email" {...field} />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="password"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="flex items-center gap-2">
+                          <Key className="h-3 w-3" /> סיסמה
+                        </FormLabel>
+                        <FormControl>
+                          <Input type="password" {...field} />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="phone"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="flex items-center gap-2">
+                          <Phone className="h-3 w-3" /> נייד לגיבוי
+                        </FormLabel>
+                        <FormControl>
+                          <Input {...field} />
                         </FormControl>
                       </FormItem>
                     )}

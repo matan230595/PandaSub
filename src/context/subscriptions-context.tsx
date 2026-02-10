@@ -29,7 +29,13 @@ interface Notification {
 const SubscriptionsContext = createContext<SubscriptionsContextType | undefined>(undefined);
 
 const encrypt = (data: string) => btoa(encodeURIComponent(data));
-const decrypt = (data: string) => decodeURIComponent(atob(data));
+const decrypt = (data: string) => {
+  try {
+    return decodeURIComponent(atob(data));
+  } catch(e) {
+    return data;
+  }
+};
 
 export function SubscriptionsProvider({ children }: { children: React.ReactNode }) {
   const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
@@ -37,12 +43,13 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
   const [notifications, setNotifications] = useState<Notification[]>([]);
 
   useEffect(() => {
-    const saved = localStorage.getItem('panda_subs_v3');
+    const saved = localStorage.getItem('panda_subs_v4');
     const wizardState = localStorage.getItem('panda_wizard');
     
     if (saved) {
       try {
-        setSubscriptions(JSON.parse(decrypt(saved)));
+        const decoded = decrypt(saved);
+        setSubscriptions(JSON.parse(decoded));
       } catch (e) {
         setSubscriptions(SAMPLE_SUBSCRIPTIONS);
       }
@@ -59,7 +66,7 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
 
   useEffect(() => {
     if (subscriptions.length > 0) {
-      localStorage.setItem('panda_subs_v3', encrypt(JSON.stringify(subscriptions)));
+      localStorage.setItem('panda_subs_v4', encrypt(JSON.stringify(subscriptions)));
     }
     checkReminders();
   }, [subscriptions]);
@@ -72,6 +79,20 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
       const renewalDate = new Date(sub.renewalDate);
       const diffDays = Math.ceil((renewalDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
       
+      // התראת ביטול יזום (Lead Days)
+      const leadDays = sub.cancelLeadDays || 3;
+      if (diffDays === leadDays) {
+        newNotifications.push({
+          id: `lead-cancel-${sub.id}`,
+          title: `ביטול יזום: ${sub.name}`,
+          message: `זה הזמן שביקשת לבטל את המינוי כדי להימנע מחיוב (נשארו ${diffDays} ימים).`,
+          date: today.toISOString(),
+          read: false,
+          type: 'warning',
+          priority: 'high'
+        });
+      }
+
       // Check Renewal Reminders
       if (diffDays <= 3 && diffDays > 0) {
         newNotifications.push({
@@ -82,16 +103,6 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
           read: false,
           type: 'critical',
           priority: 'critical'
-        });
-      } else if (diffDays <= 7 && diffDays > 0) {
-        newNotifications.push({
-          id: `renewal-high-${sub.id}`,
-          title: `תזכורת: ${sub.name} מתחדש בקרוב`,
-          message: `נשארו עוד ${diffDays} ימים עד לחיוב הבא.`,
-          date: today.toISOString(),
-          read: false,
-          type: 'warning',
-          priority: 'high'
         });
       }
 
@@ -163,8 +174,18 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
   };
 
   const exportData = () => {
-    const headers = ['Name', 'Category', 'Amount', 'Currency', 'Renewal Date', 'Status', 'Priority'];
-    const rows = subscriptions.map(s => [s.name, s.category, s.amount, s.currency, s.renewalDate, s.status, s.priority || 'none']);
+    const headers = ['Name', 'Category', 'Amount', 'Currency', 'Renewal Date', 'Status', 'Priority', 'Username', 'Email'];
+    const rows = subscriptions.map(s => [
+      s.name, 
+      s.category, 
+      s.amount, 
+      s.currency, 
+      s.renewalDate, 
+      s.status, 
+      s.priority || 'none',
+      s.credentials?.username || '',
+      s.credentials?.email || ''
+    ]);
     const csvContent = "data:text/csv;charset=utf-8,\uFEFF" 
       + [headers, ...rows].map(e => e.join(",")).join("\n");
     const encodedUri = encodeURI(csvContent);
