@@ -4,53 +4,58 @@
 
 @layer base {
   :root {
-    --background: 345 52% 94%;
-    --foreground: 340 20% 10%;
+    --background: 210 20% 98%;
+    --foreground: 220 20% 10%;
     --card: 0 0% 100%;
-    --card-foreground: 340 20% 15%;
+    --card-foreground: 220 20% 15%;
     --popover: 0 0% 100%;
-    --popover-foreground: 340 20% 10%;
-    --primary: 340 82% 51%;
+    --popover-foreground: 220 20% 10%;
+    --primary: 210 100% 50%; /* Google Blue */
     --primary-foreground: 0 0% 100%;
-    --secondary: 291 64% 96%;
-    --secondary-foreground: 291 64% 42%;
-    --muted: 345 20% 90%;
-    --muted-foreground: 340 10% 40%;
-    --accent: 291 64% 42%;
+    --secondary: 210 20% 90%;
+    --secondary-foreground: 210 20% 20%;
+    --muted: 210 20% 96%;
+    --muted-foreground: 215 16% 47%;
+    --accent: 210 100% 50%;
     --accent-foreground: 0 0% 100%;
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
-    --border: 340 20% 88%;
-    --input: 340 20% 88%;
-    --ring: 340 82% 51%;
-    --chart-1: 340 82% 51%;
-    --chart-2: 291 64% 42%;
-    --chart-3: 199 89% 48%;
-    --chart-4: 43 96% 58%;
-    --chart-5: 162 59% 41%;
-    --radius: 1rem;
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 210 100% 50%;
+    --radius: 0.75rem;
+
+    /* Category HSL approx */
+    --cat-streaming: 340 82% 52%;
+    --cat-fitness: 122 39% 49%;
+    --cat-insurance: 207 90% 54%;
+    --cat-saas: 282 44% 47%;
+    --cat-cloud: 187 100% 42%;
+    --cat-mobile: 36 100% 50%;
+    --cat-news: 16 25% 38%;
+    --cat-other: 200 18% 46%;
   }
 
   .dark {
-    --background: 340 20% 5%;
-    --foreground: 345 52% 94%;
-    --card: 340 20% 8%;
-    --card-foreground: 345 52% 90%;
-    --popover: 340 20% 8%;
-    --popover-foreground: 345 52% 94%;
-    --primary: 340 82% 51%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 291 40% 15%;
-    --secondary-foreground: 291 64% 70%;
-    --muted: 340 20% 15%;
-    --muted-foreground: 340 10% 60%;
-    --accent: 291 64% 42%;
-    --accent-foreground: 0 0% 100%;
-    --destructive: 0 62% 30%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 340 20% 15%;
-    --input: 340 20% 15%;
-    --ring: 340 82% 51%;
+    --background: 222 47% 11%;
+    --foreground: 213 31% 91%;
+    --card: 222 47% 11%;
+    --card-foreground: 213 31% 91%;
+    --popover: 222 47% 11%;
+    --popover-foreground: 213 31% 91%;
+    --primary: 210 100% 60%;
+    --primary-foreground: 222 47% 11%;
+    --secondary: 217 33% 17%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217 33% 17%;
+    --muted-foreground: 215 20% 65%;
+    --accent: 217 33% 17%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 63% 31%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217 33% 17%;
+    --input: 217 33% 17%;
+    --ring: 212 72% 59%;
   }
 }
 
@@ -64,6 +69,47 @@
   }
 }
 
+.card-shadow {
+  box-shadow: 0 1px 2px 0 rgba(60,64,67,.3), 0 1px 3px 1px rgba(60,64,67,.15);
+}
+
+.card-shadow:hover {
+  box-shadow: 0 4px 4px 0 rgba(60,64,67,.3), 0 8px 12px 6px rgba(60,64,67,.15);
+  transition: box-shadow 0.2s ease-in-out;
+}
+
+.ripple {
+  position: relative;
+  overflow: hidden;
+}
+
+.animate-in-slide {
+  animation: slideIn 0.4s ease-out forwards;
+}
+
+@keyframes slideIn {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.google-btn {
+  @apply rounded-full px-6 py-2 font-medium transition-all active:scale-95;
+}
+
 .rtl-flip {
   transform: scaleX(-1);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  @apply bg-transparent;
+}
+::-webkit-scrollbar-thumb {
+  @apply bg-muted-foreground/20 rounded-full;
+}
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-muted-foreground/40;
 }

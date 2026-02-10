@@ -1,5 +1,6 @@
 import type {Metadata} from 'next';
 import './globals.css';
+import { SubscriptionsProvider } from '@/context/subscriptions-context';
 
 export const metadata: Metadata = {
   title: 'PandaSub IL - ניהול מינויים חכם',
@@ -16,10 +17,12 @@ export default function RootLayout({
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap" rel="stylesheet" />
+        <link href="https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&family=Heebo:wght@100..900&display=swap" rel="stylesheet" />
       </head>
       <body className="font-body antialiased bg-background">
-        {children}
+        <SubscriptionsProvider>
+          {children}
+        </SubscriptionsProvider>
       </body>
     </html>
   );
