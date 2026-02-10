@@ -1,3 +1,4 @@
+
 "use client"
 
 import * as React from "react"
@@ -19,7 +20,8 @@ import {
   Trash2,
   Save,
   CheckCircle2,
-  AlertTriangle
+  AlertTriangle,
+  Loader2
 } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { 
@@ -39,7 +41,7 @@ export default function SettingsPage() {
   const [loading, setLoading] = React.useState(false)
   const [showDeleteAllAlert, setShowDeleteAllAlert] = React.useState(false)
   
-  // הגדרות מקומיות (ניתן לחבר ל-context בעתיד)
+  // הגדרות מקומיות
   const [userName, setUserName] = React.useState("ישראל ישראלי")
   const [userEmail, setUserEmail] = React.useState("israel@example.com")
   const [darkMode, setDarkMode] = React.useState(false)
@@ -59,7 +61,6 @@ export default function SettingsPage() {
   }
 
   const handleDeleteAll = () => {
-    // כאן תבוא לוגיקה של ניקוי localStorage
     localStorage.clear()
     toast({
       variant: "destructive",
@@ -67,7 +68,9 @@ export default function SettingsPage() {
       description: "כל הנתונים שלך נמחקו לצמיתות מהמערכת.",
     })
     setShowDeleteAllAlert(false)
-    window.location.reload()
+    setTimeout(() => {
+      window.location.reload()
+    }, 1000)
   }
 
   return (
@@ -166,7 +169,7 @@ export default function SettingsPage() {
                     className="bg-muted/50 rounded-xl px-4 py-3 text-sm font-bold border-none outline-none focus:ring-2 focus:ring-primary/20 cursor-pointer"
                   >
                     <option value="₪ - שקל חדש">₪ - שקל חדש</option>
-                    <option value="$ - דולר ארה\"ב">$ - דולר ארה"ב</option>
+                    <option value='$ - דולר ארה"ב'>$ - דולר ארה"ב</option>
                     <option value="€ - אירו">€ - אירו</option>
                   </select>
                 </div>
@@ -203,14 +206,13 @@ export default function SettingsPage() {
                 disabled={loading} 
                 className="gap-3 rounded-full px-16 h-16 bg-primary hover:bg-primary/90 shadow-2xl shadow-primary/30 text-xl font-black transition-all hover:-translate-y-1"
               >
-                {loading ? "שומר..." : <><Save className="h-6 w-6" /> שמור שינויים</>}
+                {loading ? <Loader2 className="h-6 w-6 animate-spin" /> : <><Save className="h-6 w-6" /> שמור שינויים</>}
               </Button>
             </div>
           </div>
         </div>
       </main>
 
-      {/* התראת מחיקה גלובלית */}
       <AlertDialog open={showDeleteAllAlert} onOpenChange={setShowDeleteAllAlert}>
         <AlertDialogContent className="text-right rounded-3xl border-none shadow-2xl max-w-md">
           <AlertDialogHeader className="items-center">
