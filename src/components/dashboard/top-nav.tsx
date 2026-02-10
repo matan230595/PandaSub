@@ -63,17 +63,17 @@ export function TopNav() {
                 )}
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-80 text-right rounded-2xl p-0 shadow-xl border-none mt-2 overflow-hidden">
-              <div className="p-4 bg-muted/30 font-bold border-b">התראות ותזכורות</div>
+            <DropdownMenuContent align="end" className="w-80 text-right rounded-2xl p-0 shadow-xl border-none mt-2 overflow-hidden">
+              <div className="p-4 bg-muted/30 font-bold border-b text-right">התראות ותזכורות</div>
               <ScrollArea className="h-[300px]">
                 {notifications.length > 0 ? (
                   notifications.map(n => (
                     <div 
                       key={n.id} 
-                      className={`p-4 border-b hover:bg-muted/20 cursor-pointer transition-colors ${!n.read ? 'bg-primary/5' : ''}`}
+                      className={`p-4 border-b hover:bg-muted/20 cursor-pointer transition-colors text-right ${!n.read ? 'bg-primary/5' : ''}`}
                       onClick={() => markNotificationAsRead(n.id)}
                     >
-                      <div className="flex justify-between items-start">
+                      <div className="flex justify-between items-start flex-row-reverse">
                         <Badge variant={n.type === 'critical' ? 'destructive' : 'secondary'} className="text-[10px]">
                           {n.type === 'critical' ? 'דחוף' : 'מידע'}
                         </Badge>
@@ -96,21 +96,21 @@ export function TopNav() {
                 <div className="bg-primary/10 text-primary h-full w-full flex items-center justify-center font-bold">י</div>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-64 text-right rounded-2xl p-2 shadow-xl border-none mt-2">
+            <DropdownMenuContent align="end" className="w-64 text-right rounded-2xl p-2 shadow-xl border-none mt-2">
               <DropdownMenuLabel className="flex flex-col items-center gap-1 py-4">
                 <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center text-primary text-2xl font-bold">י</div>
                 <div className="font-bold text-lg">ישראל ישראלי</div>
                 <div className="text-xs text-muted-foreground font-normal">israel@example.com</div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem className="rounded-lg gap-2 flex-row-reverse py-3">
+              <DropdownMenuItem className="rounded-lg gap-2 flex-row-reverse py-3 cursor-pointer">
                 <User className="h-4 w-4" /> פרופיל אישי
               </DropdownMenuItem>
-              <DropdownMenuItem className="rounded-lg gap-2 flex-row-reverse py-3">
+              <DropdownMenuItem className="rounded-lg gap-2 flex-row-reverse py-3 cursor-pointer">
                 <Settings className="h-4 w-4" /> הגדרות
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem className="rounded-lg text-destructive focus:bg-destructive/5 focus:text-destructive gap-2 flex-row-reverse py-3">
+              <DropdownMenuItem className="rounded-lg text-destructive focus:bg-destructive/5 focus:text-destructive gap-2 flex-row-reverse py-3 cursor-pointer">
                 התנתק
               </DropdownMenuItem>
             </DropdownMenuContent>

@@ -32,7 +32,7 @@
     @apply border-border;
   }
   body {
-    @apply bg-[#F8F9FA] text-foreground font-body;
+    @apply bg-[#F8F9FA] text-foreground font-body text-right;
     direction: rtl;
   }
 }
