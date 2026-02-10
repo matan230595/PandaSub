@@ -1,3 +1,4 @@
+
 "use client"
 
 import * as React from "react"
@@ -8,16 +9,18 @@ import { VoiceCreator } from "@/components/gen-ai/voice-creator"
 import { AIRecommendations } from "@/components/gen-ai/recommendations"
 import { SubscriptionsAtRisk } from "@/components/dashboard/risk-widget"
 import { Button } from "@/components/ui/button"
-import { Plus, Download, TrendingUp, Calendar, Lightbulb, Hourglass } from "lucide-react"
+import { Plus, Download, TrendingUp, Calendar, Lightbulb, Hourglass, FileText } from "lucide-react"
 import { Toaster } from "@/components/ui/toaster"
 import { AddSubscriptionModal } from "@/components/subscription/add-subscription-modal"
 import { useSubscriptions } from "@/context/subscriptions-context"
 import { Card, CardContent } from "@/components/ui/card"
 import { SetupWizard } from "@/components/setup-wizard"
+import { useToast } from "@/hooks/use-toast"
 
 export default function Home() {
   const [isAddModalOpen, setIsAddModalOpen] = React.useState(false)
-  const { subscriptions, exportData } = useSubscriptions()
+  const { subscriptions, exportData, settings } = useSubscriptions()
+  const { toast } = useToast()
 
   const totalMonthly = subscriptions
     .filter(s => s.status === 'active' || s.status === 'trial')
@@ -30,6 +33,25 @@ export default function Home() {
 
   const trialCount = subscriptions.filter(s => s.status === 'trial').length
 
+  const handleGenerateDraft = () => {
+    const activeSubs = subscriptions.filter(s => s.status === 'active' || s.status === 'trial');
+    const total = activeSubs.reduce((sum, s) => sum + s.amount, 0);
+    
+    const subListText = activeSubs.map(s => `• ${s.name}: ${s.amount}${s.currency} (חידוש ב-${s.renewalDate})`).join('\n');
+    
+    const subject = encodeURIComponent(`סיכום מינויים שבועי - PandaSub IL`);
+    const body = encodeURIComponent(
+      `שלום ${settings.userName},\n\nלהלן סיכום המינויים הפעילים שלך:\n\n${subListText}\n\nסה"כ חודשי: ${total.toLocaleString()} ${settings.currency}\n\nנשלח מ-PandaSub IL`
+    );
+
+    window.location.href = `mailto:${settings.userEmail}?subject=${subject}&body=${body}`;
+    
+    toast({
+      title: "טיוטת מייל נוצרה",
+      description: "אפליקציית המייל נפתחה עם הנתונים שלך.",
+    })
+  }
+
   return (
     <div className="min-h-screen flex flex-col bg-[#F8F9FA]">
       <SetupWizard />
@@ -37,14 +59,17 @@ export default function Home() {
       <main className="flex-1 container mx-auto p-4 md:p-8 space-y-8 animate-fade-in">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="text-right">
-            <h1 className="text-4xl font-bold tracking-tight text-foreground">שלום, ישראל! 👋</h1>
+            <h1 className="text-4xl font-bold tracking-tight text-foreground">שלום, {settings.userName.split(' ')[0]}! 👋</h1>
             <p className="text-muted-foreground mt-1">המערכת מעודכנת. יש לך {subscriptions.length} מינויים פעילים.</p>
           </div>
           <div className="flex items-center gap-3 flex-row-reverse">
-            <Button onClick={() => setIsAddModalOpen(true)} className="rounded-full google-btn gap-2 shadow-lg bg-primary hover:bg-primary/90 ripple h-12 px-6">
+            <Button onClick={() => setIsAddModalOpen(true)} className="rounded-full google-btn gap-2 shadow-lg h-12 px-6">
               <Plus className="h-5 w-5" /> הוסף מינוי
             </Button>
-            <Button variant="outline" onClick={exportData} className="rounded-full gap-2 border-primary/20 hover:bg-primary/5 text-primary ripple h-12">
+            <Button variant="outline" onClick={handleGenerateDraft} className="rounded-full gap-2 border-primary/20 hover:bg-primary/5 text-primary h-12">
+              <FileText className="h-4 w-4" /> טיוטת מייל
+            </Button>
+            <Button variant="ghost" onClick={exportData} className="rounded-full gap-2 text-muted-foreground h-12">
               <Download className="h-4 w-4" /> ייצוא
             </Button>
           </div>
