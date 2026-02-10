@@ -19,7 +19,7 @@ export interface Subscription {
   renewalDate: string;
   billingCycle: 'monthly' | 'yearly';
   paymentMethod?: string;
-  reminderDays: number[]; // רשימת ימים להתראה מראש, למשל [10, 3, 0]
+  reminderDays: number[]; // Array of days to notify in advance, e.g., [10, 3, 0]
   trialEndsAt?: string;
   autoCancelDate?: string;
   status: SubscriptionStatus;
@@ -69,7 +69,7 @@ export const SAMPLE_SUBSCRIPTIONS: Subscription[] = [
     category: 'streaming',
     amount: 54.9,
     currency: '₪',
-    renewalDate: '2025-06-15',
+    renewalDate: new Date(new Date().setDate(new Date().getDate() + 3)).toISOString().split('T')[0],
     billingCycle: 'monthly',
     paymentMethod: 'Visa 4242',
     reminderDays: [7, 3, 0],
@@ -80,7 +80,20 @@ export const SAMPLE_SUBSCRIPTIONS: Subscription[] = [
     credentials: { email: 'user@example.com', username: 'israel_n' }
   },
   {
-    id: '4',
+    id: '2',
+    name: 'Spotify Family',
+    category: 'streaming',
+    amount: 31.9,
+    currency: '₪',
+    renewalDate: new Date(new Date().setDate(new Date().getDate() + 0)).toISOString().split('T')[0],
+    billingCycle: 'monthly',
+    paymentMethod: 'Mastercard 1234',
+    reminderDays: [3, 0],
+    status: 'active',
+    priority: 'none'
+  },
+  {
+    id: '3',
     name: 'Adobe Creative Cloud',
     category: 'saas',
     amount: 199,
