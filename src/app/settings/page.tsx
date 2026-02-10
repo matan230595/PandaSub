@@ -14,6 +14,7 @@ import {
   Bell, 
   Shield, 
   Database, 
+  Download, 
   Trash2,
   Save,
   AlertTriangle,
@@ -126,7 +127,7 @@ export default function SettingsPage() {
 
           <TabsContent value="profile" className="space-y-6">
             <Card className="card-shadow border-none rounded-3xl overflow-hidden bg-white">
-              <CardHeader className="text-right">
+              <CardHeader className="text-right items-start">
                 <CardTitle className="text-xl">מידע אישי</CardTitle>
                 <CardDescription>פרטי המשתמש המשמשים לניהול המינויים</CardDescription>
               </CardHeader>
@@ -176,7 +177,7 @@ export default function SettingsPage() {
 
           <TabsContent value="display" className="space-y-6">
             <Card className="card-shadow border-none rounded-3xl overflow-hidden bg-white">
-              <CardHeader className="text-right">
+              <CardHeader className="text-right items-start">
                 <CardTitle className="text-xl">נראות וממשק</CardTitle>
                 <CardDescription>התאם את חוויית השימוש שלך</CardDescription>
               </CardHeader>
@@ -204,7 +205,7 @@ export default function SettingsPage() {
 
           <TabsContent value="notifications" className="space-y-6">
             <Card className="card-shadow border-none rounded-3xl overflow-hidden bg-white">
-              <CardHeader className="text-right">
+              <CardHeader className="text-right items-start">
                 <CardTitle className="text-xl">התראות ותזכורות</CardTitle>
                 <CardDescription>שלוט בדרך שבה PandaSub מתקשר איתך</CardDescription>
               </CardHeader>
@@ -253,8 +254,8 @@ export default function SettingsPage() {
 
           <TabsContent value="data" className="space-y-6">
             <Card className="card-shadow border-none rounded-3xl overflow-hidden bg-white">
-              <CardHeader className="text-right flex flex-col items-end">
-                <div className="flex items-center gap-3 justify-end flex-row-reverse">
+              <CardHeader className="text-right items-start">
+                <div className="flex items-center gap-3">
                   <Shield className="h-6 w-6 text-primary" />
                   <CardTitle className="text-xl">אבטחה ופרטיות</CardTitle>
                 </div>
@@ -263,7 +264,7 @@ export default function SettingsPage() {
               <CardContent className="space-y-8">
                 <div className="grid gap-6 md:grid-cols-2">
                   <div className="p-6 rounded-3xl border border-primary/20 bg-primary/5 space-y-4 text-right">
-                    <h4 className="font-bold flex items-center gap-2 justify-end">גיבוי נתונים <Trash2 className="h-4 w-4" /></h4>
+                    <h4 className="font-bold flex items-center gap-2 justify-end">גיבוי נתונים <Download className="h-4 w-4" /></h4>
                     <p className="text-xs text-muted-foreground">הורד את כל רשימת המינויים שלך לקובץ CSV.</p>
                     <Button variant="outline" onClick={exportData} className="w-full rounded-xl border-primary/20 text-primary font-bold">
                       ייצוא נתונים עכשיו
