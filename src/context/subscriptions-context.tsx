@@ -1,3 +1,4 @@
+
 "use client"
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
@@ -8,6 +9,7 @@ interface SubscriptionsContextType {
   addSubscription: (sub: Omit<Subscription, 'id'>) => void;
   updateSubscription: (id: string, sub: Partial<Subscription>) => void;
   deleteSubscription: (id: string) => void;
+  duplicateSubscription: (id: string) => void;
   markAsUsed: (id: string) => void;
   isWizardComplete: boolean;
   completeWizard: () => void;
@@ -43,7 +45,7 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
   const [notifications, setNotifications] = useState<Notification[]>([]);
 
   useEffect(() => {
-    const saved = localStorage.getItem('panda_subs_v4');
+    const saved = localStorage.getItem('panda_subs_v5');
     const wizardState = localStorage.getItem('panda_wizard');
     
     if (saved) {
@@ -66,7 +68,7 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
 
   useEffect(() => {
     if (subscriptions.length > 0) {
-      localStorage.setItem('panda_subs_v4', encrypt(JSON.stringify(subscriptions)));
+      localStorage.setItem('panda_subs_v5', encrypt(JSON.stringify(subscriptions)));
     }
     checkReminders();
   }, [subscriptions]);
@@ -80,10 +82,10 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
       const diffDays = Math.ceil((renewalDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
       
       // התראת ביטול יזום (Lead Days)
-      const leadDays = sub.cancelLeadDays || 3;
-      if (diffDays === leadDays) {
+      const leadDays = sub.cancelLeadDays || 0;
+      if (leadDays > 0 && diffDays === leadDays) {
         newNotifications.push({
-          id: `lead-cancel-${sub.id}`,
+          id: `lead-cancel-${sub.id}-${today.getDate()}`,
           title: `ביטול יזום: ${sub.name}`,
           message: `זה הזמן שביקשת לבטל את המינוי כדי להימנע מחיוב (נשארו ${diffDays} ימים).`,
           date: today.toISOString(),
@@ -94,10 +96,10 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
       }
 
       // Check Renewal Reminders
-      if (diffDays <= 3 && diffDays > 0) {
+      if (diffDays <= 3 && diffDays >= 0) {
         newNotifications.push({
-          id: `renewal-crit-${sub.id}`,
-          title: `דחוף: חיוב מחר/היום עבור ${sub.name}`,
+          id: `renewal-crit-${sub.id}-${today.getDate()}`,
+          title: `דחוף: חיוב עבור ${sub.name}`,
           message: `המינוי מתחדש בעוד ${diffDays} ימים. סכום: ${sub.amount} ${sub.currency}`,
           date: today.toISOString(),
           read: false,
@@ -110,9 +112,9 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
       if (sub.status === 'trial' && sub.trialEndsAt) {
         const trialEnd = new Date(sub.trialEndsAt);
         const trialDiff = Math.ceil((trialEnd.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-        if (trialDiff <= 3 && trialDiff > 0) {
+        if (trialDiff <= 3 && trialDiff >= 0) {
           newNotifications.push({
-            id: `trial-${sub.id}`,
+            id: `trial-end-${sub.id}-${today.getDate()}`,
             title: `תקופת ניסיון מסתיימת: ${sub.name}`,
             message: `שים לב, תקופת הניסיון מסתיימת בעוד ${trialDiff} ימים.`,
             date: today.toISOString(),
@@ -129,7 +131,7 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
         const daysSinceUsed = Math.ceil((today.getTime() - lastUsedDate.getTime()) / (1000 * 60 * 60 * 24));
         if (daysSinceUsed >= 30 && sub.status === 'active') {
           newNotifications.push({
-            id: `usage-${sub.id}`,
+            id: `usage-${sub.id}-${today.getDate()}`,
             title: `מינוי לא בשימוש: ${sub.name}`,
             message: `לא השתמשת ב-${sub.name} כבר חודש. אולי כדאי לבטל ולחסוך?`,
             date: today.toISOString(),
@@ -159,6 +161,17 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
 
   const deleteSubscription = (id: string) => {
     setSubscriptions(prev => prev.filter(s => s.id !== id));
+  };
+
+  const duplicateSubscription = (id: string) => {
+    const subToCopy = subscriptions.find(s => s.id === id);
+    if (subToCopy) {
+      const { id: _, name, ...rest } = subToCopy;
+      addSubscription({
+        ...rest,
+        name: `${name} (עותק)`,
+      });
+    }
   };
 
   const markAsUsed = (id: string) => {
@@ -206,7 +219,8 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
       subscriptions, 
       addSubscription, 
       updateSubscription, 
-      deleteSubscription, 
+      deleteSubscription,
+      duplicateSubscription,
       markAsUsed,
       isWizardComplete,
       completeWizard,
