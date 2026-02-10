@@ -90,34 +90,6 @@ export default function SettingsPage() {
     })
   }
 
-  const handleSendRealEmail = async () => {
-    setEmailLoading(true)
-    try {
-      const result = await sendWeeklyDigestAction({
-        email: settings.userEmail,
-        userName: settings.userName,
-        subscriptions: subscriptions
-      })
-
-      if (result.success) {
-        toast({
-          title: "אימייל נשלח בהצלחה!",
-          description: `סיכום המינויים נשלח לכתובת ${settings.userEmail}`,
-        })
-      } else {
-        throw new Error(result.error)
-      }
-    } catch (error: any) {
-      toast({
-        variant: "destructive",
-        title: "שגיאה בשליחת המייל",
-        description: "ודא שהגדרת API Key עבור שירות המיילים או השתמש באופציית הטיוטה.",
-      })
-    } finally {
-      setEmailLoading(false)
-    }
-  }
-
   const handleDeleteAll = () => {
     localStorage.clear()
     toast({
@@ -167,11 +139,11 @@ export default function SettingsPage() {
 
           <TabsContent value="profile" className="space-y-6">
             <Card className="card-shadow border-none rounded-3xl overflow-hidden bg-white">
-              <CardHeader>
+              <CardHeader className="text-right">
                 <CardTitle className="text-xl">מידע אישי</CardTitle>
                 <CardDescription>פרטי המשתמש המשמשים לניהול המינויים</CardDescription>
               </CardHeader>
-              <CardContent className="space-y-6">
+              <CardContent className="space-y-6 text-right">
                 <div className="grid gap-6 md:grid-cols-2">
                   <div className="space-y-2">
                     <Label className="font-bold">שם מלא</Label>
@@ -203,7 +175,7 @@ export default function SettingsPage() {
                     <select 
                       value={settings.currency}
                       onChange={(e) => updateSettings({ currency: e.target.value })}
-                      className="w-full h-12 rounded-xl bg-muted/30 px-4 font-bold border-none"
+                      className="w-full h-12 rounded-xl bg-muted/30 px-4 font-bold border-none text-right"
                     >
                       <option value="₪">₪ - שקל חדש</option>
                       <option value="$">$ - דולר אמריקאי</option>
@@ -217,13 +189,13 @@ export default function SettingsPage() {
 
           <TabsContent value="display" className="space-y-6">
             <Card className="card-shadow border-none rounded-3xl overflow-hidden bg-white">
-              <CardHeader>
+              <CardHeader className="text-right">
                 <CardTitle className="text-xl">נראות וממשק</CardTitle>
                 <CardDescription>התאם את חוויית השימוש שלך</CardDescription>
               </CardHeader>
               <CardContent className="space-y-8">
-                <div className="flex items-center justify-between">
-                  <div className="space-y-1">
+                <div className="flex items-center justify-between flex-row-reverse">
+                  <div className="space-y-1 text-right">
                     <Label className="text-lg font-bold">מצב כהה (Dark Mode)</Label>
                     <p className="text-sm text-muted-foreground">הפעל תצוגה כהה לחיסכון בסוללה</p>
                   </div>
@@ -232,8 +204,8 @@ export default function SettingsPage() {
                 
                 <div className="h-px bg-muted w-full" />
 
-                <div className="flex items-center justify-between">
-                  <div className="space-y-1">
+                <div className="flex items-center justify-between flex-row-reverse">
+                  <div className="space-y-1 text-right">
                     <Label className="text-lg font-bold">תצוגה דחוסה</Label>
                     <p className="text-sm text-muted-foreground">צמצם מרווחים כדי לראות יותר מידע</p>
                   </div>
@@ -245,13 +217,13 @@ export default function SettingsPage() {
 
           <TabsContent value="notifications" className="space-y-6">
             <Card className="card-shadow border-none rounded-3xl overflow-hidden bg-white">
-              <CardHeader>
+              <CardHeader className="text-right">
                 <CardTitle className="text-xl">התראות ותזכורות</CardTitle>
                 <CardDescription>שלוט בדרך שבה PandaSub מתקשר איתך</CardDescription>
               </CardHeader>
               <CardContent className="space-y-8">
-                <div className="flex items-center justify-between">
-                  <div className="space-y-1">
+                <div className="flex items-center justify-between flex-row-reverse">
+                  <div className="space-y-1 text-right">
                     <Label className="text-lg font-bold">התראות דפדפן (Push)</Label>
                     <p className="text-sm text-muted-foreground">קבל התראות בזמן אמת על חיובים</p>
                   </div>
@@ -260,8 +232,8 @@ export default function SettingsPage() {
                 
                 <div className="h-px bg-muted w-full" />
 
-                <div className="flex items-center justify-between">
-                  <div className="space-y-1">
+                <div className="flex items-center justify-between flex-row-reverse">
+                  <div className="space-y-1 text-right">
                     <Label className="text-lg font-bold">סיכום שבועי באימייל</Label>
                     <p className="text-sm text-muted-foreground">קבל אימייל עם סיכום כל החיובים השבועיים</p>
                   </div>
@@ -281,8 +253,8 @@ export default function SettingsPage() {
 
                 <div className="h-px bg-muted w-full" />
 
-                <div className="flex items-center justify-between">
-                  <div className="space-y-1">
+                <div className="flex items-center justify-between flex-row-reverse">
+                  <div className="space-y-1 text-right">
                     <Label className="text-lg font-bold">התראות קוליות</Label>
                     <p className="text-sm text-muted-foreground">השמע צליל בעת התראה חדשה</p>
                   </div>
@@ -294,16 +266,16 @@ export default function SettingsPage() {
 
           <TabsContent value="data" className="space-y-6">
             <Card className="card-shadow border-none rounded-3xl overflow-hidden bg-white">
-              <CardHeader>
-                <div className="flex items-center gap-3">
-                  <Shield className="h-6 w-6 text-primary" />
+              <CardHeader className="text-right">
+                <div className="flex items-center gap-3 justify-end">
                   <CardTitle className="text-xl">אבטחה ופרטיות</CardTitle>
+                  <Shield className="h-6 w-6 text-primary" />
                 </div>
                 <CardDescription>ניהול המידע האישי והגנה על החשבון</CardDescription>
               </CardHeader>
               <CardContent className="space-y-8">
                 <div className="grid gap-6 md:grid-cols-2">
-                  <div className="p-6 rounded-3xl border border-primary/20 bg-primary/5 space-y-4">
+                  <div className="p-6 rounded-3xl border border-primary/20 bg-primary/5 space-y-4 text-right">
                     <h4 className="font-bold flex items-center gap-2 justify-end">גיבוי נתונים <Download className="h-4 w-4" /></h4>
                     <p className="text-xs text-muted-foreground">הורד את כל רשימת המינויים שלך לקובץ CSV.</p>
                     <Button variant="outline" onClick={exportData} className="w-full rounded-xl border-primary/20 text-primary font-bold">
@@ -311,7 +283,7 @@ export default function SettingsPage() {
                     </Button>
                   </div>
 
-                  <div className="p-6 rounded-3xl border border-destructive/20 bg-destructive/5 space-y-4">
+                  <div className="p-6 rounded-3xl border border-destructive/20 bg-destructive/5 space-y-4 text-right">
                     <h4 className="font-bold text-destructive flex items-center gap-2 justify-end">מחיקת חשבון <Trash2 className="h-4 w-4" /></h4>
                     <p className="text-xs text-muted-foreground">פעולה זו תמחק את כל המידע שלך לצמיתות.</p>
                     <Button variant="outline" onClick={() => setShowDeleteAllAlert(true)} className="w-full rounded-xl border-destructive/20 text-destructive font-bold">
@@ -326,21 +298,21 @@ export default function SettingsPage() {
       </main>
 
       <AlertDialog open={showDeleteAllAlert} onOpenChange={setShowDeleteAllAlert}>
-        <AlertDialogContent className="text-right rounded-3xl">
+        <AlertDialogContent className="text-right rounded-3xl border-none shadow-2xl">
           <AlertDialogHeader className="items-center">
             <div className="h-20 w-20 rounded-full bg-destructive/10 flex items-center justify-center text-destructive mb-4">
               <AlertTriangle className="h-10 w-10" />
             </div>
             <AlertDialogTitle className="text-2xl font-bold">למחוק את הכל?</AlertDialogTitle>
-            <AlertDialogDescription className="text-center">
-              פעולה זו תנקה את כל המינויים וההגדרות שלך לצמיתות.
+            <AlertDialogDescription className="text-center text-muted-foreground">
+              פעולה זו תנקה את כל המינויים וההגדרות שלך לצמיתות. לא ניתן יהיה לשחזר את המידע.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="flex-row-reverse sm:justify-center gap-3 mt-8">
             <AlertDialogAction onClick={handleDeleteAll} className="bg-destructive hover:bg-destructive/90 rounded-full px-10 h-12 font-black">
               כן, מחק הכל
             </AlertDialogAction>
-            <AlertDialogCancel className="rounded-full h-12 px-10">ביטול</AlertDialogCancel>
+            <AlertDialogCancel className="rounded-full h-12 px-10 font-bold">ביטול</AlertDialogCancel>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

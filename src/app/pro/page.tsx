@@ -14,7 +14,8 @@ import {
   Users, 
   ArrowRight,
   CheckCircle2,
-  Lock
+  Lock,
+  Heart
 } from "lucide-react"
 import Link from "next/link"
 
@@ -22,7 +23,7 @@ export default function ProPage() {
   return (
     <div className="min-h-screen flex flex-col bg-[#F8F9FA]">
       <TopNav />
-      <main className="flex-1 container mx-auto p-4 md:p-8 space-y-12 animate-fade-in pb-20 max-w-5xl">
+      <main className="flex-1 container mx-auto p-4 md:p-8 space-y-12 animate-fade-in pb-20 max-w-6xl">
         
         {/* Hero Section */}
         <div className="text-center space-y-6 pt-8">
@@ -67,17 +68,19 @@ export default function ProPage() {
           />
         </div>
 
-        {/* Comparison Section */}
-        <Card className="card-shadow border-none rounded-3xl overflow-hidden bg-white mt-12">
-          <CardHeader className="bg-primary/5 text-center p-8 border-b">
-            <CardTitle className="text-3xl font-black">המסלול שמתאים לך</CardTitle>
-            <CardDescription className="text-lg">שקיפות מלאה ללא אותיות קטנות</CardDescription>
-          </CardHeader>
-          <CardContent className="p-0">
-            <div className="grid md:grid-cols-2 divide-x divide-x-reverse">
-              <div className="p-10 space-y-6">
-                <h3 className="text-2xl font-bold">Panda Free</h3>
-                <div className="text-4xl font-black">₪0 <span className="text-sm font-normal text-muted-foreground">/ לתמיד</span></div>
+        {/* Comparison Section - Now with 3 plans */}
+        <div className="space-y-8 mt-12">
+          <div className="text-center">
+            <h2 className="text-3xl font-black">המסלול שמתאים לך</h2>
+            <p className="text-muted-foreground mt-2">שקיפות מלאה ללא אותיות קטנות</p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-6">
+            {/* Free Plan */}
+            <Card className="card-shadow border-none rounded-3xl overflow-hidden bg-white flex flex-col">
+              <div className="p-8 space-y-6 flex-1">
+                <h3 className="text-2xl font-bold text-right">Panda Free</h3>
+                <div className="text-4xl font-black text-right">₪0 <span className="text-sm font-normal text-muted-foreground">/ לתמיד</span></div>
                 <ul className="space-y-4">
                   <PriceItem text="ניהול ידני של עד 10 מינויים" check />
                   <PriceItem text="יומן חיובים בסיסי" check />
@@ -86,25 +89,52 @@ export default function ProPage() {
                   <PriceItem text="ביטול אוטומטי" cross />
                 </ul>
               </div>
-              <div className="p-10 space-y-6 bg-primary/[0.02] relative">
-                <div className="absolute top-6 left-6 bg-primary text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-tighter shadow-lg">מומלץ</div>
-                <h3 className="text-2xl font-bold text-primary">Panda Pro</h3>
-                <div className="text-4xl font-black text-primary">₪19 <span className="text-sm font-normal text-muted-foreground">/ לחודש</span></div>
+              <div className="p-8 pt-0">
+                <Button variant="outline" className="w-full rounded-2xl h-12 font-bold">המשך בחינם</Button>
+              </div>
+            </Card>
+
+            {/* Pro Plan */}
+            <Card className="card-shadow border-2 border-primary rounded-3xl overflow-hidden bg-white relative flex flex-col scale-105 z-10">
+              <div className="absolute top-4 left-4 bg-primary text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-tighter shadow-lg">מומלץ</div>
+              <div className="p-8 space-y-6 flex-1 bg-primary/[0.02]">
+                <h3 className="text-2xl font-bold text-primary text-right">Panda Pro</h3>
+                <div className="text-4xl font-black text-primary text-right">₪19 <span className="text-sm font-normal text-muted-foreground">/ לחודש</span></div>
                 <ul className="space-y-4">
                   <PriceItem text="ניהול מינויים ללא הגבלה" check />
-                  <PriceItem text="סנכרון בנקאי אוטומטי מלא" check />
-                  <PriceItem text="ביטול מינויים בלחיצת כפתור" check />
-                  <PriceItem text="דוח תובנות AI שבועי מפורט" check />
-                  <PriceItem text="תמיכה בניהול משפחתי" check />
+                  <PriceItem text="סנכרון בנקאי אוטומטי" check />
+                  <PriceItem text="ביטול בלחיצת כפתור" check />
+                  <PriceItem text="דוח תובנות AI מפורט" check />
+                  <PriceItem text="תמיכה בניהול משפחתי" cross />
                 </ul>
-                <Button className="w-full rounded-2xl h-12 font-bold shadow-lg mt-6">השתדרג ל-Pro עכשיו</Button>
               </div>
-            </div>
-          </CardContent>
-        </Card>
+              <div className="p-8 pt-0 bg-primary/[0.02]">
+                <Button className="w-full rounded-2xl h-12 font-bold shadow-lg google-btn">השתדרג ל-Pro</Button>
+              </div>
+            </Card>
+
+            {/* Family Plan */}
+            <Card className="card-shadow border-none rounded-3xl overflow-hidden bg-white flex flex-col">
+              <div className="p-8 space-y-6 flex-1">
+                <h3 className="text-2xl font-bold text-right flex items-center gap-2 justify-end">Panda Family <Heart className="h-5 w-5 text-red-500 fill-red-500" /></h3>
+                <div className="text-4xl font-black text-right">₪35 <span className="text-sm font-normal text-muted-foreground">/ לחודש</span></div>
+                <ul className="space-y-4">
+                  <PriceItem text="כל יכולות ה-Pro ל-5 משתמשים" check />
+                  <PriceItem text="ניהול תקציב משותף" check />
+                  <PriceItem text="בקרת הורים על מינויי נוער" check />
+                  <PriceItem text="תמיכה אישית בביטולים מורכבים" check />
+                  <PriceItem text="תמיכת VIP עדיפות ראשונה" check />
+                </ul>
+              </div>
+              <div className="p-8 pt-0">
+                <Button variant="outline" className="w-full rounded-2xl h-12 font-bold border-primary text-primary hover:bg-primary/5">בחר במסלול משפחתי</Button>
+              </div>
+            </Card>
+          </div>
+        </div>
 
         {/* Trust Footer */}
-        <div className="flex flex-col md:flex-row items-center justify-center gap-8 text-muted-foreground opacity-60 grayscale hover:grayscale-0 transition-all">
+        <div className="flex flex-col md:flex-row items-center justify-center gap-8 text-muted-foreground opacity-60 grayscale hover:grayscale-0 transition-all pt-10">
           <div className="flex items-center gap-2 font-bold"><ShieldCheck className="h-5 w-5" /> אבטחה בדרגת בנק</div>
           <div className="flex items-center gap-2 font-bold"><Lock className="h-5 w-5" /> מידע מוצפן 256-bit</div>
           <div className="flex items-center gap-2 font-bold"><CheckCircle2 className="h-5 w-5" /> 30 יום החזר כספי</div>
@@ -133,7 +163,7 @@ function PriceItem({ text, check, cross }: any) {
     <li className={`flex items-center gap-3 flex-row-reverse text-sm font-medium ${cross ? 'opacity-40' : ''}`}>
       {check && <CheckCircle2 className="h-5 w-5 text-green-500 shrink-0" />}
       {cross && <Lock className="h-5 w-5 text-muted-foreground shrink-0" />}
-      <span className="flex-1">{text}</span>
+      <span className="flex-1 text-right">{text}</span>
     </li>
   )
 }
