@@ -1,3 +1,4 @@
+
 "use client"
 
 import * as React from "react"
@@ -33,24 +34,18 @@ export function AIRecommendations({ compact = false }: { compact?: boolean }) {
   return (
     <Card className={cn(
       "overflow-hidden border-none shadow-lg rounded-3xl bg-white dark:bg-zinc-900 h-full flex flex-col",
-      compact ? "h-[160px]" : ""
-    )}>
-      {/* Updated Header with matching gradient and RTL alignment */}
-      <CardHeader className={cn(
-        "bg-gradient-to-br from-primary to-blue-700 text-white border-b-0",
-        compact ? "p-4 py-2.5" : "p-8"
-      )}>
+      compact ? "min-h-[160px]" : "min-h-[300px]"
+    )} dir="rtl">
+      {/* Header with gradient and RTL alignment */}
+      <CardHeader className="bg-gradient-to-br from-primary to-blue-700 text-white border-b-0 p-6 md:p-8">
         <div className="flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div className={cn(
-              "bg-white/20 rounded-xl shadow-sm border border-white/10",
-              compact ? "p-1.5" : "p-3"
-            )}>
-              <Sparkles className={cn("text-white", compact ? "h-4 w-4" : "h-6 w-6")} />
+          <div className="flex items-center gap-4">
+            <div className="bg-white/20 p-3 rounded-2xl shadow-sm border border-white/10">
+              <Sparkles className="text-white h-6 w-6" />
             </div>
             <div className="text-right">
-              <CardTitle className={cn("font-black", compact ? "text-lg" : "text-2xl")}>תובנות Panda AI</CardTitle>
-              {!compact && <CardDescription className="text-sm font-medium mt-1 text-blue-50/80">ניתוח חכם של הרגלי הצריכה שלך</CardDescription>}
+              <CardTitle className="font-black text-xl md:text-2xl">תובנות Panda AI</CardTitle>
+              <CardDescription className="text-sm font-medium mt-1 text-blue-50/80">ניתוח חכם של הרגלי הצריכה שלך</CardDescription>
             </div>
           </div>
           <Button 
@@ -58,77 +53,66 @@ export function AIRecommendations({ compact = false }: { compact?: boolean }) {
             size="sm" 
             onClick={getRecommendations} 
             disabled={loading}
-            className="text-white hover:text-white hover:bg-white/10 rounded-full h-8 w-8 p-0"
+            className="text-white hover:text-white hover:bg-white/10 rounded-full h-10 w-10 p-0"
           >
-            <RefreshCcw className={cn(loading ? "animate-spin" : "", "h-4 w-4")} />
+            <RefreshCcw className={cn(loading ? "animate-spin" : "", "h-5 w-5")} />
           </Button>
         </div>
       </CardHeader>
       
-      <CardContent className="p-0 flex-1 flex flex-col justify-center overflow-hidden">
+      <CardContent className="p-0 flex-1 flex flex-col justify-center overflow-hidden bg-muted/5">
         {!results && !loading ? (
-          <div className={cn("text-center animate-fade-in", compact ? "p-3 space-y-2" : "p-10 space-y-8")}>
-            {!compact && (
-              <div className="relative mx-auto h-20 w-24">
-                <div className="absolute inset-0 bg-primary/10 rounded-full animate-ping opacity-20" />
-                <div className="relative h-20 w-20 rounded-full bg-primary/10 flex items-center justify-center text-primary mx-auto">
-                  <Sparkles className="h-10 w-10" />
-                </div>
+          <div className="text-center animate-fade-in p-8 md:p-12 space-y-8">
+            <div className="relative mx-auto h-24 w-24">
+              <div className="absolute inset-0 bg-primary/10 rounded-full animate-pulse" />
+              <div className="relative h-24 w-24 rounded-full bg-primary/10 flex items-center justify-center text-primary mx-auto border-2 border-primary/20">
+                <Sparkles className="h-12 w-12" />
               </div>
-            )}
-            <div className="space-y-1">
-              <h4 className={cn("font-black", compact ? "text-xs" : "text-xl")}>מוכן לחיסכון חכם?</h4>
-              <p className={cn("text-muted-foreground mx-auto font-medium leading-tight", compact ? "text-[9px] max-w-[180px]" : "text-base max-w-xs")}>
-                ה-AI שלנו יסרוק את המינויים שלך וימצא עבורך כפילויות.
+            </div>
+            <div className="space-y-2">
+              <h4 className="font-black text-xl md:text-2xl">מוכן לחיסכון חכם?</h4>
+              <p className="text-muted-foreground mx-auto font-medium leading-relaxed max-w-sm">
+                ה-AI שלנו יסרוק את המינויים שלך וימצא עבורך כפילויות, חלופות זולות יותר והזדמנויות לחיסכון מיידי.
               </p>
             </div>
             <Button 
               onClick={getRecommendations} 
-              className={cn(
-                "bg-primary hover:bg-primary/90 rounded-full shadow-lg shadow-primary/20 font-black transition-all hover:scale-105 active:scale-95",
-                compact ? "px-5 h-8 text-[10px]" : "px-10 h-14 text-lg"
-              )}
+              className="bg-primary hover:bg-primary/90 rounded-full shadow-xl shadow-primary/20 font-black transition-all hover:scale-105 active:scale-95 px-12 h-14 text-lg"
             >
-              צור המלצות
+              צור המלצות עכשיו
             </Button>
           </div>
         ) : loading ? (
-          <div className={cn("space-y-4", compact ? "p-4" : "p-10")}>
-            <div className="space-y-2">
-              <Skeleton className="h-3 w-3/4 ml-auto rounded-full" />
-              <Skeleton className="h-3 w-full ml-auto rounded-full" />
-              <Skeleton className="h-3 w-5/6 ml-auto rounded-full" />
+          <div className="p-8 md:p-12 space-y-6">
+            <div className="space-y-3">
+              <Skeleton className="h-4 w-3/4 mr-0 ml-auto rounded-full" />
+              <Skeleton className="h-4 w-full mr-0 ml-auto rounded-full" />
+              <Skeleton className="h-4 w-5/6 mr-0 ml-auto rounded-full" />
+              <Skeleton className="h-4 w-2/3 mr-0 ml-auto rounded-full" />
             </div>
-            <div className="flex justify-center pt-2">
-              <div className="flex items-center gap-2 text-primary text-xs font-bold animate-pulse">
-                <RefreshCcw className="h-3 w-3 animate-spin" />
-                מנתח...
+            <div className="flex justify-center pt-4">
+              <div className="flex items-center gap-3 text-primary font-bold animate-pulse">
+                <RefreshCcw className="h-5 w-5 animate-spin" />
+                מנתח את הנתונים שלך...
               </div>
             </div>
           </div>
         ) : (
-          <div className={cn("animate-fade-in overflow-y-auto custom-scrollbar h-full", compact ? "p-3" : "p-8")}>
-            <div className={cn(
-              "text-right bg-primary/5 rounded-2xl border border-primary/10 shadow-inner",
-              compact ? "p-3" : "p-8"
-            )}>
-              <div className={cn(
-                "whitespace-pre-wrap leading-relaxed text-foreground font-bold selection:bg-primary/20 direction-rtl",
-                compact ? "text-[10px]" : "text-base"
-              )}>
-                {results}
+          <div className="animate-fade-in flex-1 flex flex-col h-full max-h-[500px]">
+            <div className="p-6 md:p-8 overflow-y-auto custom-scrollbar flex-1">
+              <div className="text-right bg-white dark:bg-zinc-800 rounded-3xl border border-primary/10 shadow-inner p-6 md:p-8">
+                <div className="whitespace-pre-wrap leading-relaxed text-foreground font-medium selection:bg-primary/20 text-base md:text-lg prose prose-zinc dark:prose-invert max-w-none">
+                  {results}
+                </div>
               </div>
             </div>
-            <div className={cn(compact ? "mt-2" : "mt-6")}>
+            <div className="p-6 md:p-8 bg-white/50 border-t">
               <Button 
-                size="sm" 
+                size="lg" 
                 onClick={() => setResults(null)} 
-                className={cn(
-                  "w-full gap-2 rounded-full font-black shadow-md bg-white text-primary border border-primary/10 hover:bg-primary/5",
-                  compact ? "h-8 text-[10px]" : "h-14 text-lg"
-                )}
+                className="w-full gap-3 rounded-full font-black shadow-lg bg-primary text-white hover:bg-primary/90 h-14 text-lg"
               >
-                <CheckCircle2 className={compact ? "h-3.5 w-3.5" : "h-6 w-6"} /> הבנתי!
+                <CheckCircle2 className="h-6 w-6" /> הבנתי, תודה!
               </Button>
             </div>
           </div>

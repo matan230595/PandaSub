@@ -1,3 +1,4 @@
+
 "use client"
 
 import * as React from "react"
@@ -138,12 +139,12 @@ export function SubscriptionList() {
 
     return (
       <div className="space-y-1 w-full mt-1">
-        <div className="flex justify-between items-center text-[9px] font-bold flex-row-reverse">
-          <span className="text-muted-foreground opacity-50">{progress}%</span>
-          <span className={cn("flex items-center gap-1 flex-row-reverse", textClass)}>
+        <div className="flex justify-between items-center text-[9px] font-bold">
+          <span className={cn("flex items-center gap-1", textClass)}>
             <Clock className="h-2.5 w-2.5" />
             {daysLeft <= 0 ? "היום!" : `בעוד ${daysLeft} ימ'`}
           </span>
+          <span className="text-muted-foreground opacity-50">{progress}%</span>
         </div>
         <Progress value={progress} indicatorClassName={color} className="h-1 rounded-full" />
       </div>
@@ -162,17 +163,12 @@ export function SubscriptionList() {
           
           <CardContent className="p-5">
             <div className="flex justify-between items-start mb-4">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="rounded-full h-8 w-8" onClick={(e) => e.stopPropagation()}><MoreVertical className="h-4 w-4" /></Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="start" className="rounded-xl p-1 text-right">
-                  <DropdownMenuItem onClick={() => handleEdit(sub)} className="flex-row-reverse justify-between gap-2 rounded-lg font-bold text-xs"><Edit2 className="h-3.5 w-3.5" /> ערוך</DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => duplicateSubscription(sub.id)} className="flex-row-reverse justify-between gap-2 rounded-lg text-xs"><Copy className="h-3.5 w-3.5" /> שכפל</DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => setDeleteConfirmId(sub.id)} className="flex-row-reverse justify-between gap-2 rounded-lg text-destructive text-xs"><Trash2 className="h-3.5 w-3.5" /> מחק</DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              <div 
+                className="h-10 w-10 rounded-xl flex items-center justify-center text-xl shadow-sm" 
+                style={{ backgroundColor: `${CATEGORY_METADATA[sub.category].color}15` }}
+              >
+                {CATEGORY_METADATA[sub.category].icon}
+              </div>
 
               <div className="flex items-center gap-3">
                 <div className="text-right">
@@ -181,20 +177,26 @@ export function SubscriptionList() {
                     {sub.billingCycle === 'monthly' ? 'חודשי' : 'שנתי'}
                   </Badge>
                 </div>
-                <div 
-                  className="h-10 w-10 rounded-xl flex items-center justify-center text-xl shadow-sm" 
-                  style={{ backgroundColor: `${CATEGORY_METADATA[sub.category].color}15` }}
-                >
-                  {CATEGORY_METADATA[sub.category].icon}
-                </div>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="icon" className="rounded-full h-8 w-8" onClick={(e) => e.stopPropagation()}><MoreVertical className="h-4 w-4" /></Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="start" className="rounded-xl p-1 text-right">
+                    <DropdownMenuItem onClick={() => handleEdit(sub)} className="flex-row-reverse justify-between gap-2 rounded-lg font-bold text-xs"><Edit2 className="h-3.5 w-3.5" /> ערוך</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => duplicateSubscription(sub.id)} className="flex-row-reverse justify-between gap-2 rounded-lg text-xs"><Copy className="h-3.5 w-3.5" /> שכפל</DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={() => setDeleteConfirmId(sub.id)} className="flex-row-reverse justify-between gap-2 rounded-lg text-destructive text-xs"><Trash2 className="h-3.5 w-3.5" /> מחק</DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
             </div>
             
             <div className="grid grid-cols-2 gap-3 mb-4">
               <div className="bg-muted/30 p-2.5 rounded-xl text-right overflow-hidden border border-muted/50">
                 <div className="text-[9px] font-bold text-muted-foreground uppercase mb-0.5">סכום</div>
-                <div className="text-lg font-black text-primary truncate tabular-nums leading-none flex flex-row-reverse items-baseline justify-end gap-0.5">
-                  {sub.amount}<span className="text-xs font-bold">{sub.currency}</span>
+                <div className="text-lg font-black text-primary truncate tabular-nums leading-none flex items-baseline justify-end gap-1">
+                  <span className="text-xs font-bold">{sub.currency}</span>
+                  {sub.amount}
                 </div>
               </div>
               <div className="bg-muted/30 p-2.5 rounded-xl text-right overflow-hidden border border-muted/50">
@@ -205,11 +207,11 @@ export function SubscriptionList() {
             {renderCountdown(sub)}
           </CardContent>
           
-          <CardFooter className="bg-muted/10 border-t p-2 px-4 flex justify-between items-center flex-row-reverse">
+          <CardFooter className="bg-muted/10 border-t p-2 px-4 flex justify-between items-center">
+            <Badge style={{ backgroundColor: STATUS_METADATA[sub.status].color, color: 'white' }} className="rounded-full px-2.5 py-0 text-[9px] font-black border-none shadow-sm">{STATUS_METADATA[sub.status].label}</Badge>
             <Button variant="ghost" size="sm" className="h-7 text-[9px] font-black gap-1.5 rounded-full text-primary hover:bg-primary/10" onClick={(e) => { e.stopPropagation(); handleCancelClick(sub); }}>
               <ExternalLink className="h-3 w-3" /> ביטול מהיר
             </Button>
-            <Badge style={{ backgroundColor: STATUS_METADATA[sub.status].color, color: 'white' }} className="rounded-full px-2.5 py-0 text-[9px] font-black border-none shadow-sm">{STATUS_METADATA[sub.status].label}</Badge>
           </CardFooter>
         </Card>
       ))}
@@ -257,14 +259,14 @@ export function SubscriptionList() {
                 )}
                 {isVisible('amount') && (
                   <TableCell className="p-4">
-                    <div className="flex items-center gap-2 justify-end flex-row-reverse">
+                    <div className="flex items-center gap-2 justify-end">
+                      <span className="text-xs font-bold opacity-50">{sub.currency}</span>
                       <Input 
                         type="number"
                         value={sub.amount} 
                         onChange={(e) => updateSubscription(sub.id, { amount: parseFloat(e.target.value) || 0 })}
                         className="border-none bg-transparent hover:bg-muted/50 focus:bg-white focus:ring-2 focus:ring-primary/20 font-black h-9 text-sm w-20 text-right tabular-nums"
                       />
-                      <span className="text-xs font-bold opacity-50">{sub.currency}</span>
                     </div>
                   </TableCell>
                 )}
@@ -307,23 +309,23 @@ export function SubscriptionList() {
               onDragOver={(e) => e.preventDefault()} 
               onDrop={() => { if(draggedId) { updateSubscription(draggedId, { status }); setDraggedId(null); } }}
             >
-              <div className="flex items-center justify-between px-5 py-3 bg-white rounded-2xl shadow-sm border-r-4 transition-all flex-row-reverse" style={{ borderRightColor: STATUS_METADATA[status].color }}>
-                <Badge variant="secondary" className="rounded-full bg-muted/50 text-[10px] h-5 flex items-center font-bold">{items.length}</Badge>
-                <div className="flex items-center gap-2 flex-row-reverse">
-                  <h3 className="font-black text-sm">{STATUS_METADATA[status].label}</h3>
+              <div className="flex items-center justify-between px-5 py-3 bg-white rounded-2xl shadow-sm border-r-4 transition-all" style={{ borderRightColor: STATUS_METADATA[status].color }}>
+                <div className="flex items-center gap-2">
                   <div className="h-2 w-2 rounded-full shadow-sm" style={{ backgroundColor: STATUS_METADATA[status].color }} />
+                  <h3 className="font-black text-sm">{STATUS_METADATA[status].label}</h3>
                 </div>
+                <Badge variant="secondary" className="rounded-full bg-muted/50 text-[10px] h-5 flex items-center font-bold">{items.length}</Badge>
               </div>
               <div className="bg-muted/10 rounded-3xl p-3 space-y-4 min-h-[500px] border-2 border-dashed border-muted/30">
                 {items.map(sub => (
                   <Card key={sub.id} draggable onDragStart={() => setDraggedId(sub.id)} className="p-4 rounded-2xl bg-white shadow-sm border-none cursor-grab active:cursor-grabbing hover:shadow-md transition-all relative overflow-hidden group" onClick={() => handleEdit(sub)}>
-                    <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-20 transition-opacity"><GripVertical className="h-4 w-4" /></div>
-                    <div className="flex justify-between items-center mb-3 flex-row-reverse">
-                      <span className="text-sm font-black text-primary tabular-nums">{sub.amount}{sub.currency}</span>
-                      <div className="flex items-center gap-2 flex-row-reverse">
-                         <span className="font-black text-xs truncate max-w-[100px] text-right">{sub.name}</span>
+                    <div className="absolute top-2 left-2 opacity-0 group-hover:opacity-20 transition-opacity"><GripVertical className="h-4 w-4" /></div>
+                    <div className="flex justify-between items-center mb-3">
+                      <div className="flex items-center gap-2">
                          <span className="text-xl">{CATEGORY_METADATA[sub.category].icon}</span>
+                         <span className="font-black text-xs truncate max-w-[100px] text-right">{sub.name}</span>
                       </div>
+                      <span className="text-sm font-black text-primary tabular-nums">{sub.amount}{sub.currency}</span>
                     </div>
                     {renderCountdown(sub)}
                   </Card>

@@ -1,3 +1,4 @@
+
 "use client"
 
 import * as React from "react"
@@ -56,10 +57,10 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#F8F9FA] dark:bg-zinc-950">
+    <div className="min-h-screen flex flex-col bg-[#F8F9FA] dark:bg-zinc-950" dir="rtl">
       <SetupWizard />
       <TopNav />
-      <main className="flex-1 container mx-auto p-4 md:p-8 space-y-6 animate-fade-in pb-20">
+      <main className="flex-1 container mx-auto p-4 md:p-8 space-y-6 animate-fade-in pb-20 max-w-7xl">
         
         {/* Header Section */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -67,7 +68,7 @@ export default function Home() {
             <h1 className="text-2xl md:text-3xl font-black tracking-tight text-foreground">שלום, {settings.userName.split(' ')[0]}! 👋</h1>
             <p className="text-muted-foreground mt-1 text-sm md:text-base font-medium">יש לך {subscriptions.length} מינויים רשומים במערכת.</p>
           </div>
-          <div className="flex items-center gap-2 md:gap-3 justify-end">
+          <div className="flex items-center gap-2 md:gap-3 justify-end flex-wrap">
             <Button onClick={() => setIsAddModalOpen(true)} className="rounded-full google-btn gap-2 shadow-lg h-10 px-6 text-sm font-black">
               <Plus className="h-4 w-4" /> הוסף מינוי
             </Button>
@@ -80,43 +81,43 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Action Row - Side by side, equal height, smaller */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
-          <Card className="border-none shadow-lg bg-gradient-to-br from-primary to-blue-700 text-white rounded-3xl overflow-hidden relative group h-[160px] flex items-center">
-            <CardContent className="p-6 md:p-8 flex flex-row justify-between items-center gap-6 relative z-10 w-full h-full">
-              <div className="text-right space-y-2 flex-1 h-full flex flex-col justify-center">
-                <div className="inline-flex items-center gap-2 bg-white/20 px-2 py-0.5 rounded-full text-[8px] font-bold uppercase tracking-widest self-start">
+        {/* Action Row - 2/3 for AI, 1/3 for Action */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
+          <div className="lg:col-span-2">
+            <AIRecommendations />
+          </div>
+          
+          <Card className="border-none shadow-lg bg-gradient-to-br from-primary to-blue-700 text-white rounded-3xl overflow-hidden relative group">
+            <CardContent className="p-6 md:p-8 flex flex-col justify-center h-full relative z-10 w-full text-right">
+              <div className="space-y-4">
+                <div className="inline-flex items-center gap-2 bg-white/20 px-2 py-0.5 rounded-full text-[8px] font-bold uppercase tracking-widest">
                   Panda AI Automation
                 </div>
-                <h3 className="text-lg md:text-xl font-black">פעולה מהירה 🐼</h3>
-                <p className="text-[10px] md:text-xs opacity-90 leading-relaxed max-w-sm font-medium">
-                  סרוק חשבונית או השתמש בהוספה קולית לעדכון מיידי.
+                <h3 className="text-xl md:text-2xl font-black">פעולה מהירה 🐼</h3>
+                <p className="text-xs md:text-sm opacity-90 leading-relaxed font-medium">
+                  סרוק חשבונית או השתמש בהוספה קולית לעדכון מיידי של המערכת.
                 </p>
-                <div className="flex flex-wrap gap-2 pt-1">
+                <div className="flex flex-col gap-3 pt-2">
                   <Button 
                     variant="secondary" 
                     onClick={() => setIsAddModalOpen(true)} 
-                    className="rounded-full font-black px-5 h-8 shadow-lg bg-white text-blue-800 hover:bg-zinc-100 transition-all border-none text-[10px]"
+                    className="rounded-full font-black px-6 h-11 shadow-lg bg-white text-primary hover:bg-zinc-100 transition-all border-none text-xs"
                   >
-                    <ShieldCheck className="ml-2 h-3.5 w-3.5" /> סריקת AI
+                    <ShieldCheck className="ml-2 h-4 w-4" /> סריקת AI
                   </Button>
                   <Button 
                     variant="outline"
-                    className="rounded-full border-2 border-white text-white hover:bg-white/10 font-black px-5 h-8 transition-all text-[10px] bg-transparent"
+                    className="rounded-full border-2 border-white text-white hover:bg-white/10 font-black px-6 h-11 transition-all text-xs bg-transparent"
                   >
-                    <Zap className="ml-2 h-3.5 w-3.5" /> הוספה קולית
+                    <Zap className="ml-2 h-4 w-4" /> הוספה קולית
                   </Button>
                 </div>
               </div>
-              <div className="opacity-10 pointer-events-none shrink-0 hidden sm:block">
-                <ShieldCheck className="h-20 w-20 text-white stroke-[1]" />
+              <div className="absolute -left-4 -bottom-4 opacity-10 pointer-events-none hidden sm:block">
+                <ShieldCheck className="h-32 w-32 text-white stroke-[1]" />
               </div>
             </CardContent>
           </Card>
-
-          <div className="h-[160px] overflow-hidden">
-            <AIRecommendations compact />
-          </div>
         </div>
 
         {/* Stats Grid */}
@@ -186,26 +187,26 @@ export default function Home() {
 }
 
 function StatCard({ title, value, symbol, icon, trend, trendDesc, color }: any) {
-  const fontSize = value.length > 8 ? 'text-lg' : value.length > 5 ? 'text-xl' : 'text-2xl md:text-3xl';
+  const fontSize = value.length > 8 ? 'text-lg' : value.length > 5 ? 'text-xl' : 'text-2xl md:text-4xl';
 
   return (
     <Card className="shadow-sm border-none rounded-2xl overflow-hidden group transition-all hover:shadow-md dark:bg-zinc-900 bg-white h-full">
-      <CardContent className="p-4 text-right flex flex-col justify-between h-full">
+      <CardContent className="p-4 md:p-6 text-right flex flex-col justify-between h-full">
         <div>
-          <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center justify-between mb-4">
             <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest truncate">{title}</span>
-            <div className={`p-1.5 rounded-lg ${color} group-hover:scale-110 transition-transform duration-300 shadow-sm shrink-0`}>
+            <div className={`p-2 rounded-xl ${color} group-hover:scale-110 transition-transform duration-300 shadow-sm shrink-0`}>
               {icon}
             </div>
           </div>
-          <div className="flex items-baseline justify-start gap-1.5 tabular-nums flex-wrap overflow-hidden">
-            {symbol && <div className="text-base font-black text-primary shrink-0">{symbol}</div>}
+          <div className="flex items-baseline justify-start gap-2 tabular-nums flex-wrap overflow-hidden">
             <div className={cn("font-black text-foreground leading-none", fontSize)}>
               {value}
             </div>
+            {symbol && <div className="text-xl font-black text-primary shrink-0">{symbol}</div>}
           </div>
         </div>
-        <div className="mt-2 flex items-center gap-2 justify-start overflow-hidden">
+        <div className="mt-4 flex items-center gap-2 justify-start overflow-hidden">
           {trend && <span className="text-[9px] font-black text-green-600 bg-green-50 px-1.5 py-0.5 rounded-full shrink-0 border border-green-100">{trend}</span>}
           <span className="text-[9px] font-bold text-muted-foreground opacity-70 truncate">{trendDesc}</span>
         </div>
