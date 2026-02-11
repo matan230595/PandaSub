@@ -178,7 +178,7 @@ function StatCard({ title, value, symbol, icon, trend, trendDesc, primary, green
               primary ? "opacity-80" : "text-muted-foreground"
             )}>{title}</span>
           </div>
-          <div className="flex items-baseline justify-end gap-1 flex-row-reverse overflow-hidden">
+          <div className="flex items-baseline justify-end gap-1.5 flex-row-reverse flex-wrap overflow-hidden">
             <span className={cn("font-black tabular-nums truncate", fontSize, !primary && "text-foreground")}>
               {value}
             </span>

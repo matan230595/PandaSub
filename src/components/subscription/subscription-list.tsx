@@ -1,3 +1,4 @@
+
 "use client"
 
 import * as React from "react"
@@ -21,15 +22,11 @@ import {
   Search,
   Trash2,
   Copy,
-  Filter,
-  Check,
-  AlertTriangle,
-  CreditCard,
-  RefreshCw,
   MoreVertical,
   ExternalLink,
   GripVertical,
-  Settings2
+  Settings2,
+  AlertTriangle
 } from "lucide-react"
 import { 
   DropdownMenu, 
@@ -301,8 +298,8 @@ export function SubscriptionList() {
   const renderKanban = () => {
     const statuses: SubscriptionStatus[] = ['trial', 'active', 'frozen', 'cancelled']
     return (
-      <div className="w-full max-w-full overflow-x-auto pb-6 scrollbar-hide">
-        <div className="flex gap-6 min-w-[1200px] flex-row-reverse px-2">
+      <div className="w-full max-w-full overflow-x-auto pb-6 scrollbar-hide" dir="rtl">
+        <div className="flex gap-6 min-w-[1200px] flex-row px-2">
           {statuses.map(status => {
             const items = filteredSubs.filter(s => s.status === status)
             return (
@@ -366,6 +363,7 @@ export function SubscriptionList() {
           </div>
         </div>
       </div>
+      
       <div className="min-h-[400px] w-full max-w-full overflow-hidden">
         {viewMode === 'table' && renderTable()}
         {viewMode === 'cards' && renderCards()}

@@ -1,3 +1,4 @@
+
 "use client"
 
 import * as React from "react"
@@ -59,7 +60,7 @@ export default function Home() {
     <div className="min-h-screen flex flex-col bg-[#F8F9FA] dark:bg-zinc-950 overflow-x-hidden">
       <SetupWizard />
       <TopNav />
-      <main className="flex-1 container mx-auto p-4 md:p-8 space-y-6 animate-fade-in pb-20">
+      <main className="flex-1 container mx-auto p-4 md:p-8 space-y-6 animate-fade-in pb-20 overflow-x-hidden">
         {/* Header Section */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="text-right">
@@ -79,13 +80,13 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Quick Actions & AI Card Grid */}
+        {/* Quick Actions & AI Card Grid - Compact version */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <Card className="lg:col-span-2 border-none card-shadow bg-gradient-to-br from-primary to-blue-700 text-white rounded-[2.5rem] overflow-hidden relative group">
-            <CardContent className="p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6">
-              <div className="text-right space-y-3 z-10 flex-1">
-                <h3 className="text-xl font-black">פעולה מהירה 🐼</h3>
-                <p className="text-sm opacity-90 leading-relaxed max-w-md">
+            <CardContent className="p-6 md:p-6 flex flex-col md:flex-row items-center justify-between gap-6">
+              <div className="text-right space-y-2 z-10 flex-1">
+                <h3 className="text-lg font-black">פעולה מהירה 🐼</h3>
+                <p className="text-sm opacity-90 leading-tight max-w-md">
                   צריך להוסיף מינוי? אמור ל-Panda AI או סרוק את החשבונית לסנכרון מיידי.
                 </p>
                 <div className="flex flex-wrap gap-3 pt-2 justify-end">
@@ -97,8 +98,8 @@ export default function Home() {
                     <ShieldCheck className="ml-2 h-4 w-4" /> סריקת AI
                   </Button>
                   <Button 
-                    variant="outline" 
-                    className="rounded-full border-white/40 text-white hover:bg-white/10 font-bold px-6 h-10 transition-all bg-transparent"
+                    variant="default"
+                    className="rounded-full bg-blue-900/40 hover:bg-blue-900/60 border-none text-white font-bold px-6 h-10 shadow-lg transition-all"
                   >
                     <Zap className="ml-2 h-4 w-4" /> הוספה קולית
                   </Button>
@@ -106,20 +107,20 @@ export default function Home() {
               </div>
               
               <div className="relative hidden md:flex items-center justify-center shrink-0">
-                <div className="bg-white/10 p-4 rounded-[1.5rem] backdrop-blur-sm border border-white/20 shadow-inner group-hover:scale-105 transition-transform duration-500">
-                  <ShieldCheck className="h-8 w-8 text-white" />
+                <div className="bg-white/10 p-3 rounded-[1.5rem] backdrop-blur-sm border border-white/20 shadow-inner group-hover:scale-105 transition-transform duration-500">
+                  <ShieldCheck className="h-6 w-6 text-white" />
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <div className="h-full min-h-[140px]">
+          <div className="h-full min-h-[140px] min-w-0">
             <AIRecommendations />
           </div>
         </div>
 
         {/* Stats Grid */}
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4 min-w-0">
           <StatCard 
             title='סה"כ חודשי (משוקלל)' 
             value={totalMonthlyILS.toLocaleString(undefined, { maximumFractionDigits: 0 })} 
@@ -200,7 +201,7 @@ function StatCard({ title, value, symbol, icon, trend, trendDesc, color }: any) 
             </div>
             <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest truncate ml-2">{title}</span>
           </div>
-          <div className="flex items-baseline justify-end gap-1.5 overflow-hidden flex-wrap">
+          <div className="flex items-center justify-start gap-1.5 overflow-hidden flex-row-reverse">
             <div className={cn("font-black text-foreground tabular-nums truncate leading-tight", fontSize)}>
               {value}
             </div>

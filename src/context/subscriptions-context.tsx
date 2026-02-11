@@ -1,14 +1,12 @@
 "use client"
 
-import React, { createContext, useContext, useState, useEffect, useRef, useMemo } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { Subscription, SAMPLE_SUBSCRIPTIONS } from '@/app/lib/subscription-store';
 import { 
   collection, 
   doc, 
   setDoc, 
   onSnapshot, 
-  query, 
-  where,
   deleteDoc,
   updateDoc
 } from 'firebase/firestore';
@@ -98,10 +96,8 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
   const { user } = useUser();
   const db = useFirestore();
 
-  // סנכרון עם Firebase במקום LocalStorage
   useEffect(() => {
     if (!db || !user) {
-      // אם אין משתמש מחובר, השתמש ב-SAMPLE ו-LocalStorage (פרוטוטיפ)
       const saved = localStorage.getItem('panda_subs_v11');
       if (saved) setSubscriptions(JSON.parse(saved));
       else setSubscriptions(SAMPLE_SUBSCRIPTIONS);
@@ -134,7 +130,6 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
     }
   }, [db, user]);
 
-  // גיבוי ל-LocalStorage למקרה חירום/אופליין
   useEffect(() => {
     localStorage.setItem('panda_subs_v11', JSON.stringify(subscriptions));
     checkReminders();
@@ -148,10 +143,14 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
   const playNotificationSound = () => {
     if (!settings.soundEnabled) return;
     try {
+      // אתחול ה-AudioContext רק בזמן הצורך כדי למנוע חסימת דפדפן
       if (!audioContextRef.current) {
         audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
       }
       const ctx = audioContextRef.current;
+      if (ctx.state === 'suspended') {
+        ctx.resume();
+      }
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
       osc.type = 'sine';
@@ -191,7 +190,10 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
     setNotifications(prev => {
       const existingIds = new Set(prev.map(n => n.id));
       const added = newNotifications.filter(n => !existingIds.has(n.id));
-      if (added.length > 0) playNotificationSound();
+      if (added.length > 0) {
+        // הפעלת סאונד רק אם היתה אינטראקציה כלשהי בעבר
+        playNotificationSound();
+      }
       return [...added, ...prev].slice(0, 20);
     });
   };
