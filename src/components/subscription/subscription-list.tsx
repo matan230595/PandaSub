@@ -1,4 +1,3 @@
-
 "use client"
 
 import * as React from "react"
@@ -85,7 +84,7 @@ export function SubscriptionList() {
   const [statusFilter, setStatusFilter] = React.useState<SubscriptionStatus | 'all'>('all')
   const [deleteConfirmId, setDeleteConfirmId] = React.useState<string | null>(null)
 
-  // גרירה ושחרור פשוטה
+  // Drag and Drop State
   const [draggedId, setDraggedId] = React.useState<string | null>(null)
 
   const filteredSubs = subscriptions.filter(sub => {
@@ -287,7 +286,7 @@ export function SubscriptionList() {
                     <Input 
                       type="number"
                       value={sub.amount} 
-                      onChange={(e) => updateSubscription(sub.id, { amount: parseFloat(e.target.value) })}
+                      onChange={(e) => updateSubscription(sub.id, { amount: parseFloat(e.target.value) || 0 })}
                       className="border-none bg-transparent hover:bg-muted/50 focus:bg-white focus:ring-1 focus:ring-primary/20 font-bold h-9 text-sm pr-7"
                     />
                     <span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs opacity-40">₪</span>
@@ -373,7 +372,7 @@ export function SubscriptionList() {
                 <Badge variant="secondary" className="rounded-full bg-muted/50 text-[10px]">{items.length}</Badge>
               </div>
               
-              <div className="bg-muted/20 rounded-[2.5rem] p-3 space-y-4 min-h-[600px] border-2 border-dashed border-muted/50 transition-colors group-hover:border-primary/20">
+              <div className="bg-muted/20 rounded-[2.5rem] p-3 space-y-4 min-h-[600px] border-2 border-dashed border-muted/50 transition-colors">
                 {items.map(sub => (
                   <Card 
                     key={sub.id} 
@@ -411,7 +410,7 @@ export function SubscriptionList() {
   return (
     <div className="space-y-6">
       <div className="bg-white p-4 rounded-[2.5rem] shadow-lg border border-border/50 flex flex-col lg:flex-row gap-4 items-center">
-        <div className="relative flex-1 w-full">
+        <div className="relative flex-1 w-full text-right">
           <Search className="absolute right-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
           <Input 
             placeholder="חפש מינוי, קטגוריה או שיטת תשלום..." 
