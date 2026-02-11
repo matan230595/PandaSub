@@ -1,3 +1,4 @@
+
 "use client"
 
 import * as React from "react"
@@ -72,14 +73,22 @@ export function SubscriptionList() {
     let progressValue = 100
     let color = "bg-green-500"
     let textClass = "text-green-600"
-    if (daysLeft <= 0) { progressValue = 100; color = "bg-destructive animate-pulse"; textClass = "text-destructive font-black"; }
-    else if (daysLeft <= 3) { progressValue = 90; color = "bg-destructive"; textClass = "text-destructive font-bold"; }
-    else if (daysLeft <= 7) { progressValue = 70; color = "bg-orange-500"; textClass = "text-orange-600 font-bold"; }
-    else if (daysLeft <= 14) { progressValue = 40; color = "bg-blue-500"; textClass = "text-blue-600 font-bold"; }
-    else { progressValue = 20; color = "bg-green-500"; textClass = "text-green-600"; }
+    
+    if (daysLeft <= 0) { 
+      progressValue = 100; color = "bg-destructive animate-pulse"; textClass = "text-destructive font-black"; 
+    } else if (daysLeft <= 3) { 
+      progressValue = 90; color = "bg-destructive"; textClass = "text-destructive font-bold"; 
+    } else if (daysLeft <= 7) { 
+      progressValue = 70; color = "bg-orange-500"; textClass = "text-orange-600 font-bold"; 
+    } else if (daysLeft <= 14) { 
+      progressValue = 40; color = "bg-blue-500"; textClass = "text-blue-600 font-bold"; 
+    } else { 
+      progressValue = 20; color = "bg-green-500"; textClass = "text-green-600"; 
+    }
+    
     return (
       <div className="space-y-1 w-full mt-1">
-        <div className="flex justify-between items-center text-[9px] font-bold flex-row-reverse">
+        <div className="flex justify-between items-center text-[9px] font-bold">
           <span className={cn("flex items-center gap-1", textClass)}>
             <Clock className="h-2.5 w-2.5" />
             {daysLeft <= 0 ? "היום!" : `בעוד ${daysLeft} ימ'`}
@@ -94,8 +103,8 @@ export function SubscriptionList() {
   return (
     <div className="space-y-6 min-w-0 max-w-full overflow-hidden" dir="rtl">
       <div className="bg-white p-3 md:p-4 rounded-[2rem] shadow-md border border-border/50 flex flex-col lg:flex-row gap-4 items-center">
-        <div className="flex items-center gap-3 w-full lg:w-auto shrink-0 flex-row-reverse">
-          <div className="flex p-1.5 bg-muted/40 rounded-2xl h-11 flex-row-reverse shrink-0 shadow-inner">
+        <div className="flex items-center gap-3 w-full lg:w-auto shrink-0">
+          <div className="flex p-1.5 bg-muted/40 rounded-2xl h-11 shrink-0 shadow-inner">
             <Button variant={viewMode === 'table' ? 'default' : 'ghost'} size="icon" onClick={() => setViewMode('table')} className={cn("h-8 w-9 rounded-lg transition-all", viewMode === 'table' && "shadow-md")}><ListIcon className="h-4 w-4" /></Button>
             <Button variant={viewMode === 'cards' ? 'default' : 'ghost'} size="icon" onClick={() => setViewMode('cards')} className={cn("h-8 w-9 rounded-lg transition-all", viewMode === 'cards' && "shadow-md")}><LayoutGrid className="h-4 w-4" /></Button>
             <Button variant={viewMode === 'kanban' ? 'default' : 'ghost'} size="icon" onClick={() => setViewMode('kanban')} className={cn("h-8 w-9 rounded-lg transition-all", viewMode === 'kanban' && "shadow-md")}><Columns className="h-4 w-4" /></Button>
@@ -144,18 +153,18 @@ export function SubscriptionList() {
               <Card key={sub.id} className="border-none shadow-md hover:shadow-xl rounded-[1.5rem] bg-white overflow-hidden transition-all cursor-pointer" onClick={() => handleEdit(sub)}>
                 <div className="h-1.5 w-full" style={{ backgroundColor: CATEGORY_METADATA[sub.category].color }} />
                 <CardContent className="p-5">
-                  <div className="flex justify-between items-start mb-4 flex-row-reverse">
-                    <div className="h-10 w-10 rounded-xl flex items-center justify-center text-xl" style={{ backgroundColor: `${CATEGORY_METADATA[sub.category].color}15` }}>{CATEGORY_METADATA[sub.category].icon}</div>
+                  <div className="flex justify-between items-start mb-4">
                     <div className="text-right">
                       <h3 className="text-base font-black truncate max-w-[150px]">{sub.name}</h3>
                       <Badge variant="outline" className="text-[9px] border-primary/20 bg-primary/5 text-primary font-bold">{sub.billingCycle === 'monthly' ? 'חודשי' : 'שנתי'}</Badge>
                     </div>
+                    <div className="h-10 w-10 rounded-xl flex items-center justify-center text-xl" style={{ backgroundColor: `${CATEGORY_METADATA[sub.category].color}15` }}>{CATEGORY_METADATA[sub.category].icon}</div>
                   </div>
                   <div className="grid grid-cols-2 gap-3 mb-4">
                     <div className="bg-muted/30 p-2.5 rounded-xl text-right border border-muted/50">
                       <div className="text-[9px] font-bold text-muted-foreground uppercase mb-0.5">סכום</div>
-                      <div className="text-lg font-black text-primary truncate tabular-nums leading-none flex items-baseline justify-start gap-1 flex-row-reverse">
-                        <span className="text-xs font-bold mr-1">{sub.currency}</span>
+                      <div className="text-lg font-black text-primary truncate tabular-nums leading-none flex items-baseline justify-start gap-1">
+                        <span className="text-xs font-bold ml-1">{sub.currency}</span>
                         {sub.amount}
                       </div>
                     </div>
@@ -171,7 +180,7 @@ export function SubscriptionList() {
           </div>
         )}
         {viewMode === 'kanban' && (
-          <div className="flex gap-6 overflow-x-auto pb-8 custom-scrollbar min-w-full flex-row-reverse">
+          <div className="flex gap-6 overflow-x-auto pb-8 custom-scrollbar min-w-full">
             {['trial', 'active', 'frozen', 'cancelled'].map(status => {
               const items = filteredSubs.filter(s => s.status === status)
               return (
@@ -183,12 +192,12 @@ export function SubscriptionList() {
                   <div className="bg-muted/10 rounded-3xl p-3 space-y-4 min-h-[500px] border-2 border-dashed border-muted/30">
                     {items.map(sub => (
                       <Card key={sub.id} className="p-4 rounded-2xl bg-white shadow-sm border-none cursor-pointer" onClick={() => handleEdit(sub)}>
-                        <div className="flex justify-between items-center mb-3 flex-row-reverse">
-                           <span className="text-xl">{CATEGORY_METADATA[sub.category].icon}</span>
+                        <div className="flex justify-between items-center mb-3">
                            <span className="font-black text-xs truncate max-w-[100px] text-right">{sub.name}</span>
+                           <span className="text-xl">{CATEGORY_METADATA[sub.category].icon}</span>
                         </div>
-                        <div className="text-sm font-black text-primary text-right tabular-nums flex gap-1 justify-start flex-row-reverse">
-                          <span className="text-xs mr-1">{sub.currency}</span>
+                        <div className="text-sm font-black text-primary text-right tabular-nums flex gap-1 justify-start">
+                          <span className="text-xs ml-1">{sub.currency}</span>
                           {sub.amount}
                         </div>
                       </Card>
@@ -204,7 +213,9 @@ export function SubscriptionList() {
       <AlertDialog open={!!deleteConfirmId} onOpenChange={(open) => !open && setDeleteConfirmId(null)}>
         <AlertDialogContent className="text-right rounded-3xl" dir="rtl">
           <AlertDialogHeader className="items-center">
-            <div className="h-20 w-20 rounded-full bg-destructive/10 flex items-center justify-center text-destructive mb-4"><AlertTriangle className="h-10 w-10" /></div>
+            <div className="h-20 w-20 rounded-full bg-destructive/10 flex items-center justify-center text-destructive mb-4">
+              <AlertTriangle className="h-10 w-10" />
+            </div>
             <AlertDialogTitle className="text-2xl font-black">מחיקת מינוי?</AlertDialogTitle>
             <AlertDialogDescription className="text-center">האם אתה בטוח שברצונך למחוק את המינוי לצמיתות?</AlertDialogDescription>
           </AlertDialogHeader>

@@ -1,6 +1,8 @@
+
 'use client';
-import { getAuth, type User } from 'firebase/auth';
-import { getApp, getApps } from 'firebase/app';
+import { type User } from 'firebase/auth';
+import { getApps } from 'firebase/app';
+import { auth as firebaseAuth } from '@/lib/firebaseClient';
 
 export type SecurityRuleContext = {
   path: string;
@@ -68,8 +70,6 @@ function buildRequestObject(context: SecurityRuleContext): SecurityRuleRequest {
   let authObject: FirebaseAuthObject | null = null;
   try {
     if (typeof window !== 'undefined' && getApps().length > 0) {
-      const app = getApp();
-      const firebaseAuth = getAuth(app);
       if (firebaseAuth && firebaseAuth.currentUser) {
         authObject = buildAuthObject(firebaseAuth.currentUser);
       }
