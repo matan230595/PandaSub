@@ -59,7 +59,7 @@ export default function Home() {
     <div className="min-h-screen flex flex-col bg-[#F8F9FA] dark:bg-zinc-950">
       <SetupWizard />
       <TopNav />
-      <main className="flex-1 container mx-auto p-4 md:p-8 space-y-6 animate-fade-in pb-20 overflow-x-hidden min-w-0">
+      <main className="flex-1 container mx-auto p-4 md:p-8 space-y-6 animate-fade-in pb-20">
         
         {/* Header Section */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -67,7 +67,7 @@ export default function Home() {
             <h1 className="text-2xl md:text-3xl font-black tracking-tight text-foreground">שלום, {settings.userName.split(' ')[0]}! 👋</h1>
             <p className="text-muted-foreground mt-1 text-sm md:text-base font-medium">יש לך {subscriptions.length} מינויים רשומים במערכת.</p>
           </div>
-          <div className="flex items-center gap-2 md:gap-3 justify-start md:justify-end">
+          <div className="flex items-center gap-2 md:gap-3 justify-end">
             <Button onClick={() => setIsAddModalOpen(true)} className="rounded-full google-btn gap-2 shadow-lg h-10 px-6 text-sm font-black">
               <Plus className="h-4 w-4" /> הוסף מינוי
             </Button>
@@ -154,18 +154,16 @@ export default function Home() {
         </div>
 
         {/* Main Content Area */}
-        <div className="grid gap-8 lg:grid-cols-3 min-w-0">
-          <div className="lg:col-span-2 space-y-6 min-w-0">
+        <div className="grid gap-8 lg:grid-cols-3">
+          <div className="lg:col-span-2 space-y-6">
             <DashboardCharts />
             <div className="flex items-center justify-between pt-2">
               <h2 className="text-xl font-black text-right w-full text-foreground border-r-4 border-primary pr-3">ניהול מינויים פעילים</h2>
             </div>
-            <div className="w-full min-w-0 overflow-hidden">
-              <SubscriptionList />
-            </div>
+            <SubscriptionList />
           </div>
 
-          <div className="space-y-6 min-w-0">
+          <div className="space-y-6">
             <SubscriptionsAtRisk />
             <VoiceCreator />
           </div>

@@ -151,7 +151,7 @@ export function SubscriptionList() {
   }
 
   const renderCards = () => (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 animate-fade-in mb-12 min-w-0">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 animate-fade-in mb-12">
       {filteredSubs.map(sub => (
         <Card 
           key={sub.id} 
@@ -174,15 +174,15 @@ export function SubscriptionList() {
                 </DropdownMenuContent>
               </DropdownMenu>
 
-              <div className="flex items-center gap-3 max-w-[80%]">
-                <div className="text-right overflow-hidden">
-                  <h3 className="text-base font-black text-foreground truncate">{sub.name}</h3>
+              <div className="flex items-center gap-3">
+                <div className="text-right">
+                  <h3 className="text-base font-black text-foreground truncate max-w-[120px]">{sub.name}</h3>
                   <Badge variant="outline" className="text-[9px] px-1.5 py-0 border-primary/20 bg-primary/5 text-primary font-bold uppercase tracking-tighter">
                     {sub.billingCycle === 'monthly' ? 'חודשי' : 'שנתי'}
                   </Badge>
                 </div>
                 <div 
-                  className="h-10 w-10 rounded-xl flex items-center justify-center text-xl shadow-sm shrink-0" 
+                  className="h-10 w-10 rounded-xl flex items-center justify-center text-xl shadow-sm" 
                   style={{ backgroundColor: `${CATEGORY_METADATA[sub.category].color}15` }}
                 >
                   {CATEGORY_METADATA[sub.category].icon}
@@ -215,8 +215,8 @@ export function SubscriptionList() {
   )
 
   const renderTable = () => (
-    <div className="rounded-[1.5rem] border border-border/50 shadow-xl bg-white overflow-hidden animate-fade-in mb-12 w-full min-w-0">
-      <div className="overflow-x-auto custom-scrollbar">
+    <div className="rounded-[1.5rem] border border-border/50 shadow-xl bg-white overflow-hidden animate-fade-in mb-12">
+      <div className="overflow-x-auto">
         <Table>
           <TableHeader className="bg-muted/20">
             <TableRow>
@@ -262,7 +262,7 @@ export function SubscriptionList() {
                         onChange={(e) => updateSubscription(sub.id, { amount: parseFloat(e.target.value) || 0 })}
                         className="border-none bg-transparent hover:bg-muted/50 focus:bg-white focus:ring-2 focus:ring-primary/20 font-black h-9 text-sm w-20 text-right tabular-nums"
                       />
-                      <span className="text-xs font-bold opacity-50 shrink-0">{sub.currency}</span>
+                      <span className="text-xs font-bold opacity-50">{sub.currency}</span>
                     </div>
                   </TableCell>
                 )}
@@ -295,54 +295,52 @@ export function SubscriptionList() {
   const renderKanban = () => {
     const statuses: SubscriptionStatus[] = ['trial', 'active', 'frozen', 'cancelled']
     return (
-      <div className="w-full max-w-full overflow-x-auto pb-8 custom-scrollbar min-w-0">
-        <div className="flex gap-6 min-w-[1100px] px-2">
-          {statuses.map(status => {
-            const items = filteredSubs.filter(s => s.status === status)
-            return (
-              <div 
-                key={status} 
-                className="flex-shrink-0 w-[260px] flex flex-col gap-4" 
-                onDragOver={(e) => e.preventDefault()} 
-                onDrop={() => { if(draggedId) { updateSubscription(draggedId, { status }); setDraggedId(null); } }}
-              >
-                <div className="flex items-center justify-between px-5 py-3 bg-white rounded-2xl shadow-sm border-r-4 transition-all" style={{ borderRightColor: STATUS_METADATA[status].color }}>
-                  <Badge variant="secondary" className="rounded-full bg-muted/50 text-[10px] h-5 flex items-center font-bold">{items.length}</Badge>
-                  <div className="flex items-center gap-2">
-                    <h3 className="font-black text-sm">{STATUS_METADATA[status].label}</h3>
-                    <div className="h-2 w-2 rounded-full shadow-sm" style={{ backgroundColor: STATUS_METADATA[status].color }} />
-                  </div>
-                </div>
-                <div className="bg-muted/10 rounded-3xl p-3 space-y-4 min-h-[500px] border-2 border-dashed border-muted/30">
-                  {items.map(sub => (
-                    <Card key={sub.id} draggable onDragStart={() => setDraggedId(sub.id)} className="p-4 rounded-2xl bg-white shadow-sm border-none cursor-grab active:cursor-grabbing hover:shadow-md transition-all relative overflow-hidden group" onClick={() => handleEdit(sub)}>
-                      <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-20 transition-opacity"><GripVertical className="h-4 w-4" /></div>
-                      <div className="flex justify-between items-center mb-3">
-                        <span className="text-sm font-black text-primary shrink-0 tabular-nums">{sub.amount}{sub.currency}</span>
-                        <div className="flex items-center gap-2 overflow-hidden">
-                           <span className="font-black text-xs truncate text-right text-foreground">{sub.name}</span>
-                           <span className="text-xl shrink-0">{CATEGORY_METADATA[sub.category].icon}</span>
-                        </div>
-                      </div>
-                      {renderCountdown(sub)}
-                    </Card>
-                  ))}
-                  {items.length === 0 && (
-                    <div className="h-full flex items-center justify-center opacity-20 italic text-xs py-20 text-center px-4">
-                      גרור מינויים לכאן כדי לשנות סטטוס
-                    </div>
-                  )}
+      <div className="flex gap-6 overflow-x-auto pb-8 custom-scrollbar min-h-[600px] px-2" dir="rtl">
+        {statuses.map(status => {
+          const items = filteredSubs.filter(s => s.status === status)
+          return (
+            <div 
+              key={status} 
+              className="flex-shrink-0 w-[280px] flex flex-col gap-4" 
+              onDragOver={(e) => e.preventDefault()} 
+              onDrop={() => { if(draggedId) { updateSubscription(draggedId, { status }); setDraggedId(null); } }}
+            >
+              <div className="flex items-center justify-between px-5 py-3 bg-white rounded-2xl shadow-sm border-r-4 transition-all" style={{ borderRightColor: STATUS_METADATA[status].color }}>
+                <Badge variant="secondary" className="rounded-full bg-muted/50 text-[10px] h-5 flex items-center font-bold">{items.length}</Badge>
+                <div className="flex items-center gap-2">
+                  <h3 className="font-black text-sm">{STATUS_METADATA[status].label}</h3>
+                  <div className="h-2 w-2 rounded-full shadow-sm" style={{ backgroundColor: STATUS_METADATA[status].color }} />
                 </div>
               </div>
-            )
-          })}
-        </div>
+              <div className="bg-muted/10 rounded-3xl p-3 space-y-4 min-h-[500px] border-2 border-dashed border-muted/30">
+                {items.map(sub => (
+                  <Card key={sub.id} draggable onDragStart={() => setDraggedId(sub.id)} className="p-4 rounded-2xl bg-white shadow-sm border-none cursor-grab active:cursor-grabbing hover:shadow-md transition-all relative overflow-hidden group" onClick={() => handleEdit(sub)}>
+                    <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-20 transition-opacity"><GripVertical className="h-4 w-4" /></div>
+                    <div className="flex justify-between items-center mb-3">
+                      <span className="text-sm font-black text-primary tabular-nums">{sub.amount}{sub.currency}</span>
+                      <div className="flex items-center gap-2">
+                         <span className="font-black text-xs truncate max-w-[100px] text-right">{sub.name}</span>
+                         <span className="text-xl">{CATEGORY_METADATA[sub.category].icon}</span>
+                      </div>
+                    </div>
+                    {renderCountdown(sub)}
+                  </Card>
+                ))}
+                {items.length === 0 && (
+                  <div className="h-full flex items-center justify-center opacity-20 italic text-xs py-20 text-center px-4">
+                    גרור מינויים לכאן כדי לשנות סטטוס
+                  </div>
+                )}
+              </div>
+            </div>
+          )
+        })}
       </div>
     )
   }
 
   return (
-    <div className="space-y-6 w-full max-w-full overflow-hidden min-w-0">
+    <div className="space-y-6">
       <div className="bg-white p-3 md:p-4 rounded-[2rem] shadow-md border border-border/50 flex flex-col lg:flex-row gap-4 items-center">
         <div className="flex items-center gap-3 w-full lg:w-auto">
           <div className="flex p-1.5 bg-muted/40 rounded-2xl h-11 flex-row-reverse shrink-0 shadow-inner">
@@ -365,13 +363,13 @@ export function SubscriptionList() {
           </DropdownMenu>
         </div>
         
-        <div className="relative flex-1 w-full text-right">
+        <div className="relative flex-1 w-full">
           <Search className="absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input placeholder="חפש מינוי לפי שם או קטגוריה..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="pr-11 h-11 text-sm text-right bg-muted/20 border-none rounded-2xl focus:ring-2 focus:ring-primary/20 transition-all font-medium" />
         </div>
       </div>
       
-      <div className="min-h-[400px] w-full max-w-full overflow-hidden min-w-0">
+      <div className="min-h-[400px]">
         {viewMode === 'table' && renderTable()}
         {viewMode === 'cards' && renderCards()}
         {viewMode === 'kanban' && renderKanban()}
