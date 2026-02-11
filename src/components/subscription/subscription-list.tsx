@@ -32,7 +32,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
-import { CATEGORY_METADATA, STATUS_METADATA, Subscription, SubscriptionCategory, SubscriptionStatus } from "@/app/lib/subscription-store"
+import { CATEGORY_METADATA, STATUS_METADATA, Subscription } from "@/app/lib/subscription-store"
 import { useSubscriptions } from "@/context/subscriptions-context"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"

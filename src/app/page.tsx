@@ -8,7 +8,7 @@ import { VoiceCreator } from "@/components/gen-ai/voice-creator"
 import { AIRecommendations } from "@/components/gen-ai/recommendations"
 import { SubscriptionsAtRisk } from "@/components/dashboard/risk-widget"
 import { Button } from "@/components/ui/button"
-import { Plus, TrendingUp, Calendar, Lightbulb, Hourglass, FileText, ShieldCheck, Zap } from "lucide-react"
+import { Plus, TrendingUp, Calendar, Lightbulb, Hourglass, FileText, Zap } from "lucide-react"
 import { AddSubscriptionModal } from "@/components/subscription/add-subscription-modal"
 import { useSubscriptions } from "@/context/subscriptions-context"
 import { Card, CardContent } from "@/components/ui/card"
@@ -70,6 +70,7 @@ export default function Home() {
       <TopNav />
       <main className="flex-1 container mx-auto p-4 md:p-8 space-y-8 animate-fade-in pb-24 max-w-7xl overflow-x-hidden">
         
+        {/* Header Section */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="text-right">
             <h1 className="text-2xl md:text-3xl font-black tracking-tight text-foreground">שלום, {settings.userName.split(' ')[0]}! 👋</h1>
@@ -124,29 +125,32 @@ export default function Home() {
           <div className="lg:col-span-2">
             <AIRecommendations />
           </div>
-          <Card className="border-none shadow-xl bg-gradient-to-br from-primary to-blue-700 text-white rounded-[2rem] overflow-hidden flex flex-col justify-center min-h-[160px]">
-            <CardContent className="p-6 text-right space-y-4">
-              <div>
-                <h3 className="text-xl font-black mb-1 flex items-center gap-2 justify-end">פעולה מהירה 🐼</h3>
-                <p className="text-xs opacity-90 leading-relaxed font-medium">נהל את המינויים שלך בעזרת כלי ה-AI שלנו.</p>
-              </div>
-              
-              <div className="flex flex-col gap-3">
-                <Button 
-                  onClick={() => setIsAddModalOpen(true)} 
-                  className="rounded-full font-black h-11 shadow-lg bg-white text-primary hover:bg-zinc-100 transition-all border-none text-xs px-6"
-                >
-                  <ShieldCheck className="ml-2 h-4 w-4" /> סריקת AI
-                </Button>
-                <Button 
-                  variant="outline"
-                  className="rounded-full border-2 border-white/50 text-white hover:bg-white/10 font-black h-11 transition-all text-xs bg-transparent px-6"
-                >
-                  <Zap className="ml-2 h-4 w-4" /> הוספה קולית
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+          <div className="space-y-6">
+            <Card className="border-none shadow-xl bg-gradient-to-br from-primary to-blue-700 text-white rounded-[2rem] overflow-hidden flex flex-col justify-center min-h-[160px]">
+              <CardContent className="p-6 text-right space-y-4">
+                <div>
+                  <h3 className="text-xl font-black mb-1">פעולה מהירה 🐼</h3>
+                  <p className="text-xs opacity-90 font-medium">נהל את המינויים שלך בעזרת כלי ה-AI שלנו.</p>
+                </div>
+                
+                <div className="flex flex-col gap-3">
+                  <Button 
+                    onClick={() => setIsAddModalOpen(true)} 
+                    className="rounded-full font-black h-11 shadow-lg bg-white text-primary hover:bg-zinc-100 transition-all border-none text-xs px-6"
+                  >
+                    <Zap className="ml-2 h-4 w-4" /> סריקת AI
+                  </Button>
+                  <Button 
+                    variant="outline"
+                    className="rounded-full border-2 border-white/50 text-white hover:bg-white/10 font-black h-11 transition-all text-xs bg-transparent px-6"
+                  >
+                    <Plus className="ml-2 h-4 w-4" /> הוספה קולית
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+            <VoiceCreator />
+          </div>
         </div>
 
         {/* 3. Main Content Area */}
@@ -161,7 +165,6 @@ export default function Home() {
 
           <div className="space-y-8 min-w-0">
             <SubscriptionsAtRisk />
-            <VoiceCreator />
           </div>
         </div>
       </main>
