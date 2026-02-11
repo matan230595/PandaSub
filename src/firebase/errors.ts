@@ -1,4 +1,3 @@
-
 'use client';
 import { type User } from 'firebase/auth';
 import { getApps } from 'firebase/app';

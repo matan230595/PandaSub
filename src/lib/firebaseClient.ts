@@ -1,4 +1,3 @@
-
 import { initializeApp, getApps, getApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
@@ -13,10 +12,13 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID || staticConfig.appId,
 };
 
-// Guard: וודא שיש קונפיגורציה לפני ניסיון אתחול
-const missing = Object.entries(firebaseConfig).filter(([_, v]) => !v).map(([k]) => k);
-if (missing.length > 0 && typeof window !== 'undefined') {
-  console.warn("Missing Firebase configuration keys: " + missing.join(", "));
+// Guard: וודא שכל משתני הסביבה קיימים
+const missing = Object.entries(firebaseConfig)
+  .filter(([_, v]) => !v)
+  .map(([k]) => k);
+
+if (missing.length && typeof window !== 'undefined') {
+  console.warn("Missing Firebase env vars: " + missing.join(", "));
 }
 
 export const app = getApps().length ? getApp() : initializeApp(firebaseConfig);

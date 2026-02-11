@@ -1,4 +1,3 @@
-
 "use client"
 
 import * as React from "react"
@@ -8,7 +7,7 @@ import { SubscriptionList } from "@/components/subscription/subscription-list"
 import { AIRecommendations } from "@/components/gen-ai/recommendations"
 import { SubscriptionsAtRisk } from "@/components/dashboard/risk-widget"
 import { Button } from "@/components/ui/button"
-import { Plus, TrendingUp, Calendar, Lightbulb, Hourglass, FileText, Zap, Mic } from "lucide-react"
+import { Plus, TrendingUp, Calendar, Lightbulb, Hourglass, FileText, Zap, Mic, Sparkles } from "lucide-react"
 import { AddSubscriptionModal } from "@/components/subscription/add-subscription-modal"
 import { useSubscriptions } from "@/context/subscriptions-context"
 import { Card, CardContent } from "@/components/ui/card"
@@ -86,7 +85,7 @@ export default function Home() {
           </div>
         </div>
 
-        {/* 1. Stats Grid (TOP) */}
+        {/* 1. Stats Grid (TOP) - Fixed RTL alignment */}
         <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
           <StatCard 
             title='סה"כ חודשי' 
@@ -120,7 +119,7 @@ export default function Home() {
           />
         </div>
 
-        {/* 2. AI Insights & Quick Actions */}
+        {/* 2. AI Insights & Quick Actions - Balanced side-by-side layout */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 h-full">
             <AIRecommendations />
