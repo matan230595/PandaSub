@@ -190,11 +190,11 @@ export function SubscriptionList() {
                     <Button variant="ghost" size="icon" className="rounded-full h-8 w-8"><MoreVertical className="h-4 w-4" /></Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="rounded-2xl p-2 text-right">
-                    <DropdownMenuItem onClick={() => handleEdit(sub)} className="flex-row-reverse gap-2 rounded-xl font-bold"><Edit2 className="h-4 w-4" /> ערוך</DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => handleCancelClick(sub)} className="flex-row-reverse gap-2 rounded-xl text-primary font-bold"><ExternalLink className="h-4 w-4" /> בטל מינוי</DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => duplicateSubscription(sub.id)} className="flex-row-reverse gap-2 rounded-xl"><Copy className="h-4 w-4" /> שכפל</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleEdit(sub)} className="flex-row-reverse gap-2 rounded-xl font-bold text-right"><Edit2 className="h-4 w-4" /> ערוך</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleCancelClick(sub)} className="flex-row-reverse gap-2 rounded-xl text-primary font-bold text-right"><ExternalLink className="h-4 w-4" /> בטל מינוי</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => duplicateSubscription(sub.id)} className="flex-row-reverse gap-2 rounded-xl text-right"><Copy className="h-4 w-4" /> שכפל</DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={() => setDeleteConfirmId(sub.id)} className="flex-row-reverse gap-2 rounded-xl text-destructive"><Trash2 className="h-4 w-4" /> מחק</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setDeleteConfirmId(sub.id)} className="flex-row-reverse gap-2 rounded-xl text-destructive text-right"><Trash2 className="h-4 w-4" /> מחק</DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>
@@ -302,8 +302,8 @@ export function SubscriptionList() {
   const renderKanban = () => {
     const statuses: SubscriptionStatus[] = ['trial', 'active', 'frozen', 'cancelled']
     return (
-      <div className="w-full max-w-full overflow-x-auto pb-6 scrollbar-hide">
-        <div className="flex gap-6 min-w-[1200px] flex-row-reverse px-2">
+      <div className="w-full max-w-full overflow-x-auto pb-6 scrollbar-hide" dir="ltr">
+        <div className="flex gap-6 min-w-[1200px] flex-row-reverse px-2" dir="rtl">
           {statuses.map(status => {
             const items = filteredSubs.filter(s => s.status === status)
             return (
@@ -354,6 +354,7 @@ export function SubscriptionList() {
           <DropdownMenu>
             <DropdownMenuTrigger asChild><Button variant="outline" className="rounded-2xl h-11 gap-2 border-primary/10 bg-primary/5 text-primary font-bold px-4"><Settings2 className="h-4 w-4" /> עמודות</Button></DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="text-right rounded-2xl p-2 w-56">
+              <DropdownMenuLabel className="text-right">הצג/הסתר עמודות</DropdownMenuLabel>
               {ALL_COLUMNS.map(col => (
                 <DropdownMenuCheckboxItem key={col.id} checked={isVisible(col.id)} onCheckedChange={() => toggleColumn(col.id)} className="flex-row-reverse text-right">{col.label}</DropdownMenuCheckboxItem>
               ))}

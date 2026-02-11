@@ -1,11 +1,7 @@
-// This is an AI-powered recommendation system for identifying duplicate/redundant subscriptions, cheaper alternatives, and analyzing usage patterns.
+
 'use server';
 /**
  * @fileOverview AI-powered recommendations for duplicate subscriptions and cheaper alternatives, to optimize spending.
- *
- * - SubscriptionRecommendationInput - The input type for the subscriptionRecommendation function.
- * - SubscriptionRecommendationOutput - The return type for the subscriptionRecommendation function.
- * - subscriptionRecommendation - A function that handles the generation of subscription recommendations.
  */
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
@@ -36,7 +32,7 @@ const subscriptionRecommendationPrompt = ai.definePrompt({
 1. התשובה חייבת להיות בעברית רהוטה ומקצועית בלבד.
 2. השתמש בעיצוב Markdown נקי: בולטים (•), כותרות מודגשות (**), ורווחים בין פסקאות.
 3. אל תשתמש באנגלית אלא אם מדובר בשמות מותגים (כמו Netflix).
-4. היה ספציפי לגבי חלופות בשוק הישראלי.
+4. היה ספציפי לגבי חלופות בשוק הישראלי (למשל סלקום TV מול נטפליקס, או חבילות קוואטרו).
 
 נתח את הרשימה הבאה:
 {{subscriptionList}}
@@ -44,7 +40,7 @@ const subscriptionRecommendationPrompt = ai.definePrompt({
 ספק את ההמלצות בפורמט הבא:
 • **זיהוי כפילויות**: האם יש שירותים דומים?
 • **חלופות לחיסכון**: חבילות זולות יותר או שירותים מתחרים.
-• **ניתוח דחיפות**: המלצות לביטול על בסיס תאריכי חידוש.`,
+• **ניתוח דחיפות**: המלצות לביטול על בסיס תאריכי חידוש או חוסר שימוש.`,
 });
 
 const subscriptionRecommendationFlow = ai.defineFlow(

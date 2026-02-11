@@ -82,7 +82,7 @@ export default function Home() {
 
         {/* Quick Actions & AI Card Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <Card className="lg:col-span-2 border-none card-shadow bg-gradient-to-br from-primary to-blue-700 text-white rounded-[2.5rem] overflow-hidden relative group min-h-[200px]">
+          <Card className="lg:col-span-2 border-none card-shadow bg-gradient-to-br from-primary to-blue-700 text-white rounded-[2.5rem] overflow-hidden relative group min-h-[180px]">
             <CardContent className="p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 h-full">
               <div className="text-right space-y-3 z-10 flex-1 w-full">
                 <h3 className="text-2xl font-black">פעולה מהירה 🐼</h3>
@@ -114,7 +114,7 @@ export default function Home() {
             </CardContent>
           </Card>
 
-          <div className="h-full min-h-[200px]">
+          <div className="h-full min-h-[180px]">
             <AIRecommendations />
           </div>
         </div>
@@ -154,20 +154,18 @@ export default function Home() {
           />
         </div>
 
-        {/* Middle Section: Charts & List - Critical Fix for Overflow */}
+        {/* Middle Section: Charts & List */}
         <div className="grid gap-8 lg:grid-cols-3">
           <div className="lg:col-span-2 space-y-6 min-w-0">
             <DashboardCharts />
             <div className="flex items-center justify-between pt-4">
               <h2 className="text-2xl font-black text-right w-full text-foreground border-r-4 border-primary pr-4">מינויים אחרונים</h2>
             </div>
-            {/* The list container must have min-w-0 to allow internal overflow-x-auto to work in a flex/grid layout */}
             <div className="w-full min-w-0">
               <SubscriptionList />
             </div>
           </div>
 
-          {/* Sidebar Components */}
           <div className="space-y-6">
             <SubscriptionsAtRisk />
             <VoiceCreator />
