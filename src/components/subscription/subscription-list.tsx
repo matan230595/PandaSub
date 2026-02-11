@@ -341,12 +341,12 @@ export function SubscriptionList() {
 
   return (
     <div className="space-y-6 w-full max-w-full overflow-hidden">
-      <div className="bg-white p-3 md:p-4 rounded-[2.5rem] shadow-lg border border-border/50 flex flex-col lg:flex-row gap-4 items-center flex-row-reverse">
-        <div className="relative flex-1 w-full text-right">
+      <div className="bg-white p-3 md:p-4 rounded-[2.5rem] shadow-lg border border-border/50 flex flex-col lg:flex-row gap-4 items-center">
+        <div className="relative flex-1 w-full text-right order-2 lg:order-1">
           <Search className="absolute right-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
           <Input placeholder="חיפוש מהיר..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="pr-12 h-11 text-base text-right bg-muted/20 border-none rounded-2xl" />
         </div>
-        <div className="flex items-center gap-2 w-full lg:w-auto flex-row-reverse">
+        <div className="flex items-center gap-2 w-full lg:w-auto order-1 lg:order-2">
           <DropdownMenu>
             <DropdownMenuTrigger asChild><Button variant="outline" className="rounded-2xl h-11 gap-2 border-primary/10 bg-primary/5 text-primary font-bold px-4"><Settings2 className="h-4 w-4" /> עמודות</Button></DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="text-right rounded-2xl p-2 w-56">

@@ -67,15 +67,15 @@ export default function Home() {
             <h1 className="text-3xl md:text-4xl font-black tracking-tight text-foreground">שלום, {settings.userName.split(' ')[0]}! 👋</h1>
             <p className="text-muted-foreground mt-1 text-base">יש לך {subscriptions.length} מינויים רשומים במערכת.</p>
           </div>
-          <div className="flex items-center gap-3 flex-row-reverse">
-            <Button onClick={() => setIsAddModalOpen(true)} className="rounded-full google-btn gap-2 shadow-lg h-11 px-6">
-              <Plus className="h-5 w-5" /> הוסף מינוי
+          <div className="flex items-center gap-3">
+            <Button variant="ghost" onClick={exportData} className="rounded-full gap-2 text-muted-foreground h-11 px-4 order-3">
+              <Download className="h-4 w-4" /> ייצוא
             </Button>
-            <Button variant="outline" onClick={handleGenerateDraft} className="rounded-full gap-2 border-primary/20 hover:bg-primary/5 text-primary h-11 px-5 bg-white">
+            <Button variant="outline" onClick={handleGenerateDraft} className="rounded-full gap-2 border-primary/20 hover:bg-primary/5 text-primary h-11 px-5 bg-white order-2">
               <FileText className="h-4 w-4" /> טיוטה
             </Button>
-            <Button variant="ghost" onClick={exportData} className="rounded-full gap-2 text-muted-foreground h-11 px-4">
-              <Download className="h-4 w-4" /> ייצוא
+            <Button onClick={() => setIsAddModalOpen(true)} className="rounded-full google-btn gap-2 shadow-lg h-11 px-6 order-1">
+              <Plus className="h-5 w-5" /> הוסף מינוי
             </Button>
           </div>
         </div>
@@ -83,10 +83,12 @@ export default function Home() {
         {/* Quick Actions & AI Card Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <Card className="lg:col-span-2 border-none card-shadow bg-gradient-to-br from-primary to-blue-700 text-white rounded-[2.5rem] overflow-hidden relative group min-w-0">
-            <CardContent className="p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 h-full">
-              <div className="text-right space-y-3 z-10 flex-1 w-full">
-                <h3 className="text-xl font-black">פעולה מהירה 🐼</h3>
-                <p className="text-sm opacity-90 leading-relaxed max-w-md">
+            <CardContent className="p-6 md:p-8 flex items-center justify-between gap-6 h-full">
+              <div className="text-right space-y-4 z-10 flex-1 w-full">
+                <div className="flex items-center justify-end gap-2">
+                  <h3 className="text-xl font-black">פעולה מהירה 🐼</h3>
+                </div>
+                <p className="text-sm opacity-90 leading-relaxed max-w-md ml-auto">
                   צריך להוסיף מינוי? אמור ל-Panda AI או סרוק את החשבונית לסנכרון מיידי של כל הפרטים.
                 </p>
                 <div className="flex flex-wrap gap-3 pt-2 justify-end">
@@ -98,8 +100,8 @@ export default function Home() {
                     <ShieldCheck className="ml-2 h-4 w-4" /> סריקת AI
                   </Button>
                   <Button 
-                    variant="default"
-                    className="rounded-full bg-blue-900/40 hover:bg-blue-900/60 border-none text-white font-bold px-6 h-11 shadow-lg transition-all"
+                    variant="outline"
+                    className="rounded-full border-white text-white hover:bg-white/10 font-bold px-6 h-11 shadow-lg transition-all"
                   >
                     <Zap className="ml-2 h-4 w-4" /> הוספה קולית
                   </Button>
@@ -107,8 +109,8 @@ export default function Home() {
               </div>
               
               <div className="relative hidden md:flex items-center justify-center shrink-0">
-                <div className="bg-white/10 p-4 rounded-[2rem] backdrop-blur-sm border border-white/20 shadow-inner group-hover:scale-105 transition-transform duration-500">
-                  <ShieldCheck className="h-8 w-8 text-white" />
+                <div className="bg-white/10 p-5 rounded-2xl backdrop-blur-sm border border-white/20 shadow-inner group-hover:scale-105 transition-transform duration-500">
+                  <ShieldCheck className="h-10 w-10 text-white" />
                 </div>
               </div>
             </CardContent>
@@ -201,7 +203,7 @@ function StatCard({ title, value, symbol, icon, trend, trendDesc, color }: any) 
             </div>
             <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest truncate ml-2">{title}</span>
           </div>
-          <div className="flex items-center justify-start gap-1.5 overflow-hidden flex-row-reverse">
+          <div className="flex items-center justify-start gap-2 overflow-hidden">
             <div className={cn("font-black text-foreground tabular-nums truncate leading-tight", fontSize)}>
               {value}
             </div>
