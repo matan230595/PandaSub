@@ -113,7 +113,7 @@ export default function Home() {
             </CardContent>
           </Card>
 
-          <div className="h-full min-h-[140px]">
+          <div className="h-full min-h-[140px] min-w-0">
             <AIRecommendations />
           </div>
         </div>
@@ -160,7 +160,7 @@ export default function Home() {
             <div className="flex items-center justify-between pt-4">
               <h2 className="text-2xl font-black text-right w-full text-foreground border-r-4 border-primary pr-4">מינויים אחרונים</h2>
             </div>
-            <div className="w-full min-w-0">
+            <div className="w-full min-w-0 overflow-hidden">
               <SubscriptionList />
             </div>
           </div>
@@ -200,7 +200,7 @@ function StatCard({ title, value, symbol, icon, trend, trendDesc, color }: any) 
             </div>
             <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest truncate ml-2">{title}</span>
           </div>
-          <div className="flex items-baseline justify-start flex-row-reverse mb-1 gap-1 overflow-hidden flex-wrap">
+          <div className="flex items-baseline justify-end gap-1.5 overflow-hidden flex-wrap">
             <div className={cn("font-black text-foreground tabular-nums truncate leading-tight", fontSize)}>
               {value}
             </div>
