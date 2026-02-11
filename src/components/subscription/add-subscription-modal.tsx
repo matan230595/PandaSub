@@ -20,7 +20,6 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-  FormDescription,
 } from "@/components/ui/form"
 import {
   AlertDialog,
@@ -47,7 +46,7 @@ import { useSubscriptions } from "@/context/subscriptions-context"
 import { CATEGORY_METADATA, SubscriptionCategory, SubscriptionStatus, PRIORITY_CONFIG, Subscription } from "@/app/lib/subscription-store"
 import { useToast } from "@/hooks/use-toast"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { User, Key, Mail, Phone, Copy, Trash2, Save, FileText, AlertTriangle, Bell, CreditCard, Clock, Sparkles, Loader2 } from "lucide-react"
+import { User, Key, FileText, AlertTriangle, Clock, Sparkles, Loader2, Save, Copy, Trash2 } from "lucide-react"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Progress } from "@/components/ui/progress"
 import { differenceInDays } from "date-fns"
@@ -257,9 +256,6 @@ export function AddSubscriptionModal({ open, onOpenChange, subscription }: AddSu
                   <DialogTitle className="text-2xl font-black">
                     {isEdit ? "עריכת מינוי" : "הוספת מינוי חדש"}
                   </DialogTitle>
-                  <DialogDescription className="text-sm mt-1">
-                    {isEdit ? "נהל את פרטי החיוב והתזכורות שלך" : "הזן את פרטי המינוי או השתמש ב-AI לסריקה"}
-                  </DialogDescription>
                 </div>
                 <div className="flex items-center gap-2">
                   {!isEdit && (
@@ -431,7 +427,7 @@ export function AddSubscriptionModal({ open, onOpenChange, subscription }: AddSu
 
                   <TabsContent value="reminders" className="space-y-6">
                     <FormItem className="text-right">
-                      <FormLabel className="text-base font-black flex items-center gap-2 justify-end"><Bell className="h-4 w-4" /> התראות פעילות</FormLabel>
+                      <FormLabel className="text-base font-black">התראות פעילות</FormLabel>
                       <div className="grid grid-cols-2 gap-4 bg-muted/30 p-4 rounded-2xl border">
                         {REMINDER_OPTIONS.map((option) => (
                           <FormField
@@ -457,32 +453,6 @@ export function AddSubscriptionModal({ open, onOpenChange, subscription }: AddSu
                         ))}
                       </div>
                     </FormItem>
-                    <FormField
-                      control={form.control}
-                      name="priority"
-                      render={({ field }) => (
-                        <FormItem className="text-right">
-                          <FormLabel className="text-base font-bold">רמת עדיפות</FormLabel>
-                          <Select onValueChange={field.onChange} value={field.value}>
-                            <FormControl>
-                              <SelectTrigger className="rounded-xl h-12 flex-row-reverse text-right">
-                                <SelectValue placeholder="בחר עדיפות" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent className="rounded-xl">
-                              {Object.entries(PRIORITY_CONFIG).map(([key, config]) => (
-                                <SelectItem key={key} value={key} className="text-right py-3">
-                                  <span className="flex items-center gap-3 flex-row-reverse justify-end">
-                                    <div className="h-3 w-3 rounded-full" style={{ backgroundColor: config.color }} />
-                                    <span className="font-bold">{config.label}</span>
-                                  </span>
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </FormItem>
-                      )}
-                    />
                   </TabsContent>
 
                   <TabsContent value="security" className="space-y-6">
