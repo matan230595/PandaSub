@@ -64,54 +64,51 @@ export default function Home() {
         {/* Header Section */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="text-right">
-            <h1 className="text-3xl md:text-4xl font-black tracking-tight text-foreground">שלום, {settings.userName.split(' ')[0]}! 👋</h1>
-            <p className="text-muted-foreground mt-1 text-base">יש לך {subscriptions.length} מינויים רשומים במערכת.</p>
+            <h1 className="text-2xl md:text-3xl font-black tracking-tight text-foreground">שלום, {settings.userName.split(' ')[0]}! 👋</h1>
+            <p className="text-muted-foreground mt-1 text-sm md:text-base">יש לך {subscriptions.length} מינויים רשומים.</p>
           </div>
-          <div className="flex items-center gap-3 flex-row-reverse">
-            <Button onClick={() => setIsAddModalOpen(true)} className="rounded-full google-btn gap-2 shadow-lg h-11 px-6">
-              <Plus className="h-5 w-5" /> הוסף מינוי
+          <div className="flex items-center gap-2 md:gap-3 flex-row-reverse">
+            <Button onClick={() => setIsAddModalOpen(true)} className="rounded-full google-btn gap-2 shadow-md h-10 px-5 text-sm">
+              <Plus className="h-4 w-4" /> הוסף מינוי
             </Button>
-            <Button variant="outline" onClick={handleGenerateDraft} className="rounded-full gap-2 border-primary/20 hover:bg-primary/5 text-primary h-11 px-5 bg-white">
+            <Button variant="outline" onClick={handleGenerateDraft} className="rounded-full gap-2 border-primary/20 hover:bg-primary/5 text-primary h-10 px-4 bg-white text-sm">
               <FileText className="h-4 w-4" /> טיוטה
             </Button>
-            <Button variant="ghost" onClick={exportData} className="rounded-full gap-2 text-muted-foreground h-11 px-4">
+            <Button variant="ghost" onClick={exportData} className="rounded-full gap-2 text-muted-foreground h-10 px-3 text-sm hidden sm:flex">
               <Download className="h-4 w-4" /> ייצוא
             </Button>
           </div>
         </div>
 
-        {/* Quick Actions & AI Card Grid */}
+        {/* Quick Actions Card - Compact Redesign */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 min-w-0">
-          <Card className="lg:col-span-2 border-none card-shadow bg-gradient-to-br from-primary to-blue-700 text-white rounded-[2.5rem] overflow-hidden relative group min-w-0">
-            <CardContent className="p-6 md:p-8 flex flex-col justify-between h-full space-y-6">
-              <div className="flex justify-between items-start flex-row-reverse w-full">
-                <div className="text-right space-y-2 flex-1">
-                  <h3 className="text-2xl font-black">פעולה מהירה 🐼</h3>
-                  <p className="text-sm opacity-90 leading-relaxed max-w-md ml-auto">
-                    צריך להוסיף מינוי? אמור ל-Panda AI או סרוק את החשבונית לסנכרון מיידי של כל הפרטים.
-                  </p>
-                </div>
-                <div className="relative hidden md:flex items-center justify-center shrink-0">
-                  <div className="bg-white/10 p-4 rounded-2xl backdrop-blur-sm border border-white/20 shadow-inner group-hover:scale-105 transition-transform duration-500">
-                    <ShieldCheck className="h-8 w-8 text-white" />
-                  </div>
+          <Card className="lg:col-span-2 border-none card-shadow bg-gradient-to-br from-primary to-blue-700 text-white rounded-[2rem] overflow-hidden relative group min-w-0">
+            <CardContent className="p-6 md:p-8 flex flex-col md:flex-row justify-between items-center gap-6 h-full">
+              <div className="text-right space-y-2 flex-1">
+                <h3 className="text-xl font-black">פעולה מהירה 🐼</h3>
+                <p className="text-xs md:text-sm opacity-90 leading-relaxed max-w-sm">
+                  סרוק חשבונית או אמור ל-Panda AI להוסיף מינוי חדש באופן מיידי.
+                </p>
+                <div className="flex flex-wrap gap-2 justify-end pt-2">
+                  <Button 
+                    variant="secondary" 
+                    onClick={() => setIsAddModalOpen(true)} 
+                    className="rounded-full font-bold px-6 h-10 shadow-lg bg-white text-primary hover:bg-zinc-100 transition-all border-none text-xs"
+                  >
+                    <ShieldCheck className="ml-2 h-4 w-4" /> סריקת AI
+                  </Button>
+                  <Button 
+                    variant="outline"
+                    className="rounded-full border-white text-white hover:bg-white/10 font-bold px-6 h-10 shadow-md transition-all text-xs"
+                  >
+                    <Zap className="ml-2 h-4 w-4" /> הוספה קולית
+                  </Button>
                 </div>
               </div>
-              
-              <div className="flex flex-wrap gap-3 justify-end mt-auto">
-                <Button 
-                  variant="secondary" 
-                  onClick={() => setIsAddModalOpen(true)} 
-                  className="rounded-full font-black px-8 h-12 shadow-xl bg-white text-primary hover:bg-zinc-100 transition-all border-none"
-                >
-                  <ShieldCheck className="ml-2 h-4 w-4" /> סריקת AI
-                </Button>
-                <Button 
-                  variant="outline"
-                  className="rounded-full border-white text-white hover:bg-white/10 font-black px-8 h-12 shadow-lg transition-all"
-                >
-                  <Zap className="ml-2 h-4 w-4" /> הוספה קולית
-                </Button>
+              <div className="relative hidden md:flex items-center justify-center">
+                <div className="bg-white/10 p-4 rounded-2xl backdrop-blur-sm border border-white/20 shadow-inner group-hover:scale-105 transition-transform duration-500">
+                  <ShieldCheck className="h-8 w-8 text-white" />
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -121,21 +118,20 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Stats Grid */}
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4 min-w-0">
+        {/* Stats Grid - Fixed Overlaps */}
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 min-w-0">
           <StatCard 
-            title='סה"כ חודשי (משוקלל)' 
+            title='סה"כ חודשי משוקלל' 
             value={totalMonthlyILS.toLocaleString(undefined, { maximumFractionDigits: 0 })} 
             symbol="₪"
-            icon={<TrendingUp className="text-primary h-5 w-5" />}
+            icon={<TrendingUp className="text-primary h-4 w-4" />}
             trend="↓ 12%"
-            trendDesc="מהחודש הקודם"
             color="bg-primary/10"
           />
           <StatCard 
             title='חידושים קרובים' 
             value={`${upcomingRenewals}`} 
-            icon={<Calendar className="text-[#4CAF50] h-5 w-5" />}
+            icon={<Calendar className="text-[#4CAF50] h-4 w-4" />}
             trendDesc="ב-7 הימים הקרובים"
             color="bg-[#4CAF50]/10"
           />
@@ -143,25 +139,25 @@ export default function Home() {
             title='חיסכון אפשרי' 
             value={`1,420`} 
             symbol="₪"
-            icon={<Lightbulb className="text-[#FF9800] h-5 w-5" />}
+            icon={<Lightbulb className="text-[#FF9800] h-4 w-4" />}
             trendDesc="לפי Panda AI"
             color="bg-[#FF9800]/10"
           />
           <StatCard 
             title='תקופות ניסיון' 
             value={`${trialCount}`} 
-            icon={<Hourglass className="text-[#E91E63] h-5 w-5" />}
+            icon={<Hourglass className="text-[#E91E63] h-4 w-4" />}
             trendDesc="דורש תשומת לב"
             color="bg-[#E91E63]/10"
           />
         </div>
 
-        {/* Middle Section: Charts & List */}
+        {/* Middle Section: Charts & List - Restricted Width */}
         <div className="grid gap-8 lg:grid-cols-3 min-w-0">
           <div className="lg:col-span-2 space-y-6 min-w-0 overflow-hidden">
             <DashboardCharts />
-            <div className="flex items-center justify-between pt-4">
-              <h2 className="text-2xl font-black text-right w-full text-foreground border-r-4 border-primary pr-4">מינויים אחרונים</h2>
+            <div className="flex items-center justify-between pt-2">
+              <h2 className="text-xl font-black text-right w-full text-foreground border-r-4 border-primary pr-3">מינויים אחרונים</h2>
             </div>
             <div className="w-full min-w-0 overflow-hidden">
               <SubscriptionList />
@@ -175,13 +171,13 @@ export default function Home() {
         </div>
       </main>
 
-      <footer className="border-t bg-white dark:bg-zinc-900 py-10 text-center mt-auto">
+      <footer className="border-t bg-white dark:bg-zinc-900 py-8 text-center mt-auto">
         <div className="container mx-auto px-4">
-          <div className="flex items-center justify-center gap-2 font-bold text-primary mb-4">
-            <div className="bg-primary text-white h-8 w-8 rounded-xl flex items-center justify-center text-lg shadow-lg">🐼</div>
-            <span className="text-xl font-black tracking-tight">PandaSub IL</span>
+          <div className="flex items-center justify-center gap-2 font-bold text-primary mb-3">
+            <div className="bg-primary text-white h-7 w-7 rounded-xl flex items-center justify-center text-base shadow-md">🐼</div>
+            <span className="text-lg font-black tracking-tight">PandaSub IL</span>
           </div>
-          <p className="text-sm text-muted-foreground font-medium mb-2">© 2025 כל הזכויות שמורות. נבנה באהבה בישראל.</p>
+          <p className="text-xs text-muted-foreground font-medium">© 2025 כל הזכויות שמורות. נבנה באהבה בישראל.</p>
         </div>
       </footer>
       <AddSubscriptionModal open={isAddModalOpen} onOpenChange={setIsAddModalOpen} />
@@ -194,25 +190,25 @@ function StatCard({ title, value, symbol, icon, trend, trendDesc, color }: any) 
   const fontSize = value.length > 8 ? 'text-lg' : value.length > 5 ? 'text-xl' : 'text-2xl md:text-3xl';
 
   return (
-    <Card className="card-shadow border-none rounded-[2rem] overflow-hidden group transition-all dark:bg-zinc-900 bg-white h-full min-w-0">
-      <CardContent className="p-6 text-right flex flex-col justify-between h-full">
+    <Card className="card-shadow border-none rounded-[1.5rem] overflow-hidden group transition-all dark:bg-zinc-900 bg-white h-full min-w-0">
+      <CardContent className="p-5 text-right flex flex-col justify-between h-full">
         <div>
-          <div className="flex items-center justify-between mb-4 flex-row-reverse">
-            <div className={`p-2.5 rounded-2xl ${color} group-hover:scale-110 transition-transform duration-300 shadow-sm shrink-0`}>
+          <div className="flex items-center justify-between mb-3 flex-row-reverse">
+            <div className={`p-2 rounded-xl ${color} group-hover:scale-110 transition-transform duration-300 shadow-sm shrink-0`}>
               {icon}
             </div>
             <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest truncate ml-2">{title}</span>
           </div>
-          <div className="flex items-baseline justify-start gap-1.5 flex-row-reverse overflow-hidden">
-            <div className={cn("font-black text-foreground tabular-nums truncate leading-tight", fontSize)}>
+          <div className="flex items-center justify-end gap-1 flex-row-reverse overflow-hidden">
+            <div className={cn("font-black text-foreground tabular-nums truncate leading-none", fontSize)}>
               {value}
             </div>
-            {symbol && <div className="text-lg font-black text-primary shrink-0">{symbol}</div>}
+            {symbol && <div className="text-base md:text-lg font-black text-primary shrink-0 mr-1">{symbol}</div>}
           </div>
         </div>
         <div className="mt-3 flex items-center gap-2 flex-row-reverse justify-start overflow-hidden">
-          {trend && <span className="text-[10px] font-black text-green-500 bg-green-50 px-2 py-0.5 rounded-full shrink-0">{trend}</span>}
-          <span className="text-[10px] font-bold text-muted-foreground opacity-70 truncate">{trendDesc}</span>
+          {trend && <span className="text-[9px] font-black text-green-500 bg-green-50 px-2 py-0.5 rounded-full shrink-0">{trend}</span>}
+          <span className="text-[9px] font-bold text-muted-foreground opacity-70 truncate">{trendDesc}</span>
         </div>
       </CardContent>
     </Card>
