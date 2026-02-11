@@ -2,7 +2,7 @@
 import { getAuth, type User } from 'firebase/auth';
 import { getApp, getApps } from 'firebase/app';
 
-type SecurityRuleContext = {
+export type SecurityRuleContext = {
   path: string;
   operation: 'get' | 'list' | 'create' | 'update' | 'delete' | 'write';
   requestResourceData?: any;
@@ -67,6 +67,7 @@ function buildAuthObject(currentUser: User | null): FirebaseAuthObject | null {
 function buildRequestObject(context: SecurityRuleContext): SecurityRuleRequest {
   let authObject: FirebaseAuthObject | null = null;
   try {
+    // Check if apps are initialized before accessing auth
     if (getApps().length > 0) {
       const app = getApp();
       const firebaseAuth = getAuth(app);
@@ -75,7 +76,7 @@ function buildRequestObject(context: SecurityRuleContext): SecurityRuleRequest {
       }
     }
   } catch (e) {
-    // Silently fail during initialization
+    // Fail silently during initial load
   }
 
   return {

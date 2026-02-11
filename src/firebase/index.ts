@@ -7,7 +7,7 @@ import { getFirestore, Firestore } from 'firebase/firestore';
 
 /**
  * Singleton initialization for Firebase services.
- * Ensures that getAuth() and getFirestore() are always called with a valid app instance.
+ * Safe for use in client components and ensures app is initialized only once.
  */
 export function initializeFirebase() {
   let app: FirebaseApp;

@@ -32,7 +32,7 @@ export function AIRecommendations() {
 
   return (
     <Card className="overflow-hidden border-none shadow-lg rounded-[2rem] bg-white dark:bg-zinc-900 h-full flex flex-col min-h-[160px]" dir="rtl">
-      <CardHeader className="bg-gradient-to-br from-primary to-blue-700 text-white border-b-0 p-5">
+      <CardHeader className="bg-primary text-white border-b-0 p-5">
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="bg-white/20 p-2 rounded-xl border border-white/10">

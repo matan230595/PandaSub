@@ -86,7 +86,7 @@ export default function Home() {
           </div>
         </div>
 
-        {/* 1. Stats Grid (Top) */}
+        {/* 1. Stats Grid (TOP - AS REQUESTED) */}
         <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
           <StatCard 
             title='סה"כ חודשי' 
@@ -120,29 +120,27 @@ export default function Home() {
           />
         </div>
 
-        {/* 2. AI Insights & Quick Actions (Side by Side) */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
-          <div className="lg:col-span-2">
-            <AIRecommendations />
-          </div>
-          <div className="space-y-6">
-            <Card className="border-none shadow-xl bg-gradient-to-br from-primary to-blue-700 text-white rounded-[2rem] overflow-hidden flex flex-col justify-center min-h-[160px]">
+        {/* 2. AI Insights & Quick Actions (Side by Side 50/50) */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
+          <AIRecommendations />
+          <div className="grid grid-cols-1 gap-6">
+            <Card className="border-none shadow-xl bg-gradient-to-br from-primary to-blue-700 text-white rounded-[2rem] overflow-hidden flex flex-col justify-center h-full min-h-[160px]">
               <CardContent className="p-6 text-right space-y-4">
                 <div>
                   <h3 className="text-xl font-black mb-1">פעולה מהירה 🐼</h3>
                   <p className="text-xs opacity-90 font-medium">נהל את המינויים שלך בעזרת כלי ה-AI שלנו.</p>
                 </div>
                 
-                <div className="flex flex-col gap-3">
+                <div className="flex flex-col sm:flex-row gap-3">
                   <Button 
                     onClick={() => setIsAddModalOpen(true)} 
-                    className="rounded-full font-black h-11 shadow-lg bg-white text-primary hover:bg-zinc-100 transition-all border-none text-xs px-6"
+                    className="flex-1 rounded-full font-black h-11 shadow-lg bg-white text-primary hover:bg-zinc-100 transition-all border-none text-xs px-6"
                   >
                     <Zap className="ml-2 h-4 w-4" /> סריקת AI
                   </Button>
                   <Button 
                     variant="outline"
-                    className="rounded-full border-2 border-white/50 text-white hover:bg-white/10 font-black h-11 transition-all text-xs bg-transparent px-6"
+                    className="flex-1 rounded-full border-2 border-white/50 text-white hover:bg-white/10 font-black h-11 transition-all text-xs bg-transparent px-6"
                   >
                     <Plus className="ml-2 h-4 w-4" /> הוספה קולית
                   </Button>
@@ -199,11 +197,11 @@ function StatCard({ title, value, symbol, icon, trendDesc, color }: any) {
         </div>
         
         <div className="flex flex-col items-start gap-1 mb-2">
-          <div className="flex items-baseline justify-start gap-1.5 tabular-nums overflow-hidden w-full flex-row-reverse">
-            {symbol && <div className="text-xl font-black text-primary mb-0.5 ml-1">{symbol}</div>}
+          <div className="flex items-baseline justify-start gap-1 tabular-nums overflow-hidden w-full">
             <div className={cn("font-black text-foreground leading-none", fontSize)}>
               {value}
             </div>
+            {symbol && <div className="text-xl font-black text-primary mb-0.5 ml-1">{symbol}</div>}
           </div>
         </div>
 
