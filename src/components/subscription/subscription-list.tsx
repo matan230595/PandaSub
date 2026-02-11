@@ -146,7 +146,7 @@ export function SubscriptionList() {
           </span>
           <span className="text-muted-foreground opacity-50">{progress}%</span>
         </div>
-        <Progress value={progress} className="h-1 rounded-full" indicatorClassName={color} />
+        <Progress value={progress} indicatorClassName={color} className="h-1 rounded-full" />
       </div>
     )
   }
@@ -298,7 +298,7 @@ export function SubscriptionList() {
   const renderKanban = () => {
     const statuses: SubscriptionStatus[] = ['trial', 'active', 'frozen', 'cancelled']
     return (
-      <div className="w-full max-w-full overflow-x-auto pb-6 scrollbar-hide" dir="rtl">
+      <div className="w-full max-w-full overflow-x-auto pb-6" dir="rtl">
         <div className="flex gap-6 min-w-[1200px] flex-row px-2">
           {statuses.map(status => {
             const items = filteredSubs.filter(s => s.status === status)

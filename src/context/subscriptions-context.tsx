@@ -141,16 +141,21 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
     return amount * rate;
   };
 
+  const initAudio = () => {
+    if (!audioContextRef.current) {
+      audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
+    }
+    const ctx = audioContextRef.current;
+    if (ctx.state === 'suspended') {
+      ctx.resume();
+    }
+    return ctx;
+  };
+
   const playNotificationSound = () => {
     if (!settings.soundEnabled) return;
     try {
-      if (!audioContextRef.current) {
-        audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
-      }
-      const ctx = audioContextRef.current;
-      if (ctx.state === 'suspended') {
-        ctx.resume();
-      }
+      const ctx = initAudio();
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
       osc.type = 'sine';
@@ -191,6 +196,7 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
       const existingIds = new Set(prev.map(n => n.id));
       const added = newNotifications.filter(n => !existingIds.has(n.id));
       if (added.length > 0) {
+        // We only play sound if the user has already interacted with the app
         playNotificationSound();
       }
       return [...added, ...prev].slice(0, 20);
@@ -288,7 +294,9 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
       exportData, notifications, markNotificationAsRead, settings, updateSettings,
       convertAmount
     }}>
-      {children}
+      <div onClick={() => initAudio()}>
+        {children}
+      </div>
     </SubscriptionsContext.Provider>
   );
 }

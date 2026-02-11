@@ -8,7 +8,7 @@ import { getFirestore } from 'firebase/firestore'
 
 /**
  * Initializes Firebase services correctly for both local and deployment environments.
- * Uses the firebaseConfig object directly to avoid initialization errors in Vercel.
+ * Uses the firebaseConfig object directly to avoid initialization errors.
  */
 export function initializeFirebase() {
   try {
@@ -19,8 +19,10 @@ export function initializeFirebase() {
     }
     return getSdks(getApp());
   } catch (error) {
-    console.error("Firebase initialization failed, using fallback sdk access:", error);
-    return getSdks(getApp());
+    console.warn("Firebase fallback initialization:", error);
+    // In some server-side or early build contexts, app might not be available
+    const fallbackApp = initializeApp(firebaseConfig, "fallback-" + Math.random());
+    return getSdks(fallbackApp);
   }
 }
 
