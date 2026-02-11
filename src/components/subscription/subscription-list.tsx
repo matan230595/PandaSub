@@ -138,9 +138,9 @@ export function SubscriptionList() {
 
     return (
       <div className="space-y-1 w-full mt-1">
-        <div className="flex justify-between items-center text-[9px] font-bold">
+        <div className="flex justify-between items-center text-[9px] font-bold flex-row-reverse">
           <span className="text-muted-foreground opacity-50">{progress}%</span>
-          <span className={cn("flex items-center gap-1", textClass)}>
+          <span className={cn("flex items-center gap-1 flex-row-reverse", textClass)}>
             <Clock className="h-2.5 w-2.5" />
             {daysLeft <= 0 ? "היום!" : `בעוד ${daysLeft} ימ'`}
           </span>
@@ -193,7 +193,9 @@ export function SubscriptionList() {
             <div className="grid grid-cols-2 gap-3 mb-4">
               <div className="bg-muted/30 p-2.5 rounded-xl text-right overflow-hidden border border-muted/50">
                 <div className="text-[9px] font-bold text-muted-foreground uppercase mb-0.5">סכום</div>
-                <div className="text-lg font-black text-primary truncate tabular-nums leading-none">{sub.amount}<span className="text-xs font-bold mr-0.5">{sub.currency}</span></div>
+                <div className="text-lg font-black text-primary truncate tabular-nums leading-none flex flex-row-reverse items-baseline justify-end gap-0.5">
+                  {sub.amount}<span className="text-xs font-bold">{sub.currency}</span>
+                </div>
               </div>
               <div className="bg-muted/30 p-2.5 rounded-xl text-right overflow-hidden border border-muted/50">
                 <div className="text-[9px] font-bold text-muted-foreground uppercase mb-0.5">חידוש</div>
@@ -203,7 +205,7 @@ export function SubscriptionList() {
             {renderCountdown(sub)}
           </CardContent>
           
-          <CardFooter className="bg-muted/10 border-t p-2 px-4 flex justify-between items-center">
+          <CardFooter className="bg-muted/10 border-t p-2 px-4 flex justify-between items-center flex-row-reverse">
             <Button variant="ghost" size="sm" className="h-7 text-[9px] font-black gap-1.5 rounded-full text-primary hover:bg-primary/10" onClick={(e) => { e.stopPropagation(); handleCancelClick(sub); }}>
               <ExternalLink className="h-3 w-3" /> ביטול מהיר
             </Button>
@@ -255,7 +257,7 @@ export function SubscriptionList() {
                 )}
                 {isVisible('amount') && (
                   <TableCell className="p-4">
-                    <div className="flex items-center gap-2 justify-end">
+                    <div className="flex items-center gap-2 justify-end flex-row-reverse">
                       <Input 
                         type="number"
                         value={sub.amount} 
@@ -305,9 +307,9 @@ export function SubscriptionList() {
               onDragOver={(e) => e.preventDefault()} 
               onDrop={() => { if(draggedId) { updateSubscription(draggedId, { status }); setDraggedId(null); } }}
             >
-              <div className="flex items-center justify-between px-5 py-3 bg-white rounded-2xl shadow-sm border-r-4 transition-all" style={{ borderRightColor: STATUS_METADATA[status].color }}>
+              <div className="flex items-center justify-between px-5 py-3 bg-white rounded-2xl shadow-sm border-r-4 transition-all flex-row-reverse" style={{ borderRightColor: STATUS_METADATA[status].color }}>
                 <Badge variant="secondary" className="rounded-full bg-muted/50 text-[10px] h-5 flex items-center font-bold">{items.length}</Badge>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 flex-row-reverse">
                   <h3 className="font-black text-sm">{STATUS_METADATA[status].label}</h3>
                   <div className="h-2 w-2 rounded-full shadow-sm" style={{ backgroundColor: STATUS_METADATA[status].color }} />
                 </div>
@@ -316,9 +318,9 @@ export function SubscriptionList() {
                 {items.map(sub => (
                   <Card key={sub.id} draggable onDragStart={() => setDraggedId(sub.id)} className="p-4 rounded-2xl bg-white shadow-sm border-none cursor-grab active:cursor-grabbing hover:shadow-md transition-all relative overflow-hidden group" onClick={() => handleEdit(sub)}>
                     <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-20 transition-opacity"><GripVertical className="h-4 w-4" /></div>
-                    <div className="flex justify-between items-center mb-3">
+                    <div className="flex justify-between items-center mb-3 flex-row-reverse">
                       <span className="text-sm font-black text-primary tabular-nums">{sub.amount}{sub.currency}</span>
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 flex-row-reverse">
                          <span className="font-black text-xs truncate max-w-[100px] text-right">{sub.name}</span>
                          <span className="text-xl">{CATEGORY_METADATA[sub.category].icon}</span>
                       </div>

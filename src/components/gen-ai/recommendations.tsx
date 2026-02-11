@@ -33,15 +33,15 @@ export function AIRecommendations({ compact = false }: { compact?: boolean }) {
   return (
     <Card className={cn(
       "overflow-hidden border-none shadow-lg rounded-3xl bg-white dark:bg-zinc-900 h-full flex flex-col",
-      compact ? "h-[220px]" : ""
+      compact ? "h-[180px]" : ""
     )}>
-      {/* Updated Header with blue gradient and RTL alignment */}
+      {/* Updated Header with matching gradient and RTL alignment */}
       <CardHeader className={cn(
         "bg-gradient-to-br from-primary to-blue-700 text-white border-b-0",
-        compact ? "p-4 py-3" : "p-8"
+        compact ? "p-4 py-2.5" : "p-8"
       )}>
-        <div className="flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
+        <div className="flex items-center justify-between gap-4 flex-row-reverse">
+          <div className="flex items-center gap-3 flex-row-reverse">
             <div className={cn(
               "bg-white/20 rounded-xl shadow-sm border border-white/10",
               compact ? "p-1.5" : "p-3"
@@ -67,7 +67,7 @@ export function AIRecommendations({ compact = false }: { compact?: boolean }) {
       
       <CardContent className="p-0 flex-1 flex flex-col justify-center overflow-hidden">
         {!results && !loading ? (
-          <div className={cn("text-center animate-fade-in", compact ? "p-4 space-y-3" : "p-10 space-y-8")}>
+          <div className={cn("text-center animate-fade-in", compact ? "p-3 space-y-2" : "p-10 space-y-8")}>
             {!compact && (
               <div className="relative mx-auto h-20 w-24">
                 <div className="absolute inset-0 bg-primary/10 rounded-full animate-ping opacity-20" />
@@ -77,16 +77,16 @@ export function AIRecommendations({ compact = false }: { compact?: boolean }) {
               </div>
             )}
             <div className="space-y-1">
-              <h4 className={cn("font-black", compact ? "text-sm" : "text-xl")}>מוכן לחיסכון חכם?</h4>
-              <p className={cn("text-muted-foreground mx-auto font-medium leading-tight", compact ? "text-[10px] max-w-[180px]" : "text-base max-w-xs")}>
-                ה-AI שלנו יסרוק את המינויים שלך וימצא עבורך כפילויות וחלופות זולות.
+              <h4 className={cn("font-black", compact ? "text-xs" : "text-xl")}>מוכן לחיסכון חכם?</h4>
+              <p className={cn("text-muted-foreground mx-auto font-medium leading-tight", compact ? "text-[9px] max-w-[180px]" : "text-base max-w-xs")}>
+                ה-AI שלנו יסרוק את המינויים שלך וימצא עבורך כפילויות.
               </p>
             </div>
             <Button 
               onClick={getRecommendations} 
               className={cn(
                 "bg-primary hover:bg-primary/90 rounded-full shadow-lg shadow-primary/20 font-black transition-all hover:scale-105 active:scale-95",
-                compact ? "px-6 h-9 text-xs" : "px-10 h-14 text-lg"
+                compact ? "px-5 h-8 text-[10px]" : "px-10 h-14 text-lg"
               )}
             >
               צור המלצות
@@ -107,28 +107,28 @@ export function AIRecommendations({ compact = false }: { compact?: boolean }) {
             </div>
           </div>
         ) : (
-          <div className={cn("animate-fade-in overflow-y-auto custom-scrollbar", compact ? "p-4" : "p-8")}>
+          <div className={cn("animate-fade-in overflow-y-auto custom-scrollbar h-full", compact ? "p-3" : "p-8")}>
             <div className={cn(
               "text-right bg-primary/5 rounded-2xl border border-primary/10 shadow-inner",
-              compact ? "p-4" : "p-8"
+              compact ? "p-3" : "p-8"
             )}>
               <div className={cn(
                 "whitespace-pre-wrap leading-relaxed text-foreground font-bold selection:bg-primary/20 direction-rtl",
-                compact ? "text-[11px]" : "text-base"
+                compact ? "text-[10px]" : "text-base"
               )}>
                 {results}
               </div>
             </div>
-            <div className={cn(compact ? "mt-3" : "mt-6")}>
+            <div className={cn(compact ? "mt-2" : "mt-6")}>
               <Button 
                 size="sm" 
                 onClick={() => setResults(null)} 
                 className={cn(
                   "w-full gap-2 rounded-full font-black shadow-md bg-white text-primary border border-primary/10 hover:bg-primary/5",
-                  compact ? "h-9 text-xs" : "h-14 text-lg"
+                  compact ? "h-8 text-[10px]" : "h-14 text-lg"
                 )}
               >
-                <CheckCircle2 className={compact ? "h-4 w-4" : "h-6 w-6"} /> הבנתי!
+                <CheckCircle2 className={compact ? "h-3.5 w-3.5" : "h-6 w-6"} /> הבנתי!
               </Button>
             </div>
           </div>

@@ -82,39 +82,39 @@ export default function Home() {
 
         {/* Action Row - Side by side, equal height, smaller */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
-          <Card className="border-none shadow-lg bg-gradient-to-br from-primary to-blue-700 text-white rounded-3xl overflow-hidden relative group h-[220px] flex items-center">
-            <CardContent className="p-6 md:p-8 flex flex-row justify-between items-center gap-6 relative z-10 w-full">
-              <div className="text-right space-y-3 flex-1">
-                <div className="inline-flex items-center gap-2 bg-white/20 px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-widest">
+          <Card className="border-none shadow-lg bg-gradient-to-br from-primary to-blue-700 text-white rounded-3xl overflow-hidden relative group h-[180px] flex items-center">
+            <CardContent className="p-6 md:p-8 flex flex-row-reverse justify-between items-center gap-6 relative z-10 w-full">
+              <div className="text-right space-y-2 flex-1">
+                <div className="inline-flex items-center gap-2 bg-white/20 px-2 py-0.5 rounded-full text-[8px] font-bold uppercase tracking-widest">
                   Panda AI Automation
                 </div>
-                <h3 className="text-xl md:text-2xl font-black">פעולה מהירה 🐼</h3>
-                <p className="text-xs md:text-sm opacity-90 leading-relaxed max-w-sm font-medium">
+                <h3 className="text-lg md:text-xl font-black">פעולה מהירה 🐼</h3>
+                <p className="text-[10px] md:text-xs opacity-90 leading-relaxed max-w-sm font-medium">
                   סרוק חשבונית או השתמש בהוספה קולית כדי לעדכן את המערכת באופן מיידי.
                 </p>
-                <div className="flex flex-wrap gap-3 pt-2">
+                <div className="flex flex-wrap gap-2 pt-1 justify-start md:justify-end">
                   <Button 
                     variant="secondary" 
                     onClick={() => setIsAddModalOpen(true)} 
-                    className="rounded-full font-black px-6 h-10 shadow-lg bg-white text-primary hover:bg-zinc-100 transition-all border-none text-xs"
+                    className="rounded-full font-black px-5 h-9 shadow-lg bg-white text-blue-700 hover:bg-zinc-100 transition-all border-none text-[10px]"
                   >
-                    <ShieldCheck className="ml-2 h-4 w-4" /> סריקת AI
+                    <ShieldCheck className="ml-2 h-3.5 w-3.5" /> סריקת AI
                   </Button>
                   <Button 
                     variant="outline"
-                    className="rounded-full border-2 border-white/50 text-white hover:bg-white/10 font-black px-6 h-10 transition-all text-xs"
+                    className="rounded-full border-2 border-white text-white hover:bg-white/10 font-black px-5 h-9 transition-all text-[10px] bg-transparent"
                   >
-                    <Zap className="ml-2 h-4 w-4" /> הוספה קולית
+                    <Zap className="ml-2 h-3.5 w-3.5" /> הוספה קולית
                   </Button>
                 </div>
               </div>
               <div className="opacity-10 pointer-events-none shrink-0 hidden sm:block">
-                <ShieldCheck className="h-24 w-24 text-white stroke-[1]" />
+                <ShieldCheck className="h-20 w-20 text-white stroke-[1]" />
               </div>
             </CardContent>
           </Card>
 
-          <div className="h-[220px] overflow-hidden">
+          <div className="h-[180px] overflow-hidden">
             <AIRecommendations compact />
           </div>
         </div>
@@ -198,14 +198,14 @@ function StatCard({ title, value, symbol, icon, trend, trendDesc, color }: any) 
             </div>
             <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest truncate ml-2">{title}</span>
           </div>
-          <div className="flex items-baseline justify-end gap-1 tabular-nums flex-wrap overflow-hidden">
+          <div className="flex items-baseline justify-end gap-1.5 tabular-nums flex-wrap overflow-hidden flex-row-reverse">
             <div className={cn("font-black text-foreground leading-none", fontSize)}>
               {value}
             </div>
             {symbol && <div className="text-base font-black text-primary shrink-0">{symbol}</div>}
           </div>
         </div>
-        <div className="mt-2 flex items-center gap-2 justify-end overflow-hidden">
+        <div className="mt-2 flex items-center gap-2 justify-end overflow-hidden flex-row-reverse">
           {trend && <span className="text-[9px] font-black text-green-600 bg-green-50 px-1.5 py-0.5 rounded-full shrink-0 border border-green-100">{trend}</span>}
           <span className="text-[9px] font-bold text-muted-foreground opacity-70 truncate">{trendDesc}</span>
         </div>
