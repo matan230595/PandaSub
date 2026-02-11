@@ -120,8 +120,10 @@ export default function Home() {
         </div>
 
         {/* 2. AI Insights & Quick Actions (Side by Side) */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
-          <AIRecommendations />
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
+          <div className="lg:col-span-2">
+            <AIRecommendations />
+          </div>
           <Card className="border-none shadow-xl bg-gradient-to-br from-primary to-blue-700 text-white rounded-[2rem] overflow-hidden flex flex-col justify-center min-h-[160px]">
             <CardContent className="p-6 text-right space-y-4">
               <div>
@@ -129,7 +131,7 @@ export default function Home() {
                 <p className="text-xs opacity-90 leading-relaxed font-medium">נהל את המינויים שלך בעזרת כלי ה-AI שלנו.</p>
               </div>
               
-              <div className="flex flex-col sm:flex-row gap-3 justify-end">
+              <div className="flex flex-col gap-3">
                 <Button 
                   onClick={() => setIsAddModalOpen(true)} 
                   className="rounded-full font-black h-11 shadow-lg bg-white text-primary hover:bg-zinc-100 transition-all border-none text-xs px-6"

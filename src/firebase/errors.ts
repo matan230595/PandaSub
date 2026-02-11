@@ -67,6 +67,7 @@ function buildAuthObject(currentUser: User | null): FirebaseAuthObject | null {
 function buildRequestObject(context: SecurityRuleContext): SecurityRuleRequest {
   let authObject: FirebaseAuthObject | null = null;
   try {
+    // בודק אם יש אפליקציות מאותחלות לפני גישה ל-Auth
     if (getApps().length > 0) {
       const app = getApp();
       const firebaseAuth = getAuth(app);
@@ -75,7 +76,7 @@ function buildRequestObject(context: SecurityRuleContext): SecurityRuleRequest {
       }
     }
   } catch (e) {
-    // Silence errors during initialization
+    // התעלמות משגיאות בזמן אתחול
   }
 
   return {

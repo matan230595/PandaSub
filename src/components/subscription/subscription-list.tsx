@@ -69,14 +69,14 @@ export function SubscriptionList() {
     const renewal = new Date(sub.renewalDate)
     renewal.setHours(0,0,0,0)
     const daysLeft = differenceInDays(renewal, today)
-    let progress = 100
+    let progressValue = 100
     let color = "bg-green-500"
     let textClass = "text-green-600"
-    if (daysLeft <= 0) { progress = 100; color = "bg-destructive animate-pulse"; textClass = "text-destructive font-black"; }
-    else if (daysLeft <= 3) { progress = 90; color = "bg-destructive"; textClass = "text-destructive font-bold"; }
-    else if (daysLeft <= 7) { progress = 70; color = "bg-orange-500"; textClass = "text-orange-600 font-bold"; }
-    else if (daysLeft <= 14) { progress = 40; color = "bg-blue-500"; textClass = "text-blue-600 font-bold"; }
-    else { progress = 20; color = "bg-green-500"; textClass = "text-green-600"; }
+    if (daysLeft <= 0) { progressValue = 100; color = "bg-destructive animate-pulse"; textClass = "text-destructive font-black"; }
+    else if (daysLeft <= 3) { progressValue = 90; color = "bg-destructive"; textClass = "text-destructive font-bold"; }
+    else if (daysLeft <= 7) { progressValue = 70; color = "bg-orange-500"; textClass = "text-orange-600 font-bold"; }
+    else if (daysLeft <= 14) { progressValue = 40; color = "bg-blue-500"; textClass = "text-blue-600 font-bold"; }
+    else { progressValue = 20; color = "bg-green-500"; textClass = "text-green-600"; }
     return (
       <div className="space-y-1 w-full mt-1">
         <div className="flex justify-between items-center text-[9px] font-bold flex-row-reverse">
@@ -84,9 +84,9 @@ export function SubscriptionList() {
             <Clock className="h-2.5 w-2.5" />
             {daysLeft <= 0 ? "היום!" : `בעוד ${daysLeft} ימ'`}
           </span>
-          <span className="text-muted-foreground opacity-50">{progress}%</span>
+          <span className="text-muted-foreground opacity-50">{progressValue}%</span>
         </div>
-        <Progress value={progress} indicatorClassName={color} className="h-1 rounded-full" />
+        <Progress value={progressValue} indicatorClassName={color} className="h-1 rounded-full" />
       </div>
     )
   }

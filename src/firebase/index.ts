@@ -18,10 +18,13 @@ export function initializeFirebase() {
     app = getApp();
   }
   
+  const auth = getAuth(app);
+  const firestore = getFirestore(app);
+  
   return {
     firebaseApp: app,
-    auth: getAuth(app),
-    firestore: getFirestore(app)
+    auth,
+    firestore
   };
 }
 
