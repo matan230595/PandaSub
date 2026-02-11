@@ -19,7 +19,9 @@ import {
   AlertTriangle,
   Loader2,
   Eye,
-  FileText
+  FileText,
+  Users,
+  Banknote
 } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { 
@@ -43,7 +45,8 @@ export default function SettingsPage() {
   const [localProfile, setLocalProfile] = React.useState({
     userName: settings.userName,
     userEmail: settings.userEmail,
-    userPhone: settings.userPhone
+    userPhone: settings.userPhone,
+    familyName: settings.familyName
   });
 
   const handleSave = () => {
@@ -56,25 +59,6 @@ export default function SettingsPage() {
         description: "כל השינויים עודכנו בהצלחה במערכת.",
       })
     }, 1000)
-  }
-
-  const handleGenerateDraft = () => {
-    const activeSubs = subscriptions.filter(s => s.status === 'active' || s.status === 'trial');
-    const total = activeSubs.reduce((sum, s) => sum + s.amount, 0);
-    
-    const subListText = activeSubs.map(s => `• ${s.name}: ${s.amount}${s.currency} (חידוש ב-${s.renewalDate})`).join('\n');
-    
-    const subject = encodeURIComponent("סיכום מינויים שבועי - PandaSub IL");
-    const body = encodeURIComponent(
-      `שלום ${localProfile.userName},\n\nלהלן סיכום המינויים הפעילים שלך:\n\n${subListText}\n\nסה"כ חודשי: ${total.toLocaleString()} ${settings.currency}\n\nנשלח מ-PandaSub IL`
-    );
-
-    window.location.href = `mailto:${localProfile.userEmail}?subject=${subject}&body=${body}`;
-    
-    toast({
-      title: "טיוטת מייל נוצרה",
-      description: "אפליקציית המייל נפתחה עם הנתונים שלך.",
-    })
   }
 
   const handleDeleteAll = () => {
@@ -113,14 +97,14 @@ export default function SettingsPage() {
             <TabsTrigger value="profile" className="rounded-xl font-bold gap-2">
               <User className="h-4 w-4" /> פרופיל
             </TabsTrigger>
-            <TabsTrigger value="display" className="rounded-xl font-bold gap-2">
-              <Eye className="h-4 w-4" /> תצוגה
+            <TabsTrigger value="family" className="rounded-xl font-bold gap-2">
+              <Users className="h-4 w-4" /> משפחה
             </TabsTrigger>
             <TabsTrigger value="notifications" className="rounded-xl font-bold gap-2">
               <Bell className="h-4 w-4" /> התראות
             </TabsTrigger>
             <TabsTrigger value="data" className="rounded-xl font-bold gap-2">
-              <Database className="h-4 w-4" /> מידע ופרטיות
+              <Database className="h-4 w-4" /> מידע
             </TabsTrigger>
           </TabsList>
 
@@ -132,7 +116,7 @@ export default function SettingsPage() {
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="grid gap-6 md:grid-cols-2">
-                  <div className="space-y-2">
+                  <div className="space-y-2 text-right">
                     <Label className="font-bold">שם מלא</Label>
                     <Input 
                       value={localProfile.userName} 
@@ -140,7 +124,7 @@ export default function SettingsPage() {
                       className="rounded-xl h-12 text-right" 
                     />
                   </div>
-                  <div className="space-y-2">
+                  <div className="space-y-2 text-right">
                     <Label className="font-bold">כתובת אימייל</Label>
                     <Input 
                       type="email"
@@ -149,7 +133,7 @@ export default function SettingsPage() {
                       className="rounded-xl h-12 text-right" 
                     />
                   </div>
-                  <div className="space-y-2">
+                  <div className="space-y-2 text-right">
                     <Label className="font-bold">מספר טלפון</Label>
                     <Input 
                       value={localProfile.userPhone} 
@@ -157,7 +141,7 @@ export default function SettingsPage() {
                       className="rounded-xl h-12 text-right" 
                     />
                   </div>
-                  <div className="space-y-2">
+                  <div className="space-y-2 text-right">
                     <Label className="font-bold">מטבע ברירת מחדל</Label>
                     <select 
                       value={settings.currency}
@@ -174,29 +158,29 @@ export default function SettingsPage() {
             </Card>
           </TabsContent>
 
-          <TabsContent value="display" className="space-y-6">
+          <TabsContent value="family" className="space-y-6">
             <Card className="card-shadow border-none rounded-3xl overflow-hidden bg-white dark:bg-zinc-900">
               <CardHeader className="text-right">
-                <CardTitle className="text-xl">נראות וממשק</CardTitle>
-                <CardDescription>התאם את חוויית השימוש שלך</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-8">
-                <div className="flex items-center justify-between flex-row-reverse">
-                  <div className="space-y-1 text-right">
-                    <Label className="text-lg font-bold">מצב כהה (Dark Mode)</Label>
-                    <p className="text-sm text-muted-foreground">הפעל תצוגה כהה לחיסכון בסוללה</p>
-                  </div>
-                  <Switch checked={settings.darkMode} onCheckedChange={(checked) => updateSettings({ darkMode: checked })} />
+                <div className="flex items-center gap-2 flex-row-reverse justify-start">
+                  <Users className="h-5 w-5 text-primary" />
+                  <CardTitle className="text-xl">שיתוף משפחתי</CardTitle>
                 </div>
-                
-                <div className="h-px bg-muted w-full" />
-
-                <div className="flex items-center justify-between flex-row-reverse">
-                  <div className="space-y-1 text-right">
-                    <Label className="text-lg font-bold">תצוגה דחוסה</Label>
-                    <p className="text-sm text-muted-foreground">צמצם מרווחים כדי לראות יותר מידע</p>
+                <CardDescription>נהל קבוצת משפחה למניעת כפל מינויים</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="space-y-4">
+                  <div className="space-y-2 text-right">
+                    <Label className="font-bold">שם קבוצת משפחה</Label>
+                    <Input 
+                      placeholder="למשל: משפחת ישראלי"
+                      value={localProfile.familyName} 
+                      onChange={(e) => setLocalProfile(prev => ({ ...prev, familyName: e.target.value }))}
+                      className="rounded-xl h-12 text-right" 
+                    />
                   </div>
-                  <Switch checked={settings.compactMode} onCheckedChange={(checked) => updateSettings({ compactMode: checked })} />
+                  <p className="text-sm text-muted-foreground bg-primary/5 p-4 rounded-xl">
+                    כאשר תגדיר שם משפחה, Panda AI ינתח מינויים של בני משפחה אחרים ויתריע על כפילויות (Pro).
+                  </p>
                 </div>
               </CardContent>
             </Card>
@@ -211,8 +195,8 @@ export default function SettingsPage() {
               <CardContent className="space-y-8">
                 <div className="flex items-center justify-between flex-row-reverse">
                   <div className="space-y-1 text-right">
-                    <Label className="text-lg font-bold">התראות דפדפן (Push)</Label>
-                    <p className="text-sm text-muted-foreground">קבל התראות בזמן אמת על חיובים</p>
+                    <Label className="text-lg font-bold">התראות Push (Real-time)</Label>
+                    <p className="text-sm text-muted-foreground">קבל התראות לנייד ולדפדפן בזמן אמת</p>
                   </div>
                   <Switch checked={settings.pushNotifications} onCheckedChange={(checked) => updateSettings({ pushNotifications: checked })} />
                 </div>
@@ -221,31 +205,10 @@ export default function SettingsPage() {
 
                 <div className="flex items-center justify-between flex-row-reverse">
                   <div className="space-y-1 text-right">
-                    <Label className="text-lg font-bold">סיכום שבועי באימייל</Label>
-                    <p className="text-sm text-muted-foreground">קבל אימייל עם סיכום כל החיובים השבועיים</p>
+                    <Label className="text-lg font-bold">סנכרון בנקאי אוטומטי</Label>
+                    <p className="text-sm text-muted-foreground">זיהוי אוטומטי של מינויים מחשבון הבנק</p>
                   </div>
-                  <div className="flex items-center gap-4">
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      onClick={handleGenerateDraft} 
-                      className="rounded-full gap-2 border-primary/20 text-primary"
-                    >
-                      <FileText className="h-4 w-4" />
-                      צור טיוטת מייל
-                    </Button>
-                    <Switch checked={settings.emailDigest} onCheckedChange={(checked) => updateSettings({ emailDigest: checked })} />
-                  </div>
-                </div>
-
-                <div className="h-px bg-muted w-full" />
-
-                <div className="flex items-center justify-between flex-row-reverse">
-                  <div className="space-y-1 text-right">
-                    <Label className="text-lg font-bold">התראות קוליות</Label>
-                    <p className="text-sm text-muted-foreground">השמע צליל בעת התראה חדשה</p>
-                  </div>
-                  <Switch checked={settings.soundEnabled} onCheckedChange={(checked) => updateSettings({ soundEnabled: checked })} />
+                  <Switch checked={settings.bankSyncEnabled} onCheckedChange={(checked) => updateSettings({ bankSyncEnabled: checked })} />
                 </div>
               </CardContent>
             </Card>
@@ -258,7 +221,7 @@ export default function SettingsPage() {
                   <CardTitle className="text-xl text-right">אבטחה ופרטיות</CardTitle>
                   <Shield className="h-6 w-6 text-primary" />
                 </div>
-                <CardDescription className="text-right">ניהול המידע האישי והגנה על החשבון</CardDescription>
+                <CardDescription className="text-right">ניהול המינויים שלך מסונכרן כעת עם Firebase Cloud</CardDescription>
               </CardHeader>
               <CardContent className="space-y-8">
                 <div className="grid gap-6 md:grid-cols-2">
@@ -272,7 +235,7 @@ export default function SettingsPage() {
 
                   <div className="p-6 rounded-3xl border border-destructive/20 bg-destructive/5 space-y-4 text-right">
                     <h4 className="font-bold text-destructive flex items-center gap-2 justify-end">מחיקת חשבון <Trash2 className="h-4 w-4" /></h4>
-                    <p className="text-xs text-muted-foreground">הופעה זו תמחק את כל המידע שלך לצמיתות.</p>
+                    <p className="text-xs text-muted-foreground">פעולה זו תמחק את כל המידע שלך לצמיתות.</p>
                     <Button variant="outline" onClick={() => setShowDeleteAllAlert(true)} className="w-full rounded-xl border-destructive/20 text-destructive font-bold">
                       מחק הכל לצמיתות
                     </Button>

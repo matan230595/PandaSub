@@ -3,13 +3,13 @@
 import * as React from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { Sparkles, ArrowLeft, RefreshCcw, CheckCircle2 } from "lucide-react"
+import { Sparkles, RefreshCcw, CheckCircle2 } from "lucide-react"
 import { subscriptionRecommendation } from "@/ai/flows/ai-subscription-recommendations"
 import { useSubscriptions } from "@/context/subscriptions-context"
 import { Skeleton } from "@/components/ui/skeleton"
 
 export function AIRecommendations() {
-  const { subscriptions } = useSubscriptions()
+  const { subscriptions, convertAmount } = useSubscriptions()
   const [loading, setLoading] = React.useState(false)
   const [results, setResults] = React.useState<string | null>(null)
 
@@ -17,7 +17,7 @@ export function AIRecommendations() {
     setLoading(true)
     try {
       const subListStr = subscriptions.length > 0 
-        ? subscriptions.map(s => `${s.name}: ${s.amount}${s.currency} (${s.category}), מחדש ב-${s.renewalDate}`).join('\n')
+        ? subscriptions.map(s => `${s.name}: ${s.amount}${s.currency} (${s.category}), ≈ ₪${convertAmount(s.amount, s.currency).toFixed(1)}, מחדש ב-${s.renewalDate}`).join('\n')
         : "אין מינויים כרגע"
       
       const { recommendations } = await subscriptionRecommendation({ subscriptionList: subListStr })
@@ -30,7 +30,7 @@ export function AIRecommendations() {
   }
 
   return (
-    <Card className="overflow-hidden border-none card-shadow rounded-3xl bg-white">
+    <Card className="overflow-hidden border-none card-shadow rounded-3xl bg-white dark:bg-zinc-900 h-full flex flex-col">
       <CardHeader className="bg-primary/5 border-b p-6">
         <div className="flex items-center justify-between flex-row-reverse">
           <div className="flex items-center gap-3 flex-row-reverse">
@@ -47,13 +47,13 @@ export function AIRecommendations() {
             size="sm" 
             onClick={getRecommendations} 
             disabled={loading}
-            className="text-primary hover:text-primary hover:bg-primary/10 rounded-full"
+            className="text-primary hover:text-primary hover:bg-primary/10 rounded-full h-8 w-8 p-0"
           >
             {loading ? <RefreshCcw className="h-4 w-4 animate-spin" /> : <RefreshCcw className="h-4 w-4" />}
           </Button>
         </div>
       </CardHeader>
-      <CardContent className="p-0">
+      <CardContent className="p-0 flex-1 overflow-auto">
         {!results && !loading ? (
           <div className="p-12 text-center space-y-6">
             <div className="mx-auto h-20 w-20 rounded-full bg-primary/10 flex items-center justify-center text-primary animate-pulse">
@@ -71,17 +71,18 @@ export function AIRecommendations() {
             <Skeleton className="h-4 w-full ml-auto" />
             <Skeleton className="h-4 w-5/6 ml-auto" />
             <Skeleton className="h-4 w-2/3 ml-auto" />
+            <Skeleton className="h-4 w-full ml-auto" />
           </div>
         ) : (
-          <div className="p-8 space-y-6">
-            <div className="text-right">
-              <div className="whitespace-pre-wrap text-base leading-relaxed text-foreground font-medium">
+          <div className="p-6 space-y-6">
+            <div className="text-right bg-muted/20 p-6 rounded-2xl border border-primary/10">
+              <div className="whitespace-pre-wrap text-sm leading-relaxed text-foreground font-medium selection:bg-primary/20">
                 {results}
               </div>
             </div>
-            <div className="pt-4 flex gap-4">
-              <Button size="lg" className="flex-1 gap-2 rounded-full font-bold shadow-lg shadow-primary/20">
-                <CheckCircle2 className="h-5 w-5" /> יישם המלצות
+            <div className="pt-2 flex gap-4">
+              <Button size="lg" onClick={() => setResults(null)} className="flex-1 gap-2 rounded-full font-bold shadow-lg shadow-primary/20 bg-primary/10 text-primary hover:bg-primary/20">
+                <CheckCircle2 className="h-5 w-5" /> הבנתי, תודה!
               </Button>
             </div>
           </div>

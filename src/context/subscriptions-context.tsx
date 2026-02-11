@@ -1,7 +1,20 @@
 "use client"
 
-import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef, useMemo } from 'react';
 import { Subscription, SAMPLE_SUBSCRIPTIONS } from '@/app/lib/subscription-store';
+import { 
+  collection, 
+  doc, 
+  setDoc, 
+  onSnapshot, 
+  query, 
+  where,
+  deleteDoc,
+  updateDoc
+} from 'firebase/firestore';
+import { useFirestore, useUser } from '@/firebase';
+import { errorEmitter } from '@/firebase/error-emitter';
+import { FirestorePermissionError } from '@/firebase/errors';
 
 interface UserSettings {
   darkMode: boolean;
@@ -15,7 +28,9 @@ interface UserSettings {
   userName: string;
   userEmail: string;
   userPhone: string;
+  familyName: string;
   visibleColumns: string[];
+  bankSyncEnabled: boolean;
 }
 
 interface Notification {
@@ -47,15 +62,6 @@ interface SubscriptionsContextType {
 
 const SubscriptionsContext = createContext<SubscriptionsContextType | undefined>(undefined);
 
-const encrypt = (data: string) => btoa(encodeURIComponent(data));
-const decrypt = (data: string) => {
-  try {
-    return decodeURIComponent(atob(data));
-  } catch(e) {
-    return data;
-  }
-};
-
 const DEFAULT_SETTINGS: UserSettings = {
   darkMode: false,
   compactMode: false,
@@ -68,7 +74,9 @@ const DEFAULT_SETTINGS: UserSettings = {
   userName: 'ישראל ישראלי',
   userEmail: 'israel@example.com',
   userPhone: '050-1234567',
-  visibleColumns: ['name', 'amount', 'renewalDate', 'status', 'category', 'paymentMethod']
+  familyName: '',
+  visibleColumns: ['name', 'amount', 'renewalDate', 'status', 'category'],
+  bankSyncEnabled: false
 };
 
 const EXCHANGE_RATES: Record<string, number> = {
@@ -86,47 +94,49 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [settings, setSettings] = useState<UserSettings>(DEFAULT_SETTINGS);
   const audioContextRef = useRef<AudioContext | null>(null);
+  
+  const { user } = useUser();
+  const db = useFirestore();
 
+  // סנכרון עם Firebase במקום LocalStorage
   useEffect(() => {
-    const saved = localStorage.getItem('panda_subs_v10');
-    const wizardState = localStorage.getItem('panda_wizard');
-    const savedSettings = localStorage.getItem('panda_settings');
-    
-    if (saved) {
-      try {
-        const decoded = decrypt(saved);
-        setSubscriptions(JSON.parse(decoded));
-      } catch (e) {
-        setSubscriptions(SAMPLE_SUBSCRIPTIONS);
+    if (!db || !user) {
+      // אם אין משתמש מחובר, השתמש ב-SAMPLE ו-LocalStorage (פרוטוטיפ)
+      const saved = localStorage.getItem('panda_subs_v11');
+      if (saved) setSubscriptions(JSON.parse(saved));
+      else setSubscriptions(SAMPLE_SUBSCRIPTIONS);
+      return;
+    }
+
+    const subsRef = collection(db, 'users', user.uid, 'subscriptions');
+    const unsubscribe = onSnapshot(subsRef, (snapshot) => {
+      const subs: Subscription[] = [];
+      snapshot.forEach(doc => subs.push({ ...doc.data() as Subscription, id: doc.id }));
+      setSubscriptions(subs);
+    }, (error) => {
+      errorEmitter.emit('permission-error', new FirestorePermissionError({
+        path: subsRef.path,
+        operation: 'list'
+      }));
+    });
+
+    const settingsRef = doc(db, 'users', user.uid);
+    const unsubscribeSettings = onSnapshot(settingsRef, (snapshot) => {
+      if (snapshot.exists()) {
+        const data = snapshot.data();
+        if (data.settings) setSettings(prev => ({ ...prev, ...data.settings }));
       }
-    } else {
-      setSubscriptions(SAMPLE_SUBSCRIPTIONS);
-    }
+    });
 
-    if (savedSettings) {
-      setSettings(prev => ({ ...prev, ...JSON.parse(savedSettings) }));
+    return () => {
+      unsubscribe();
+      unsubscribeSettings();
     }
+  }, [db, user]);
 
-    if (wizardState === 'complete') {
-      setIsWizardComplete(true);
-    } else if (!saved) {
-      setIsWizardComplete(false);
-    }
-  }, []);
-
+  // גיבוי ל-LocalStorage למקרה חירום/אופליין
   useEffect(() => {
-    localStorage.setItem('panda_settings', JSON.stringify(settings));
-    if (settings.darkMode) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-  }, [settings]);
-
-  useEffect(() => {
-    if (subscriptions.length > 0) {
-      localStorage.setItem('panda_subs_v10', encrypt(JSON.stringify(subscriptions)));
-    }
+    localStorage.setItem('panda_subs_v11', JSON.stringify(subscriptions));
     checkReminders();
   }, [subscriptions]);
 
@@ -187,20 +197,50 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
   };
 
   const updateSettings = (newSettings: Partial<UserSettings>) => {
-    setSettings(prev => ({ ...prev, ...newSettings }));
+    const updated = { ...settings, ...newSettings };
+    setSettings(updated);
+    if (user && db) {
+      setDoc(doc(db, 'users', user.uid), { settings: updated }, { merge: true });
+    }
   };
 
   const addSubscription = (sub: Omit<Subscription, 'id'>) => {
-    const newSub = { ...sub, id: Math.random().toString(36).substr(2, 9) };
-    setSubscriptions(prev => [newSub, ...prev]);
+    if (user && db) {
+      const newDoc = doc(collection(db, 'users', user.uid, 'subscriptions'));
+      setDoc(newDoc, { ...sub, id: newDoc.id }).catch(e => {
+        errorEmitter.emit('permission-error', new FirestorePermissionError({
+          path: newDoc.path,
+          operation: 'create',
+          requestResourceData: sub
+        }));
+      });
+    } else {
+      const newSub = { ...sub, id: Math.random().toString(36).substr(2, 9) };
+      setSubscriptions(prev => [newSub, ...prev]);
+    }
   };
 
   const updateSubscription = (id: string, sub: Partial<Subscription>) => {
-    setSubscriptions(prev => prev.map(s => s.id === id ? { ...s, ...sub } : s));
+    if (user && db) {
+      const subRef = doc(db, 'users', user.uid, 'subscriptions', id);
+      updateDoc(subRef, sub).catch(e => {
+        errorEmitter.emit('permission-error', new FirestorePermissionError({
+          path: subRef.path,
+          operation: 'update',
+          requestResourceData: sub
+        }));
+      });
+    } else {
+      setSubscriptions(prev => prev.map(s => s.id === id ? { ...s, ...sub } : s));
+    }
   };
 
   const deleteSubscription = (id: string) => {
-    setSubscriptions(prev => prev.filter(s => s.id !== id));
+    if (user && db) {
+      deleteDoc(doc(db, 'users', user.uid, 'subscriptions', id));
+    } else {
+      setSubscriptions(prev => prev.filter(s => s.id !== id));
+    }
   };
 
   const duplicateSubscription = (id: string) => {
@@ -212,10 +252,11 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
   };
 
   const markAsUsed = (id: string) => {
-    const today = new Date().toISOString().split('T')[0];
-    setSubscriptions(prev => prev.map(s => 
-      s.id === id ? { ...s, usageCount: (s.usageCount || 0) + 1, lastUsed: today } : s
-    ));
+    const sub = subscriptions.find(s => s.id === id);
+    if (sub) {
+      const today = new Date().toISOString().split('T')[0];
+      updateSubscription(id, { usageCount: (sub.usageCount || 0) + 1, lastUsed: today });
+    }
   };
 
   const completeWizard = () => {

@@ -6,42 +6,56 @@ import { DashboardCharts } from "@/components/dashboard/stats-charts"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { useSubscriptions } from "@/context/subscriptions-context"
 import { CATEGORY_METADATA } from "@/app/lib/subscription-store"
-import { TrendingUp, TrendingDown, DollarSign, Wallet, ArrowUpRight, ArrowDownRight } from "lucide-react"
+import { TrendingUp, DollarSign, Wallet, ArrowUpRight, ArrowDownRight, Activity } from "lucide-react"
+import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip, Cell } from "recharts"
 
 export default function AnalysisPage() {
-  const { subscriptions } = useSubscriptions()
+  const { subscriptions, convertAmount } = useSubscriptions()
 
   const totalMonthly = subscriptions
     .filter(s => s.status === 'active' || s.status === 'trial')
-    .reduce((sum, s) => sum + s.amount, 0)
+    .reduce((sum, s) => sum + convertAmount(s.amount, s.currency), 0)
 
   const categorySpending = subscriptions.reduce((acc, sub) => {
-    acc[sub.category] = (acc[sub.category] || 0) + sub.amount
+    const amount = convertAmount(sub.amount, sub.currency)
+    acc[sub.category] = (acc[sub.category] || 0) + amount
     return acc
   }, {} as Record<string, number>)
 
   const sortedCategories = Object.entries(categorySpending)
     .sort(([, a], [, b]) => b - a)
 
+  const pricePerUseData = subscriptions
+    .filter(s => s.usageCount && s.usageCount > 0)
+    .map(s => ({
+      name: s.name,
+      ppu: convertAmount(s.amount, s.currency) / (s.usageCount || 1),
+      color: CATEGORY_METADATA[s.category].color
+    }))
+    .sort((a, b) => b.ppu - a.ppu)
+
   return (
-    <div className="min-h-screen flex flex-col bg-[#F8F9FA]">
+    <div className="min-h-screen flex flex-col bg-[#F8F9FA] dark:bg-zinc-950">
       <TopNav />
-      <main className="flex-1 container mx-auto p-4 md:p-8 space-y-8 animate-fade-in pb-20">
+      <main className="flex-1 container mx-auto p-4 md:p-8 space-y-8 animate-fade-in pb-24">
         <div className="text-right">
-          <h1 className="text-3xl font-bold tracking-tight">ניתוח הוצאות מעמיק</h1>
+          <h1 className="text-3xl font-black tracking-tight">ניתוח פיננסי מעמיק</h1>
           <p className="text-muted-foreground text-lg">סקירה ויזואלית של התקציב והרגלי הצריכה שלך</p>
         </div>
 
         <div className="grid gap-6 md:grid-cols-3">
-          <Card className="card-shadow border-none rounded-3xl bg-gradient-to-br from-primary to-blue-700 text-white">
-            <CardContent className="p-8 text-right">
+          <Card className="card-shadow border-none rounded-3xl bg-gradient-to-br from-primary to-blue-700 text-white overflow-hidden">
+            <CardContent className="p-8 text-right relative">
               <div className="flex items-center justify-between mb-4 flex-row-reverse">
                 <div className="bg-white/20 p-3 rounded-2xl">
                   <Wallet className="h-6 w-6" />
                 </div>
-                <span className="text-sm font-bold opacity-80 uppercase tracking-wider">הוצאה חודשית נוכחית</span>
+                <span className="text-sm font-bold opacity-80 uppercase tracking-wider">הוצאה חודשית משוקללת</span>
               </div>
-              <div className="text-4xl font-black">₪{totalMonthly.toLocaleString()}</div>
+              <div className="flex items-baseline justify-end gap-2 flex-row-reverse">
+                <span className="text-4xl font-black">{totalMonthly.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                <span className="text-xl font-bold">₪</span>
+              </div>
               <div className="mt-4 flex items-center gap-2 justify-end text-sm font-bold">
                 <span className="bg-white/20 px-2 py-0.5 rounded-full flex items-center gap-1">
                   12.5%+ <ArrowUpRight className="h-3 w-3" />
@@ -51,7 +65,7 @@ export default function AnalysisPage() {
             </CardContent>
           </Card>
 
-          <Card className="card-shadow border-none rounded-3xl bg-white">
+          <Card className="card-shadow border-none rounded-3xl bg-white dark:bg-zinc-900">
             <CardContent className="p-8 text-right">
               <div className="flex items-center justify-between mb-4 flex-row-reverse">
                 <div className="bg-green-100 p-3 rounded-2xl text-green-600">
@@ -59,8 +73,11 @@ export default function AnalysisPage() {
                 </div>
                 <span className="text-sm font-bold text-muted-foreground uppercase tracking-wider">ממוצע למינוי</span>
               </div>
-              <div className="text-4xl font-black text-foreground">
-                ₪{subscriptions.length > 0 ? (totalMonthly / subscriptions.length).toFixed(1) : 0}
+              <div className="flex items-baseline justify-end gap-2 flex-row-reverse">
+                <span className="text-4xl font-black text-foreground">
+                  {(subscriptions.length > 0 ? totalMonthly / subscriptions.length : 0).toFixed(1)}
+                </span>
+                <span className="text-xl font-bold text-foreground">₪</span>
               </div>
               <div className="mt-4 flex items-center gap-2 justify-end text-sm font-bold text-green-600">
                 <span className="bg-green-50 px-2 py-0.5 rounded-full flex items-center gap-1">
@@ -71,7 +88,7 @@ export default function AnalysisPage() {
             </CardContent>
           </Card>
 
-          <Card className="card-shadow border-none rounded-3xl bg-white">
+          <Card className="card-shadow border-none rounded-3xl bg-white dark:bg-zinc-900">
             <CardContent className="p-8 text-right">
               <div className="flex items-center justify-between mb-4 flex-row-reverse">
                 <div className="bg-orange-100 p-3 rounded-2xl text-orange-600">
@@ -79,7 +96,10 @@ export default function AnalysisPage() {
                 </div>
                 <span className="text-sm font-bold text-muted-foreground uppercase tracking-wider">הוצאה שנתית חזויה</span>
               </div>
-              <div className="text-4xl font-black text-foreground">₪{(totalMonthly * 12).toLocaleString()}</div>
+              <div className="flex items-baseline justify-end gap-2 flex-row-reverse">
+                <span className="text-4xl font-black text-foreground">{(totalMonthly * 12).toLocaleString()}</span>
+                <span className="text-xl font-bold text-foreground">₪</span>
+              </div>
               <div className="mt-4 text-sm font-medium text-muted-foreground">כולל חישוב אינפלציה וחידושים</div>
             </CardContent>
           </Card>
@@ -88,7 +108,51 @@ export default function AnalysisPage() {
         <DashboardCharts />
 
         <div className="grid gap-6 lg:grid-cols-2">
-          <Card className="card-shadow border-none rounded-3xl bg-white">
+          <Card className="card-shadow border-none rounded-3xl bg-white dark:bg-zinc-900 overflow-hidden">
+            <CardHeader className="bg-muted/30 border-b">
+              <div className="flex items-center gap-2 flex-row-reverse justify-start">
+                <Activity className="h-5 w-5 text-primary" />
+                <CardTitle>יחס עלות מול תועלת</CardTitle>
+              </div>
+              <CardDescription>כמה עולה לך כל "כניסה" או שימוש במינוי?</CardDescription>
+            </CardHeader>
+            <CardContent className="p-6 h-[350px]">
+              {pricePerUseData.length > 0 ? (
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={pricePerUseData} layout="vertical" margin={{ right: 30, left: 30 }}>
+                    <XAxis type="number" hide />
+                    <YAxis dataKey="name" type="category" width={100} axisLine={false} tickLine={false} orientation="right" />
+                    <Tooltip 
+                      content={({ active, payload }) => {
+                        if (active && payload && payload.length) {
+                          return (
+                            <div className="bg-white p-2 border rounded-xl shadow-lg text-right">
+                              <p className="font-bold text-sm">{payload[0].payload.name}</p>
+                              <p className="text-primary font-black">₪{payload[0].value?.toLocaleString()} לשימוש</p>
+                            </div>
+                          )
+                        }
+                        return null
+                      }}
+                    />
+                    <Bar dataKey="ppu" radius={[0, 4, 4, 0]} barSize={20}>
+                      {pricePerUseData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="flex flex-col items-center justify-center h-full opacity-40 text-center">
+                  <div className="text-5xl mb-4">📊</div>
+                  <p className="font-bold">אין מספיק נתוני שימוש</p>
+                  <p className="text-xs">עדכן את כמות השימושים במינויים כדי לראות ניתוח</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          <Card className="card-shadow border-none rounded-3xl bg-white dark:bg-zinc-900">
             <CardHeader>
               <CardTitle>התפלגות לפי קטגוריה</CardTitle>
               <CardDescription>איפה הכסף שלך מושקע הכי הרבה?</CardDescription>
@@ -114,32 +178,6 @@ export default function AnalysisPage() {
                   </div>
                 </div>
               ))}
-            </CardContent>
-          </Card>
-
-          <Card className="card-shadow border-none rounded-3xl bg-white">
-            <CardHeader>
-              <CardTitle>מגמות ושינויים</CardTitle>
-              <CardDescription>תובנות על בסיס נתונים היסטוריים</CardDescription>
-            </CardHeader>
-            <CardContent className="flex flex-col items-center justify-center py-12 text-center space-y-4">
-              <div className="h-20 w-20 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                <TrendingUp className="h-10 w-10" />
-              </div>
-              <div className="space-y-2">
-                <h3 className="text-xl font-bold">הוצאות הענן שלך גדלו</h3>
-                <p className="text-muted-foreground max-w-xs">זיהינו עלייה של 15% בהוצאות על אחסון ענן בשלושת החודשים האחרונים.</p>
-              </div>
-              <div className="pt-4 flex gap-3">
-                <div className="bg-muted/50 p-4 rounded-2xl text-right flex-1">
-                  <div className="text-xs font-bold text-muted-foreground mb-1 uppercase">הכי יקר</div>
-                  <div className="font-black text-lg">Adobe</div>
-                </div>
-                <div className="bg-muted/50 p-4 rounded-2xl text-right flex-1">
-                  <div className="text-xs font-bold text-muted-foreground mb-1 uppercase">הכי זול</div>
-                  <div className="font-black text-lg">Spotify</div>
-                </div>
-              </div>
             </CardContent>
           </Card>
         </div>

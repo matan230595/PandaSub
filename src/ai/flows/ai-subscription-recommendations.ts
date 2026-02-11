@@ -30,10 +30,21 @@ const subscriptionRecommendationPrompt = ai.definePrompt({
   name: 'subscriptionRecommendationPrompt',
   input: {schema: SubscriptionRecommendationInputSchema},
   output: {schema: SubscriptionRecommendationOutputSchema},
-  prompt: `Analyze the following list of subscriptions and provide recommendations for identifying duplicate/redundant subscriptions, cheaper alternatives, and usage pattern analysis.
+  prompt: `אתה מומחה פיננסי חכם בשם Panda AI. תפקידך לנתח את רשימת המינויים של המשתמש ולתת המלצות לחיסכון.
 
-Subscription List:
-{{subscriptionList}}`,
+הוראות חשובות:
+1. התשובה חייבת להיות בעברית רהוטה ומקצועית בלבד.
+2. השתמש בעיצוב Markdown נקי: בולטים (•), כותרות מודגשות (**), ורווחים בין פסקאות.
+3. אל תשתמש באנגלית אלא אם מדובר בשמות מותגים (כמו Netflix).
+4. היה ספציפי לגבי חלופות בשוק הישראלי.
+
+נתח את הרשימה הבאה:
+{{subscriptionList}}
+
+ספק את ההמלצות בפורמט הבא:
+• **זיהוי כפילויות**: האם יש שירותים דומים?
+• **חלופות לחיסכון**: חבילות זולות יותר או שירותים מתחרים.
+• **ניתוח דחיפות**: המלצות לביטול על בסיס תאריכי חידוש.`,
 });
 
 const subscriptionRecommendationFlow = ai.defineFlow(

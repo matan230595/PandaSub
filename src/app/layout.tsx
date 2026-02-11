@@ -3,6 +3,7 @@ import './globals.css';
 import { SubscriptionsProvider } from '@/context/subscriptions-context';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/app-sidebar';
+import { FirebaseClientProvider } from '@/firebase/client-provider';
 
 export const metadata: Metadata = {
   title: 'PandaSub IL - ניהול מינויים חכם',
@@ -38,16 +39,18 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
       </head>
       <body className="font-body antialiased bg-background overflow-x-hidden">
-        <SubscriptionsProvider>
-          <SidebarProvider>
-            <div className="flex min-h-screen w-full flex-row-reverse">
-              <AppSidebar />
-              <div className="flex-1 flex flex-col w-full overflow-x-hidden">
-                {children}
+        <FirebaseClientProvider>
+          <SubscriptionsProvider>
+            <SidebarProvider>
+              <div className="flex min-h-screen w-full flex-row-reverse">
+                <AppSidebar />
+                <div className="flex-1 flex flex-col w-full overflow-x-hidden">
+                  {children}
+                </div>
               </div>
-            </div>
-          </SidebarProvider>
-        </SubscriptionsProvider>
+            </SidebarProvider>
+          </SubscriptionsProvider>
+        </FirebaseClientProvider>
       </body>
     </html>
   );
