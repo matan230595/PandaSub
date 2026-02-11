@@ -82,39 +82,39 @@ export default function Home() {
 
         {/* Quick Actions & AI Card Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <Card className="lg:col-span-2 border-none card-shadow bg-gradient-to-br from-primary to-blue-700 text-white rounded-[2.5rem] overflow-hidden relative group min-h-[180px]">
+          <Card className="lg:col-span-2 border-none card-shadow bg-gradient-to-br from-primary to-blue-700 text-white rounded-[2.5rem] overflow-hidden relative group min-h-[140px]">
             <CardContent className="p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 h-full">
               <div className="text-right space-y-3 z-10 flex-1 w-full">
-                <h3 className="text-2xl font-black">פעולה מהירה 🐼</h3>
-                <p className="text-base opacity-90 leading-relaxed max-w-lg">
+                <h3 className="text-xl font-black">פעולה מהירה 🐼</h3>
+                <p className="text-sm opacity-90 leading-relaxed max-w-lg">
                   צריך להוסיף מינוי? אמור ל-Panda AI או סרוק את החשבונית.
                 </p>
-                <div className="flex flex-wrap gap-3 pt-2 justify-end">
+                <div className="flex flex-wrap gap-3 pt-1 justify-end">
                   <Button 
                     variant="secondary" 
                     onClick={() => setIsAddModalOpen(true)} 
-                    className="rounded-full font-bold px-6 h-12 shadow-xl text-primary bg-white hover:bg-zinc-100 transition-all"
+                    className="rounded-full font-bold px-5 h-10 shadow-xl text-primary bg-white hover:bg-zinc-100 transition-all text-xs"
                   >
-                    <ShieldCheck className="ml-2 h-5 w-5" /> סריקת AI
+                    <ShieldCheck className="ml-2 h-4 w-4" /> סריקת AI
                   </Button>
                   <Button 
                     variant="outline" 
-                    className="rounded-full border-white/40 text-white hover:bg-white/10 font-bold px-6 h-12 transition-all bg-transparent"
+                    className="rounded-full border-white/40 text-white hover:bg-white/10 font-bold px-5 h-10 transition-all bg-transparent text-xs"
                   >
-                    <Zap className="ml-2 h-5 w-5" /> הוספה קולית
+                    <Zap className="ml-2 h-4 w-4" /> הוספה קולית
                   </Button>
                 </div>
               </div>
               
               <div className="relative hidden md:flex items-center justify-center shrink-0">
-                <div className="bg-white/10 p-6 rounded-[2rem] backdrop-blur-sm border border-white/20 shadow-inner group-hover:scale-105 transition-transform duration-500">
-                  <ShieldCheck className="h-12 w-12 text-white" />
+                <div className="bg-white/10 p-4 rounded-[1.5rem] backdrop-blur-sm border border-white/20 shadow-inner group-hover:scale-105 transition-transform duration-500">
+                  <ShieldCheck className="h-8 w-8 text-white" />
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <div className="h-full min-h-[180px]">
+          <div className="h-full min-h-[140px]">
             <AIRecommendations />
           </div>
         </div>
@@ -156,7 +156,7 @@ export default function Home() {
 
         {/* Middle Section: Charts & List */}
         <div className="grid gap-8 lg:grid-cols-3">
-          <div className="lg:col-span-2 space-y-6 min-w-0">
+          <div className="lg:col-span-2 space-y-6 min-w-0 overflow-hidden">
             <DashboardCharts />
             <div className="flex items-center justify-between pt-4">
               <h2 className="text-2xl font-black text-right w-full text-foreground border-r-4 border-primary pr-4">מינויים אחרונים</h2>
@@ -166,7 +166,7 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="space-y-6">
+          <div className="space-y-6 min-w-0">
             <SubscriptionsAtRisk />
             <VoiceCreator />
           </div>
@@ -189,27 +189,27 @@ export default function Home() {
 }
 
 function StatCard({ title, value, symbol, icon, trend, trendDesc, color }: any) {
-  const fontSize = value.length > 8 ? 'text-xl' : value.length > 5 ? 'text-2xl' : 'text-3xl md:text-4xl';
+  const fontSize = value.length > 8 ? 'text-lg' : value.length > 5 ? 'text-xl' : 'text-2xl md:text-3xl';
 
   return (
-    <Card className="card-shadow border-none rounded-[2rem] overflow-hidden group transition-all dark:bg-zinc-900 bg-white h-full">
+    <Card className="card-shadow border-none rounded-[2rem] overflow-hidden group transition-all dark:bg-zinc-900 bg-white h-full min-w-0">
       <CardContent className="p-6 text-right flex flex-col justify-between h-full">
         <div>
           <div className="flex items-center justify-between mb-4 flex-row-reverse">
-            <div className={`p-2.5 rounded-2xl ${color} group-hover:scale-110 transition-transform duration-300 shadow-sm`}>
+            <div className={`p-2.5 rounded-2xl ${color} group-hover:scale-110 transition-transform duration-300 shadow-sm shrink-0`}>
               {icon}
             </div>
-            <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest truncate max-w-[120px]">{title}</span>
+            <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest truncate ml-2">{title}</span>
           </div>
-          <div className="flex items-baseline justify-start flex-row-reverse mb-1 gap-1 overflow-hidden">
-            <div className={cn("font-black text-foreground tabular-nums truncate", fontSize)}>
+          <div className="flex items-baseline justify-start flex-row-reverse mb-1 gap-1 overflow-hidden flex-wrap">
+            <div className={cn("font-black text-foreground tabular-nums truncate leading-tight", fontSize)}>
               {value}
             </div>
-            {symbol && <div className="text-xl font-black text-primary shrink-0">{symbol}</div>}
+            {symbol && <div className="text-lg font-black text-primary shrink-0">{symbol}</div>}
           </div>
         </div>
-        <div className="mt-3 flex items-center gap-2 flex-row-reverse justify-start">
-          {trend && <span className="text-[10px] font-black text-green-500 bg-green-50 px-2 py-0.5 rounded-full">{trend}</span>}
+        <div className="mt-3 flex items-center gap-2 flex-row-reverse justify-start overflow-hidden">
+          {trend && <span className="text-[10px] font-black text-green-500 bg-green-50 px-2 py-0.5 rounded-full shrink-0">{trend}</span>}
           <span className="text-[10px] font-bold text-muted-foreground opacity-70 truncate">{trendDesc}</span>
         </div>
       </CardContent>
