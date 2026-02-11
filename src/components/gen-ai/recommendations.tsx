@@ -35,21 +35,22 @@ export function AIRecommendations({ compact = false }: { compact?: boolean }) {
       "overflow-hidden border-none shadow-lg rounded-3xl bg-white dark:bg-zinc-900 h-full flex flex-col",
       compact ? "h-[220px]" : ""
     )}>
+      {/* Updated Header with blue gradient and RTL alignment */}
       <CardHeader className={cn(
-        "bg-primary/5 border-b",
+        "bg-gradient-to-br from-primary to-blue-700 text-white border-b-0",
         compact ? "p-4 py-3" : "p-8"
       )}>
-        <div className="flex items-center justify-between flex-row-reverse gap-4">
-          <div className="flex items-center gap-3 flex-row-reverse">
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
             <div className={cn(
-              "bg-primary/10 rounded-xl shadow-sm border border-primary/10",
+              "bg-white/20 rounded-xl shadow-sm border border-white/10",
               compact ? "p-1.5" : "p-3"
             )}>
-              <Sparkles className={cn("text-primary", compact ? "h-4 w-4" : "h-6 w-6")} />
+              <Sparkles className={cn("text-white", compact ? "h-4 w-4" : "h-6 w-6")} />
             </div>
             <div className="text-right">
               <CardTitle className={cn("font-black", compact ? "text-lg" : "text-2xl")}>תובנות Panda AI</CardTitle>
-              {!compact && <CardDescription className="text-sm font-medium mt-1">ניתוח חכם של הרגלי הצריכה שלך</CardDescription>}
+              {!compact && <CardDescription className="text-sm font-medium mt-1 text-blue-50/80">ניתוח חכם של הרגלי הצריכה שלך</CardDescription>}
             </div>
           </div>
           <Button 
@@ -57,7 +58,7 @@ export function AIRecommendations({ compact = false }: { compact?: boolean }) {
             size="sm" 
             onClick={getRecommendations} 
             disabled={loading}
-            className="text-primary hover:text-primary hover:bg-primary/10 rounded-full h-8 w-8 p-0"
+            className="text-white hover:text-white hover:bg-white/10 rounded-full h-8 w-8 p-0"
           >
             <RefreshCcw className={cn(loading ? "animate-spin" : "", "h-4 w-4")} />
           </Button>
