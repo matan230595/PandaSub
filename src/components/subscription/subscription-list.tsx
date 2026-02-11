@@ -153,7 +153,7 @@ export function SubscriptionList() {
                       {sub.billingCycle === 'monthly' ? 'חודשי' : 'שנתי'}
                     </Badge>
                     {sub.priority && sub.priority !== 'none' && (
-                      <div className="h-2 w-2 rounded-full" style={{ backgroundColor: PRIORITY_CONFIG[sub.priority].color }} />
+                      <div className="h-2 w-2 rounded-full" style={{ backgroundColor: PRIORITY_CONFIG[sub.priority as keyof typeof PRIORITY_CONFIG].color }} />
                     )}
                   </div>
                 </div>

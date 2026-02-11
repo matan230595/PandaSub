@@ -42,12 +42,16 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Checkbox } from "@/components/ui/checkbox"
+import { Badge } from "@/components/ui/badge"
 import { useSubscriptions } from "@/context/subscriptions-context"
 import { CATEGORY_METADATA, SubscriptionCategory, SubscriptionStatus, PRIORITY_CONFIG, Subscription } from "@/app/lib/subscription-store"
 import { useToast } from "@/hooks/use-toast"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { User, Key, Mail, Phone, Copy, Trash2, Save, FileText, AlertTriangle, Bell, CreditCard } from "lucide-react"
+import { User, Key, Mail, Phone, Copy, Trash2, Save, FileText, AlertTriangle, Bell, CreditCard, Clock } from "lucide-react"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import { Progress } from "@/components/ui/progress"
+import { differenceInDays } from "date-fns"
+import { cn } from "@/lib/utils"
 
 const formSchema = z.object({
   name: z.string().min(2, { message: "שם המינוי חייב להכיל לפחות 2 תווים" }),
@@ -146,6 +150,44 @@ export function AddSubscriptionModal({ open, onOpenChange, subscription }: AddSu
     }
   }, [open, subscription, form])
 
+  const renderCountdownInModal = () => {
+    const today = new Date()
+    const renewalDateValue = form.watch("renewalDate")
+    if (!renewalDateValue) return null
+    
+    const renewal = new Date(renewalDateValue)
+    const daysLeft = differenceInDays(renewal, today)
+    
+    let progress = 100
+    let color = "bg-green-500"
+    let textClass = "text-green-600"
+
+    if (daysLeft <= 0) {
+      progress = 100; color = "bg-destructive animate-pulse"; textClass = "text-destructive font-black";
+    } else if (daysLeft <= 3) {
+      progress = 90; color = "bg-destructive animate-pulse"; textClass = "text-destructive font-bold";
+    } else if (daysLeft <= 7) {
+      progress = 70; color = "bg-orange-500"; textClass = "text-orange-600 font-bold";
+    } else if (daysLeft <= 14) {
+      progress = 40; color = "bg-blue-500"; textClass = "text-blue-600 font-bold";
+    } else {
+      progress = 20; color = "bg-green-500"; textClass = "text-green-600";
+    }
+
+    return (
+      <div className="bg-white/50 p-4 rounded-2xl border mb-6">
+        <div className="flex justify-between items-center mb-2">
+          <span className={cn("text-sm font-black flex items-center gap-2", textClass)}>
+            <Clock className="h-4 w-4" />
+            {daysLeft <= 0 ? "החיוב היום!" : `נותרו ${daysLeft} ימים לחידוש`}
+          </span>
+          <Badge variant="secondary" className="rounded-full">{progress}% לקראת חיוב</Badge>
+        </div>
+        <Progress value={progress} className="h-2" indicatorClassName={color} />
+      </div>
+    )
+  }
+
   function onSubmit(values: z.infer<typeof formSchema>) {
     const data = {
       name: values.name,
@@ -205,6 +247,8 @@ export function AddSubscriptionModal({ open, onOpenChange, subscription }: AddSu
               </DialogHeader>
 
               <ScrollArea className="flex-1 p-6">
+                {renderCountdownInModal()}
+                
                 <Tabs defaultValue="basic" className="w-full">
                   <TabsList className="grid w-full grid-cols-4 mb-8 bg-muted/50 p-1.5 rounded-2xl h-14">
                     <TabsTrigger value="basic" className="rounded-xl font-bold">בסיסי</TabsTrigger>
