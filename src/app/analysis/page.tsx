@@ -1,3 +1,4 @@
+
 "use client"
 
 import * as React from "react"
@@ -37,7 +38,7 @@ export default function AnalysisPage() {
   return (
     <div className="min-h-screen flex flex-col bg-[#F8F9FA] dark:bg-zinc-950">
       <TopNav />
-      <main className="flex-1 container mx-auto p-4 md:p-8 space-y-8 animate-fade-in pb-24">
+      <main className="flex-1 container mx-auto p-4 md:p-8 space-y-8 animate-fade-in pb-24 overflow-x-hidden">
         <div className="text-right">
           <h1 className="text-3xl font-black tracking-tight">ניתוח פיננסי מעמיק</h1>
           <p className="text-muted-foreground text-lg">סקירה ויזואלית של התקציב והרגלי הצריכה שלך</p>
@@ -45,18 +46,20 @@ export default function AnalysisPage() {
 
         <div className="grid gap-6 md:grid-cols-3">
           <Card className="card-shadow border-none rounded-3xl bg-gradient-to-br from-primary to-blue-700 text-white overflow-hidden">
-            <CardContent className="p-8 text-right relative">
+            <CardContent className="p-6 md:p-8 text-right relative">
               <div className="flex items-center justify-between mb-4 flex-row-reverse">
-                <div className="bg-white/20 p-3 rounded-2xl">
-                  <Wallet className="h-6 w-6" />
+                <div className="bg-white/20 p-2.5 rounded-2xl">
+                  <Wallet className="h-5 w-5" />
                 </div>
-                <span className="text-sm font-bold opacity-80 uppercase tracking-wider">הוצאה חודשית משוקללת</span>
+                <span className="text-xs font-bold opacity-80 uppercase tracking-wider">הוצאה חודשית משוקללת</span>
               </div>
-              <div className="flex items-baseline justify-end gap-2 flex-row-reverse">
-                <span className="text-4xl font-black">{totalMonthly.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                <span className="text-xl font-bold">₪</span>
+              <div className="flex items-baseline justify-end gap-1 flex-row-reverse overflow-hidden">
+                <span className={`font-black truncate ${totalMonthly > 9999 ? 'text-2xl' : 'text-4xl'}`}>
+                  {totalMonthly.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                </span>
+                <span className="text-xl font-bold shrink-0">₪</span>
               </div>
-              <div className="mt-4 flex items-center gap-2 justify-end text-sm font-bold">
+              <div className="mt-4 flex items-center gap-2 justify-end text-xs font-bold">
                 <span className="bg-white/20 px-2 py-0.5 rounded-full flex items-center gap-1">
                   12.5%+ <ArrowUpRight className="h-3 w-3" />
                 </span>
@@ -66,20 +69,20 @@ export default function AnalysisPage() {
           </Card>
 
           <Card className="card-shadow border-none rounded-3xl bg-white dark:bg-zinc-900">
-            <CardContent className="p-8 text-right">
+            <CardContent className="p-6 md:p-8 text-right">
               <div className="flex items-center justify-between mb-4 flex-row-reverse">
-                <div className="bg-green-100 p-3 rounded-2xl text-green-600">
-                  <DollarSign className="h-6 w-6" />
+                <div className="bg-green-100 p-2.5 rounded-2xl text-green-600">
+                  <DollarSign className="h-5 w-5" />
                 </div>
-                <span className="text-sm font-bold text-muted-foreground uppercase tracking-wider">ממוצע למינוי</span>
+                <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">ממוצע למינוי</span>
               </div>
-              <div className="flex items-baseline justify-end gap-2 flex-row-reverse">
-                <span className="text-4xl font-black text-foreground">
-                  {(subscriptions.length > 0 ? totalMonthly / subscriptions.length : 0).toFixed(1)}
+              <div className="flex items-baseline justify-end gap-1 flex-row-reverse overflow-hidden">
+                <span className="text-3xl font-black text-foreground truncate">
+                  {(subscriptions.length > 0 ? totalMonthly / subscriptions.length : 0).toFixed(0)}
                 </span>
-                <span className="text-xl font-bold text-foreground">₪</span>
+                <span className="text-xl font-bold text-foreground shrink-0">₪</span>
               </div>
-              <div className="mt-4 flex items-center gap-2 justify-end text-sm font-bold text-green-600">
+              <div className="mt-4 flex items-center gap-2 justify-end text-[10px] font-bold text-green-600">
                 <span className="bg-green-50 px-2 py-0.5 rounded-full flex items-center gap-1">
                   4.2%- <ArrowDownRight className="h-3 w-3" />
                 </span>
@@ -89,18 +92,20 @@ export default function AnalysisPage() {
           </Card>
 
           <Card className="card-shadow border-none rounded-3xl bg-white dark:bg-zinc-900">
-            <CardContent className="p-8 text-right">
+            <CardContent className="p-6 md:p-8 text-right">
               <div className="flex items-center justify-between mb-4 flex-row-reverse">
-                <div className="bg-orange-100 p-3 rounded-2xl text-orange-600">
-                  <TrendingUp className="h-6 w-6" />
+                <div className="bg-orange-100 p-2.5 rounded-2xl text-orange-600">
+                  <TrendingUp className="h-5 w-5" />
                 </div>
-                <span className="text-sm font-bold text-muted-foreground uppercase tracking-wider">הוצאה שנתית חזויה</span>
+                <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">הוצאה שנתית חזויה</span>
               </div>
-              <div className="flex items-baseline justify-end gap-2 flex-row-reverse">
-                <span className="text-4xl font-black text-foreground">{(totalMonthly * 12).toLocaleString()}</span>
-                <span className="text-xl font-bold text-foreground">₪</span>
+              <div className="flex items-baseline justify-end gap-1 flex-row-reverse overflow-hidden">
+                <span className={`font-black text-foreground truncate ${totalMonthly * 12 > 99999 ? 'text-xl md:text-2xl' : 'text-3xl md:text-4xl'}`}>
+                  {(totalMonthly * 12).toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                </span>
+                <span className="text-xl font-bold text-foreground shrink-0">₪</span>
               </div>
-              <div className="mt-4 text-sm font-medium text-muted-foreground">כולל חישוב אינפלציה וחידושים</div>
+              <div className="mt-4 text-[10px] font-medium text-muted-foreground truncate">כולל חישוב אינפלציה וחידושים</div>
             </CardContent>
           </Card>
         </div>
@@ -112,7 +117,7 @@ export default function AnalysisPage() {
             <CardHeader className="bg-muted/30 border-b">
               <div className="flex items-center gap-2 flex-row-reverse justify-start">
                 <Activity className="h-5 w-5 text-primary" />
-                <CardTitle>יחס עלות מול תועלת</CardTitle>
+                <CardTitle className="text-lg font-bold">יחס עלות מול תועלת</CardTitle>
               </div>
               <CardDescription>כמה עולה לך כל "כניסה" או שימוש במינוי?</CardDescription>
             </CardHeader>
@@ -154,7 +159,7 @@ export default function AnalysisPage() {
 
           <Card className="card-shadow border-none rounded-3xl bg-white dark:bg-zinc-900">
             <CardHeader>
-              <CardTitle>התפלגות לפי קטגוריה</CardTitle>
+              <CardTitle className="text-lg font-bold">התפלגות לפי קטגוריה</CardTitle>
               <CardDescription>איפה הכסף שלך מושקע הכי הרבה?</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -163,15 +168,15 @@ export default function AnalysisPage() {
                   <div className="flex justify-between items-center flex-row-reverse">
                     <div className="flex items-center gap-2 flex-row-reverse">
                       <span className="text-xl">{CATEGORY_METADATA[cat as any].icon}</span>
-                      <span className="font-bold">{CATEGORY_METADATA[cat as any].label}</span>
+                      <span className="font-bold text-sm">{CATEGORY_METADATA[cat as any].label}</span>
                     </div>
-                    <span className="font-black text-primary">₪{amount.toLocaleString()}</span>
+                    <span className="font-black text-primary text-sm">₪{amount.toLocaleString()}</span>
                   </div>
                   <div className="h-2 w-full bg-muted rounded-full overflow-hidden">
                     <div 
                       className="h-full rounded-full transition-all duration-1000" 
                       style={{ 
-                        width: `${(amount / totalMonthly) * 100}%`,
+                        width: `${(amount / (totalMonthly || 1)) * 100}%`,
                         backgroundColor: CATEGORY_METADATA[cat as any].color
                       }}
                     />
