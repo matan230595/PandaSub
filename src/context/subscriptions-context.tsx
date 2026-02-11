@@ -42,6 +42,7 @@ interface SubscriptionsContextType {
   markNotificationAsRead: (id: string) => void;
   settings: UserSettings;
   updateSettings: (newSettings: Partial<UserSettings>) => void;
+  convertAmount: (amount: number, fromCurrency: string) => number;
 }
 
 const SubscriptionsContext = createContext<SubscriptionsContextType | undefined>(undefined);
@@ -70,6 +71,16 @@ const DEFAULT_SETTINGS: UserSettings = {
   visibleColumns: ['name', 'amount', 'renewalDate', 'status', 'category', 'paymentMethod']
 };
 
+// Simulated exchange rates for prototype
+const EXCHANGE_RATES: Record<string, number> = {
+  '₪': 1,
+  'ILS': 1,
+  '$': 3.72,
+  'USD': 3.72,
+  '€': 4.05,
+  'EUR': 4.05,
+};
+
 export function SubscriptionsProvider({ children }: { children: React.ReactNode }) {
   const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
   const [isWizardComplete, setIsWizardComplete] = useState<boolean>(true);
@@ -78,7 +89,7 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
   const audioContextRef = useRef<AudioContext | null>(null);
 
   useEffect(() => {
-    const saved = localStorage.getItem('panda_subs_v8');
+    const saved = localStorage.getItem('panda_subs_v9');
     const wizardState = localStorage.getItem('panda_wizard');
     const savedSettings = localStorage.getItem('panda_settings');
     
@@ -115,10 +126,15 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
 
   useEffect(() => {
     if (subscriptions.length > 0) {
-      localStorage.setItem('panda_subs_v8', encrypt(JSON.stringify(subscriptions)));
+      localStorage.setItem('panda_subs_v9', encrypt(JSON.stringify(subscriptions)));
     }
     checkReminders();
   }, [subscriptions]);
+
+  const convertAmount = (amount: number, fromCurrency: string) => {
+    const rate = EXCHANGE_RATES[fromCurrency] || EXCHANGE_RATES[fromCurrency.toUpperCase()] || 1;
+    return amount * rate;
+  };
 
   const playNotificationSound = () => {
     if (!settings.soundEnabled) return;
@@ -233,7 +249,8 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
     <SubscriptionsContext.Provider value={{ 
       subscriptions, addSubscription, updateSubscription, deleteSubscription,
       duplicateSubscription, markAsUsed, isWizardComplete, completeWizard,
-      exportData, notifications, markNotificationAsRead, settings, updateSettings
+      exportData, notifications, markNotificationAsRead, settings, updateSettings,
+      convertAmount
     }}>
       {children}
     </SubscriptionsContext.Provider>

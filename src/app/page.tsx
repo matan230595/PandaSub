@@ -8,7 +8,7 @@ import { VoiceCreator } from "@/components/gen-ai/voice-creator"
 import { AIRecommendations } from "@/components/gen-ai/recommendations"
 import { SubscriptionsAtRisk } from "@/components/dashboard/risk-widget"
 import { Button } from "@/components/ui/button"
-import { Plus, Download, TrendingUp, Calendar, Lightbulb, Hourglass, FileText } from "lucide-react"
+import { Plus, Download, TrendingUp, Calendar, Lightbulb, Hourglass, FileText, Zap, ShieldCheck } from "lucide-react"
 import { Toaster } from "@/components/ui/toaster"
 import { AddSubscriptionModal } from "@/components/subscription/add-subscription-modal"
 import { useSubscriptions } from "@/context/subscriptions-context"
@@ -18,12 +18,12 @@ import { useToast } from "@/hooks/use-toast"
 
 export default function Home() {
   const [isAddModalOpen, setIsAddModalOpen] = React.useState(false)
-  const { subscriptions, exportData, settings } = useSubscriptions()
+  const { subscriptions, exportData, settings, convertAmount } = useSubscriptions()
   const { toast } = useToast()
 
-  const totalMonthly = subscriptions
+  const totalMonthlyILS = subscriptions
     .filter(s => s.status === 'active' || s.status === 'trial')
-    .reduce((sum, s) => sum + s.amount, 0)
+    .reduce((sum, s) => sum + convertAmount(s.amount, s.currency), 0)
 
   const upcomingRenewals = subscriptions.filter(s => {
     const renewal = new Date(s.renewalDate)
@@ -37,20 +37,20 @@ export default function Home() {
 
   const handleGenerateDraft = () => {
     const activeSubs = subscriptions.filter(s => s.status === 'active' || s.status === 'trial');
-    const total = activeSubs.reduce((sum, s) => sum + s.amount, 0);
+    const total = activeSubs.reduce((sum, s) => sum + convertAmount(s.amount, s.currency), 0);
     
-    const subListText = activeSubs.map(s => `• ${s.name}: ${s.amount}${s.currency} (חידוש ב-${s.renewalDate})`).join('\n');
+    const subListText = activeSubs.map(s => `• ${s.name}: ${s.amount}${s.currency} (≈ ₪${convertAmount(s.amount, s.currency).toFixed(1)})`).join('\n');
     
     const subject = encodeURIComponent("סיכום מינויים שבועי - PandaSub IL");
     const body = encodeURIComponent(
-      `שלום ${settings.userName},\n\nלהלן סיכום המינויים הפעילים שלך:\n\n${subListText}\n\nסה"כ חודשי: ${total.toLocaleString()} ${settings.currency}\n\nנשלח מ-PandaSub IL`
+      `שלום ${settings.userName},\n\nלהלן סיכום המינויים הפעילים שלך:\n\n${subListText}\n\nסה"כ חודשי (משוקלל): ₪${total.toLocaleString()}\n\nנשלח מ-PandaSub IL`
     );
 
     window.location.href = `mailto:${settings.userEmail}?subject=${subject}&body=${body}`;
     
     toast({
       title: "טיוטת מייל נוצרה",
-      description: "אפליקציית המייל נפתחה עם הנתונים שלך.",
+      description: "אפליקציית המייל נפתחה עם הנתונים המומרים שלך.",
     })
   }
 
@@ -62,7 +62,7 @@ export default function Home() {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="text-right">
             <h1 className="text-4xl font-bold tracking-tight text-foreground">שלום, {settings.userName.split(' ')[0]}! 👋</h1>
-            <p className="text-muted-foreground mt-1">המערכת מעודכנת. יש לך {subscriptions.length} מינויים פעילים.</p>
+            <p className="text-muted-foreground mt-1">המערכת מעודכנת. יש לך {subscriptions.length} מינויים רשומים.</p>
           </div>
           <div className="flex items-center gap-3 flex-row-reverse">
             <Button onClick={() => setIsAddModalOpen(true)} className="rounded-full google-btn gap-2 shadow-lg h-12 px-6">
@@ -77,10 +77,30 @@ export default function Home() {
           </div>
         </div>
 
+        {/* Quick Action Widget */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <Card className="md:col-span-2 border-none card-shadow bg-gradient-to-br from-primary to-blue-700 text-white rounded-[2rem] overflow-hidden">
+            <CardContent className="p-8 flex items-center justify-between flex-row-reverse">
+              <div className="text-right space-y-2">
+                <h3 className="text-2xl font-bold">פעולה מהירה 🐼</h3>
+                <p className="opacity-80">צריך להוסיף מינוי מהר? פשוט תגיד לו או סרוק את החשבונית.</p>
+                <div className="flex gap-3 pt-4 justify-end">
+                  <Button variant="secondary" onClick={() => setIsAddModalOpen(true)} className="rounded-full font-bold">סרוק חשבונית AI</Button>
+                  <Button variant="outline" className="rounded-full border-white text-white hover:bg-white/10 font-bold">הוספה קולית</Button>
+                </div>
+              </div>
+              <div className="bg-white/20 p-6 rounded-3xl hidden sm:block">
+                <ShieldCheck className="h-16 w-16" />
+              </div>
+            </CardContent>
+          </Card>
+          <AIRecommendations />
+        </div>
+
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           <StatCard 
-            title='סה"כ חודשי' 
-            value={`₪${totalMonthly.toLocaleString()}`} 
+            title='סה"כ חודשי (משוקלל)' 
+            value={`₪${totalMonthlyILS.toLocaleString()}`} 
             icon={<TrendingUp className="text-primary h-6 w-6" />}
             trend="↓ 12%"
             trendDesc="מהחודש הקודם"
@@ -121,7 +141,17 @@ export default function Home() {
           <div className="space-y-8">
             <SubscriptionsAtRisk />
             <VoiceCreator />
-            <AIRecommendations />
+            <Card className="border-none card-shadow rounded-2xl bg-white overflow-hidden">
+              <CardContent className="p-6 text-right">
+                <div className="flex items-center gap-2 flex-row-reverse mb-4">
+                  <Zap className="h-5 w-5 text-primary" />
+                  <h3 className="font-bold">טיפ המרת מט"ח</h3>
+                </div>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  זיהינו מינויים בדולר ואירו. שער ההמרה המעודכן הוחל על כל החישובים בדשבורד שלך לדיוק מקסימלי.
+                </p>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </main>

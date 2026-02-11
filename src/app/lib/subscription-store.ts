@@ -19,7 +19,7 @@ export interface Subscription {
   renewalDate: string;
   billingCycle: 'monthly' | 'yearly';
   paymentMethod?: string;
-  reminderDays: number[]; // Array of days to notify in advance, e.g., [14, 7, 3, 0]
+  reminderDays: number[];
   trialEndsAt?: string;
   status: SubscriptionStatus;
   atRisk?: boolean;
@@ -61,6 +61,16 @@ export const PRIORITY_CONFIG = {
   none: { label: 'ללא', color: '#E0E0E0' }
 };
 
+export const CANCELLATION_LINKS: Record<string, string> = {
+  'netflix': 'https://www.netflix.com/cancelplan',
+  'spotify': 'https://www.spotify.com/account/subscription/',
+  'apple': 'https://support.apple.com/HT202039',
+  'google': 'https://myaccount.google.com/subscriptions',
+  'adobe': 'https://account.adobe.com/plans',
+  'amazon': 'https://www.amazon.com/mc/manage',
+  'disney': 'https://www.disneyplus.com/account/subscription',
+};
+
 export const SAMPLE_SUBSCRIPTIONS: Subscription[] = [
   {
     id: '1',
@@ -82,8 +92,8 @@ export const SAMPLE_SUBSCRIPTIONS: Subscription[] = [
     id: '2',
     name: 'Spotify Family',
     category: 'streaming',
-    amount: 31.9,
-    currency: '₪',
+    amount: 9.99,
+    currency: '$',
     renewalDate: new Date(new Date().setDate(new Date().getDate() + 10)).toISOString().split('T')[0],
     billingCycle: 'monthly',
     paymentMethod: 'Mastercard 1234',
@@ -95,8 +105,8 @@ export const SAMPLE_SUBSCRIPTIONS: Subscription[] = [
     id: '3',
     name: 'Adobe Creative Cloud',
     category: 'saas',
-    amount: 199,
-    currency: '₪',
+    amount: 52.99,
+    currency: '€',
     renewalDate: '2025-05-28',
     billingCycle: 'yearly',
     paymentMethod: 'Mastercard 8899',
