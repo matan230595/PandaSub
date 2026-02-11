@@ -1,4 +1,3 @@
-
 "use client"
 
 import * as React from "react"
@@ -57,12 +56,12 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#F8F9FA] dark:bg-zinc-950 overflow-x-hidden" dir="rtl">
+    <div className="min-h-screen flex flex-col bg-[#F8F9FA] dark:bg-zinc-950">
       <SetupWizard />
       <TopNav />
-      <main className="flex-1 container mx-auto p-4 md:p-8 space-y-6 animate-fade-in pb-20 overflow-hidden">
+      <main className="flex-1 container mx-auto p-4 md:p-8 space-y-6 animate-fade-in pb-20">
         
-        {/* Header Section - Clean alignment */}
+        {/* Header Section */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="text-right">
             <h1 className="text-2xl md:text-3xl font-black tracking-tight text-foreground">שלום, {settings.userName.split(' ')[0]}! 👋</h1>
@@ -81,36 +80,36 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Action Row - Fixed sizing and overlapping */}
+        {/* Quick Action Banner */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 min-w-0">
-          <Card className="lg:col-span-2 border-none shadow-xl bg-gradient-to-br from-primary to-blue-700 text-white rounded-[2.5rem] overflow-hidden relative group min-h-[200px]">
-            <CardContent className="p-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-8 h-full relative z-10">
-              <div className="text-right space-y-3 flex-1">
+          <Card className="lg:col-span-2 border-none shadow-xl bg-gradient-to-br from-primary to-blue-700 text-white rounded-[2rem] overflow-hidden relative group min-h-[180px]">
+            <CardContent className="p-6 md:p-8 flex flex-col md:flex-row justify-between items-center gap-6 h-full relative z-10">
+              <div className="text-right space-y-2 flex-1">
                 <div className="inline-flex items-center gap-2 bg-white/20 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest mb-1">
                   Panda AI Automation
                 </div>
-                <h3 className="text-2xl font-black leading-tight">פעולה מהירה 🐼</h3>
-                <p className="text-sm opacity-90 leading-relaxed max-w-sm font-medium">
-                  סרוק חשבונית או אמור ל-Panda AI להוסיף מינוי חדש באופן מיידי. חסוך זמן והימנע מטעויות.
+                <h3 className="text-xl md:text-2xl font-black">פעולה מהירה 🐼</h3>
+                <p className="text-xs md:text-sm opacity-90 leading-relaxed max-w-md font-medium">
+                  סרוק חשבונית או אמור ל-Panda AI להוסיף מינוי חדש באופן מיידי.
                 </p>
-                <div className="flex flex-wrap gap-3 pt-4">
+                <div className="flex flex-wrap gap-3 pt-3">
                   <Button 
                     variant="secondary" 
                     onClick={() => setIsAddModalOpen(true)} 
-                    className="rounded-full font-black px-8 h-12 shadow-2xl bg-white text-primary hover:bg-zinc-100 transition-all border-none"
+                    className="rounded-full font-black px-6 h-10 shadow-lg bg-white text-primary hover:bg-zinc-100 transition-all border-none"
                   >
-                    <ShieldCheck className="ml-2 h-5 w-5" /> סריקת AI
+                    <ShieldCheck className="ml-2 h-4 w-4" /> סריקת AI
                   </Button>
                   <Button 
                     variant="outline"
-                    className="rounded-full border-2 border-white/50 text-white hover:bg-white/10 font-black px-8 h-12 transition-all"
+                    className="rounded-full border-2 border-white/50 text-white hover:bg-white/10 font-black px-6 h-10 transition-all"
                   >
-                    <Zap className="ml-2 h-5 w-5" /> הוספה קולית
+                    <Zap className="ml-2 h-4 w-4" /> הוספה קולית
                   </Button>
                 </div>
               </div>
-              <div className="absolute left-8 top-1/2 -translate-y-1/2 opacity-20 md:opacity-40 pointer-events-none">
-                <ShieldCheck className="h-40 w-40 text-white stroke-[1]" />
+              <div className="opacity-20 md:opacity-30 pointer-events-none shrink-0">
+                <ShieldCheck className="h-24 w-24 md:h-32 md:w-32 text-white stroke-[1]" />
               </div>
             </CardContent>
           </Card>
@@ -120,10 +119,10 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Stats Grid - Fixed Overlaps and RTL */}
+        {/* Stats Grid */}
         <div className="grid gap-4 grid-cols-2 lg:grid-cols-4 min-w-0">
           <StatCard 
-            title='סה"כ חודשי משוקלל' 
+            title='סה"כ חודשי' 
             value={totalMonthlyILS.toLocaleString(undefined, { maximumFractionDigits: 0 })} 
             symbol="₪"
             icon={<TrendingUp className="text-primary h-4 w-4" />}
@@ -154,14 +153,14 @@ export default function Home() {
           />
         </div>
 
-        {/* Main Content Area - Restricted Width */}
+        {/* Main Content Area */}
         <div className="grid gap-8 lg:grid-cols-3 min-w-0">
-          <div className="lg:col-span-2 space-y-6 min-w-0">
+          <div className="lg:col-span-2 space-y-6 min-w-0 overflow-hidden">
             <DashboardCharts />
             <div className="flex items-center justify-between pt-2">
               <h2 className="text-xl font-black text-right w-full text-foreground border-r-4 border-primary pr-3">ניהול מינויים פעילים</h2>
             </div>
-            <div className="w-full min-w-0 overflow-hidden">
+            <div className="w-full min-w-0">
               <SubscriptionList />
             </div>
           </div>
@@ -189,28 +188,27 @@ export default function Home() {
 }
 
 function StatCard({ title, value, symbol, icon, trend, trendDesc, color }: any) {
-  // Dynamic font size to prevent overlapping
-  const fontSize = value.length > 8 ? 'text-lg' : value.length > 5 ? 'text-xl md:text-2xl' : 'text-2xl md:text-3xl';
+  const fontSize = value.length > 8 ? 'text-lg' : value.length > 5 ? 'text-xl' : 'text-2xl md:text-3xl';
 
   return (
-    <Card className="shadow-sm border-none rounded-[2rem] overflow-hidden group transition-all hover:shadow-md dark:bg-zinc-900 bg-white h-full min-w-0">
-      <CardContent className="p-5 md:p-6 text-right flex flex-col justify-between h-full">
+    <Card className="shadow-sm border-none rounded-[1.5rem] overflow-hidden group transition-all hover:shadow-md dark:bg-zinc-900 bg-white h-full min-w-0">
+      <CardContent className="p-5 text-right flex flex-col justify-between h-full">
         <div>
-          <div className="flex items-center justify-between mb-4 flex-row-reverse">
-            <div className={`p-2.5 rounded-2xl ${color} group-hover:scale-110 transition-transform duration-300 shadow-sm shrink-0`}>
+          <div className="flex items-center justify-between mb-3">
+            <div className={`p-2 rounded-xl ${color} group-hover:scale-110 transition-transform duration-300 shadow-sm shrink-0`}>
               {icon}
             </div>
             <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest truncate ml-2">{title}</span>
           </div>
-          <div className="flex items-baseline justify-end gap-1.5 flex-row-reverse overflow-hidden">
-            <div className={cn("font-black text-foreground tabular-nums truncate leading-none", fontSize)}>
+          <div className="flex items-baseline justify-end gap-1 tabular-nums">
+            <div className={cn("font-black text-foreground leading-none", fontSize)}>
               {value}
             </div>
-            {symbol && <div className="text-lg md:text-xl font-black text-primary shrink-0">{symbol}</div>}
+            {symbol && <div className="text-lg font-black text-primary shrink-0">{symbol}</div>}
           </div>
         </div>
-        <div className="mt-4 flex items-center gap-2 flex-row-reverse justify-start overflow-hidden">
-          {trend && <span className="text-[10px] font-black text-green-600 bg-green-50 px-2.5 py-0.5 rounded-full shrink-0 border border-green-100">{trend}</span>}
+        <div className="mt-3 flex items-center gap-2 justify-end overflow-hidden">
+          {trend && <span className="text-[10px] font-black text-green-600 bg-green-50 px-2 py-0.5 rounded-full shrink-0 border border-green-100">{trend}</span>}
           <span className="text-[10px] font-bold text-muted-foreground opacity-70 truncate">{trendDesc}</span>
         </div>
       </CardContent>

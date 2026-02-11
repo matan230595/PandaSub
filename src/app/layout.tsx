@@ -42,9 +42,9 @@ export default function RootLayout({
         <FirebaseClientProvider>
           <SubscriptionsProvider>
             <SidebarProvider>
-              <div className="flex min-h-screen w-full flex-row-reverse">
+              <div className="flex min-h-screen w-full relative">
                 <AppSidebar />
-                <div className="flex-1 flex flex-col w-full overflow-x-hidden">
+                <div className="flex-1 flex flex-col min-w-0 overflow-x-hidden">
                   {children}
                 </div>
               </div>

@@ -1,4 +1,3 @@
-
 "use client"
 
 import * as React from "react"
@@ -139,12 +138,12 @@ export function SubscriptionList() {
 
     return (
       <div className="space-y-1 w-full mt-1">
-        <div className="flex justify-between items-center text-[9px] font-bold flex-row-reverse">
+        <div className="flex justify-between items-center text-[9px] font-bold">
+          <span className="text-muted-foreground opacity-50">{progress}%</span>
           <span className={cn("flex items-center gap-1", textClass)}>
             <Clock className="h-2.5 w-2.5" />
             {daysLeft <= 0 ? "היום!" : `בעוד ${daysLeft} ימ'`}
           </span>
-          <span className="text-muted-foreground opacity-50">{progress}%</span>
         </div>
         <Progress value={progress} indicatorClassName={color} className="h-1 rounded-full" />
       </div>
@@ -156,59 +155,59 @@ export function SubscriptionList() {
       {filteredSubs.map(sub => (
         <Card 
           key={sub.id} 
-          className="group relative border-none shadow-md hover:shadow-xl rounded-[2rem] bg-white overflow-hidden transition-all hover:translate-y-[-4px] cursor-pointer"
+          className="group relative border-none shadow-md hover:shadow-xl rounded-[1.5rem] bg-white overflow-hidden transition-all hover:translate-y-[-4px] cursor-pointer"
           onClick={() => handleEdit(sub)}
         >
-          <div className="h-2 w-full" style={{ backgroundColor: CATEGORY_METADATA[sub.category].color }} />
+          <div className="h-1.5 w-full" style={{ backgroundColor: CATEGORY_METADATA[sub.category].color }} />
           
-          <CardContent className="p-6">
-            <div className="flex justify-between items-start mb-5 flex-row-reverse">
-              <div className="flex items-center gap-4 flex-row-reverse max-w-[80%]">
-                <div 
-                  className="h-12 w-12 rounded-2xl flex items-center justify-center text-2xl shadow-sm shrink-0" 
-                  style={{ backgroundColor: `${CATEGORY_METADATA[sub.category].color}15` }}
-                >
-                  {CATEGORY_METADATA[sub.category].icon}
-                </div>
-                <div className="text-right overflow-hidden">
-                  <h3 className="text-lg font-black text-foreground truncate">{sub.name}</h3>
-                  <Badge variant="outline" className="text-[10px] px-2 py-0 border-primary/20 bg-primary/5 text-primary font-bold">
-                    {sub.billingCycle === 'monthly' ? 'חודשי' : 'שנתי'}
-                  </Badge>
-                </div>
-              </div>
-              
+          <CardContent className="p-5">
+            <div className="flex justify-between items-start mb-4">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="icon" className="rounded-full h-8 w-8" onClick={(e) => e.stopPropagation()}><MoreVertical className="h-4 w-4" /></Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="rounded-xl p-1 text-right">
-                  <DropdownMenuItem onClick={() => handleEdit(sub)} className="flex-row-reverse gap-2 rounded-lg font-bold text-xs"><Edit2 className="h-3.5 w-3.5" /> ערוך</DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => duplicateSubscription(sub.id)} className="flex-row-reverse gap-2 rounded-lg text-xs"><Copy className="h-3.5 w-3.5" /> שכפל</DropdownMenuItem>
+                <DropdownMenuContent align="start" className="rounded-xl p-1 text-right">
+                  <DropdownMenuItem onClick={() => handleEdit(sub)} className="flex-row-reverse justify-between gap-2 rounded-lg font-bold text-xs"><Edit2 className="h-3.5 w-3.5" /> ערוך</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => duplicateSubscription(sub.id)} className="flex-row-reverse justify-between gap-2 rounded-lg text-xs"><Copy className="h-3.5 w-3.5" /> שכפל</DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => setDeleteConfirmId(sub.id)} className="flex-row-reverse gap-2 rounded-lg text-destructive text-xs"><Trash2 className="h-3.5 w-3.5" /> מחק</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setDeleteConfirmId(sub.id)} className="flex-row-reverse justify-between gap-2 rounded-lg text-destructive text-xs"><Trash2 className="h-3.5 w-3.5" /> מחק</DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
+
+              <div className="flex items-center gap-3 max-w-[80%]">
+                <div className="text-right overflow-hidden">
+                  <h3 className="text-base font-black text-foreground truncate">{sub.name}</h3>
+                  <Badge variant="outline" className="text-[9px] px-1.5 py-0 border-primary/20 bg-primary/5 text-primary font-bold uppercase tracking-tighter">
+                    {sub.billingCycle === 'monthly' ? 'חודשי' : 'שנתי'}
+                  </Badge>
+                </div>
+                <div 
+                  className="h-10 w-10 rounded-xl flex items-center justify-center text-xl shadow-sm shrink-0" 
+                  style={{ backgroundColor: `${CATEGORY_METADATA[sub.category].color}15` }}
+                >
+                  {CATEGORY_METADATA[sub.category].icon}
+                </div>
+              </div>
             </div>
             
-            <div className="grid grid-cols-2 gap-3 mb-5">
-              <div className="bg-muted/30 p-3 rounded-2xl text-right overflow-hidden border border-muted/50">
-                <div className="text-[10px] font-bold text-muted-foreground uppercase mb-1">סכום</div>
-                <div className="text-xl font-black text-primary truncate tabular-nums">{sub.amount}<span className="text-xs font-bold mr-1">{sub.currency}</span></div>
+            <div className="grid grid-cols-2 gap-3 mb-4">
+              <div className="bg-muted/30 p-2.5 rounded-xl text-right overflow-hidden border border-muted/50">
+                <div className="text-[9px] font-bold text-muted-foreground uppercase mb-0.5">סכום</div>
+                <div className="text-lg font-black text-primary truncate tabular-nums leading-none">{sub.amount}<span className="text-xs font-bold mr-0.5">{sub.currency}</span></div>
               </div>
-              <div className="bg-muted/30 p-3 rounded-2xl text-right overflow-hidden border border-muted/50">
-                <div className="text-[10px] font-bold text-muted-foreground uppercase mb-1">חידוש</div>
-                <div className="text-sm font-black text-foreground truncate">{format(new Date(sub.renewalDate), 'd בMMM', { locale: he })}</div>
+              <div className="bg-muted/30 p-2.5 rounded-xl text-right overflow-hidden border border-muted/50">
+                <div className="text-[9px] font-bold text-muted-foreground uppercase mb-0.5">חידוש</div>
+                <div className="text-xs font-black text-foreground truncate leading-none">{format(new Date(sub.renewalDate), 'd בMMM', { locale: he })}</div>
               </div>
             </div>
             {renderCountdown(sub)}
           </CardContent>
           
-          <CardFooter className="bg-muted/10 border-t p-3 flex justify-between items-center flex-row-reverse">
-            <Badge style={{ backgroundColor: STATUS_METADATA[sub.status].color, color: 'white' }} className="rounded-full px-3 py-0.5 text-[10px] font-black border-none shadow-sm">{STATUS_METADATA[sub.status].label}</Badge>
-            <Button variant="ghost" size="sm" className="h-8 text-[10px] font-black gap-1.5 rounded-full text-primary hover:bg-primary/10" onClick={(e) => { e.stopPropagation(); handleCancelClick(sub); }}>
-              ביטול מהיר <ExternalLink className="h-3 w-3" />
+          <CardFooter className="bg-muted/10 border-t p-2 px-4 flex justify-between items-center">
+            <Button variant="ghost" size="sm" className="h-7 text-[9px] font-black gap-1.5 rounded-full text-primary hover:bg-primary/10" onClick={(e) => { e.stopPropagation(); handleCancelClick(sub); }}>
+              <ExternalLink className="h-3 w-3" /> ביטול מהיר
             </Button>
+            <Badge style={{ backgroundColor: STATUS_METADATA[sub.status].color, color: 'white' }} className="rounded-full px-2.5 py-0 text-[9px] font-black border-none shadow-sm">{STATUS_METADATA[sub.status].label}</Badge>
           </CardFooter>
         </Card>
       ))}
@@ -216,7 +215,7 @@ export function SubscriptionList() {
   )
 
   const renderTable = () => (
-    <div className="rounded-[2rem] border border-border/50 shadow-xl bg-white overflow-hidden animate-fade-in mb-12 w-full min-w-0">
+    <div className="rounded-[1.5rem] border border-border/50 shadow-xl bg-white overflow-hidden animate-fade-in mb-12 w-full min-w-0">
       <div className="overflow-x-auto custom-scrollbar">
         <Table>
           <TableHeader className="bg-muted/20">
@@ -237,7 +236,7 @@ export function SubscriptionList() {
                     <Input 
                       value={sub.name} 
                       onChange={(e) => updateSubscription(sub.id, { name: e.target.value })}
-                      className="border-none bg-transparent hover:bg-muted/50 focus:bg-white focus:ring-2 focus:ring-primary/20 font-black h-10 text-sm text-right"
+                      className="border-none bg-transparent hover:bg-muted/50 focus:bg-white focus:ring-2 focus:ring-primary/20 font-black h-9 text-sm text-right"
                     />
                   </TableCell>
                 )}
@@ -246,7 +245,7 @@ export function SubscriptionList() {
                     <select 
                       value={sub.category} 
                       onChange={(e) => updateSubscription(sub.id, { category: e.target.value as SubscriptionCategory })}
-                      className="w-full border-none bg-transparent hover:bg-muted/50 h-10 rounded-xl text-sm px-2 cursor-pointer outline-none text-right font-medium"
+                      className="w-full border-none bg-transparent hover:bg-muted/50 h-9 rounded-xl text-sm px-2 cursor-pointer outline-none text-right font-medium"
                     >
                       {Object.entries(CATEGORY_METADATA).map(([key, val]) => (
                         <option key={key} value={key}>{val.icon} {val.label}</option>
@@ -261,7 +260,7 @@ export function SubscriptionList() {
                         type="number"
                         value={sub.amount} 
                         onChange={(e) => updateSubscription(sub.id, { amount: parseFloat(e.target.value) || 0 })}
-                        className="border-none bg-transparent hover:bg-muted/50 focus:bg-white focus:ring-2 focus:ring-primary/20 font-black h-10 text-sm w-20 text-right tabular-nums"
+                        className="border-none bg-transparent hover:bg-muted/50 focus:bg-white focus:ring-2 focus:ring-primary/20 font-black h-9 text-sm w-20 text-right tabular-nums"
                       />
                       <span className="text-xs font-bold opacity-50 shrink-0">{sub.currency}</span>
                     </div>
@@ -269,20 +268,20 @@ export function SubscriptionList() {
                 )}
                 {isVisible('renewalDate') && (
                   <TableCell className="p-4">
-                    <Input type="date" value={sub.renewalDate} onChange={(e) => updateSubscription(sub.id, { renewalDate: e.target.value })} className="border-none bg-transparent hover:bg-muted/50 h-10 text-sm text-right rounded-xl" />
+                    <Input type="date" value={sub.renewalDate} onChange={(e) => updateSubscription(sub.id, { renewalDate: e.target.value })} className="border-none bg-transparent hover:bg-muted/50 h-9 text-sm text-right rounded-xl" />
                   </TableCell>
                 )}
                 {isVisible('status') && (
                   <TableCell className="p-4">
-                    <select value={sub.status} onChange={(e) => updateSubscription(sub.id, { status: e.target.value as SubscriptionStatus })} className="w-full border-none bg-transparent hover:bg-muted/50 h-10 rounded-xl text-sm px-2 font-black cursor-pointer outline-none text-right" style={{ color: STATUS_METADATA[sub.status].color }}>
+                    <select value={sub.status} onChange={(e) => updateSubscription(sub.id, { status: e.target.value as SubscriptionStatus })} className="w-full border-none bg-transparent hover:bg-muted/50 h-9 rounded-xl text-sm px-2 font-black cursor-pointer outline-none text-right" style={{ color: STATUS_METADATA[sub.status].color }}>
                       {Object.entries(STATUS_METADATA).map(([key, val]) => <option key={key} value={key}>{val.label}</option>)}
                     </select>
                   </TableCell>
                 )}
                 <TableCell className="text-center p-4">
                   <div className="flex items-center justify-center gap-2">
-                    <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl hover:bg-primary/10 text-primary" onClick={() => handleEdit(sub)}><Edit2 className="h-4 w-4" /></Button>
-                    <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl hover:bg-destructive/10 text-destructive" onClick={() => setDeleteConfirmId(sub.id)}><Trash2 className="h-4 w-4" /></Button>
+                    <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg hover:bg-primary/10 text-primary" onClick={() => handleEdit(sub)}><Edit2 className="h-4 w-4" /></Button>
+                    <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg hover:bg-destructive/10 text-destructive" onClick={() => setDeleteConfirmId(sub.id)}><Trash2 className="h-4 w-4" /></Button>
                   </div>
                 </TableCell>
               </TableRow>
@@ -296,8 +295,8 @@ export function SubscriptionList() {
   const renderKanban = () => {
     const statuses: SubscriptionStatus[] = ['trial', 'active', 'frozen', 'cancelled']
     return (
-      <div className="w-full max-w-full overflow-x-auto pb-8 custom-scrollbar" dir="rtl">
-        <div className="flex gap-6 min-w-[1100px] flex-row px-2">
+      <div className="w-full max-w-full overflow-x-auto pb-8 custom-scrollbar">
+        <div className="flex gap-6 min-w-[1100px] px-2">
           {statuses.map(status => {
             const items = filteredSubs.filter(s => s.status === status)
             return (
@@ -307,23 +306,23 @@ export function SubscriptionList() {
                 onDragOver={(e) => e.preventDefault()} 
                 onDrop={() => { if(draggedId) { updateSubscription(draggedId, { status }); setDraggedId(null); } }}
               >
-                <div className="flex items-center justify-between px-5 py-3 bg-white rounded-[1.5rem] shadow-sm border-r-4 transition-all" style={{ borderRightColor: STATUS_METADATA[status].color }}>
-                  <div className="flex items-center gap-3 flex-row-reverse">
-                    <div className="h-2 w-2 rounded-full shadow-sm" style={{ backgroundColor: STATUS_METADATA[status].color }} />
-                    <h3 className="font-black text-sm">{STATUS_METADATA[status].label}</h3>
-                  </div>
+                <div className="flex items-center justify-between px-5 py-3 bg-white rounded-2xl shadow-sm border-r-4 transition-all" style={{ borderRightColor: STATUS_METADATA[status].color }}>
                   <Badge variant="secondary" className="rounded-full bg-muted/50 text-[10px] h-5 flex items-center font-bold">{items.length}</Badge>
+                  <div className="flex items-center gap-2">
+                    <h3 className="font-black text-sm">{STATUS_METADATA[status].label}</h3>
+                    <div className="h-2 w-2 rounded-full shadow-sm" style={{ backgroundColor: STATUS_METADATA[status].color }} />
+                  </div>
                 </div>
-                <div className="bg-muted/10 rounded-[2.5rem] p-3 space-y-4 min-h-[500px] border-2 border-dashed border-muted/30">
+                <div className="bg-muted/10 rounded-3xl p-3 space-y-4 min-h-[500px] border-2 border-dashed border-muted/30">
                   {items.map(sub => (
-                    <Card key={sub.id} draggable onDragStart={() => setDraggedId(sub.id)} className="p-4 rounded-[1.5rem] bg-white shadow-sm border-none cursor-grab active:cursor-grabbing hover:shadow-md transition-all relative overflow-hidden group" onClick={() => handleEdit(sub)}>
-                      <div className="absolute top-2 left-2 opacity-0 group-hover:opacity-20 transition-opacity"><GripVertical className="h-4 w-4" /></div>
-                      <div className="flex justify-between items-center flex-row-reverse mb-3">
-                        <div className="flex items-center gap-3 flex-row-reverse overflow-hidden">
-                           <span className="text-xl shrink-0">{CATEGORY_METADATA[sub.category].icon}</span>
-                           <span className="font-black text-xs truncate text-right text-foreground">{sub.name}</span>
-                        </div>
+                    <Card key={sub.id} draggable onDragStart={() => setDraggedId(sub.id)} className="p-4 rounded-2xl bg-white shadow-sm border-none cursor-grab active:cursor-grabbing hover:shadow-md transition-all relative overflow-hidden group" onClick={() => handleEdit(sub)}>
+                      <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-20 transition-opacity"><GripVertical className="h-4 w-4" /></div>
+                      <div className="flex justify-between items-center mb-3">
                         <span className="text-sm font-black text-primary shrink-0 tabular-nums">{sub.amount}{sub.currency}</span>
+                        <div className="flex items-center gap-2 overflow-hidden">
+                           <span className="font-black text-xs truncate text-right text-foreground">{sub.name}</span>
+                           <span className="text-xl shrink-0">{CATEGORY_METADATA[sub.category].icon}</span>
+                        </div>
                       </div>
                       {renderCountdown(sub)}
                     </Card>
@@ -344,30 +343,31 @@ export function SubscriptionList() {
 
   return (
     <div className="space-y-6 w-full max-w-full overflow-hidden">
-      <div className="bg-white p-3 md:p-4 rounded-[2.5rem] shadow-md border border-border/50 flex flex-col lg:flex-row gap-4 items-center">
-        <div className="relative flex-1 w-full text-right order-2 lg:order-1">
-          <Search className="absolute right-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-          <Input placeholder="חפש מינוי לפי שם או קטגוריה..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="pr-12 h-12 text-sm text-right bg-muted/20 border-none rounded-[1.5rem] focus:ring-2 focus:ring-primary/20 transition-all font-medium" />
-        </div>
-        <div className="flex items-center gap-3 w-full lg:w-auto order-1 lg:order-2">
+      <div className="bg-white p-3 md:p-4 rounded-[2rem] shadow-md border border-border/50 flex flex-col lg:flex-row gap-4 items-center">
+        <div className="flex items-center gap-3 w-full lg:w-auto">
+          <div className="flex p-1.5 bg-muted/40 rounded-2xl h-11 flex-row-reverse shrink-0 shadow-inner">
+            <Button variant={viewMode === 'table' ? 'default' : 'ghost'} size="icon" onClick={() => setViewMode('table')} className={cn("h-8 w-9 rounded-lg transition-all", viewMode === 'table' && "shadow-md")}><ListIcon className="h-4 w-4" /></Button>
+            <Button variant={viewMode === 'cards' ? 'default' : 'ghost'} size="icon" onClick={() => setViewMode('cards')} className={cn("h-8 w-9 rounded-lg transition-all", viewMode === 'cards' && "shadow-md")}><LayoutGrid className="h-4 w-4" /></Button>
+            <Button variant={viewMode === 'kanban' ? 'default' : 'ghost'} size="icon" onClick={() => setViewMode('kanban')} className={cn("h-8 w-9 rounded-lg transition-all", viewMode === 'kanban' && "shadow-md")}><Columns className="h-4 w-4" /></Button>
+          </div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="rounded-[1.25rem] h-12 gap-3 border-primary/10 bg-primary/5 text-primary font-black px-5 text-sm shadow-sm hover:bg-primary/10 transition-all">
+              <Button variant="outline" className="rounded-xl h-11 gap-2 border-primary/10 bg-primary/5 text-primary font-black px-4 text-xs shadow-sm hover:bg-primary/10 transition-all">
                 <Settings2 className="h-4 w-4" /> עמודות
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="text-right rounded-2xl p-2 w-56 shadow-xl">
-              <DropdownMenuLabel className="text-right text-xs font-black opacity-50 uppercase tracking-tighter p-2">הצג/הסתר עמודות</DropdownMenuLabel>
+            <DropdownMenuContent align="start" className="text-right rounded-2xl p-2 w-56 shadow-xl">
+              <DropdownMenuLabel className="text-right text-[10px] font-black opacity-50 uppercase tracking-tighter p-2">הצג/הסתר עמודות</DropdownMenuLabel>
               {ALL_COLUMNS.map(col => (
-                <DropdownMenuCheckboxItem key={col.id} checked={isVisible(col.id)} onCheckedChange={() => toggleColumn(col.id)} className="flex-row-reverse text-right text-sm font-bold rounded-xl py-2 cursor-pointer">{col.label}</DropdownMenuCheckboxItem>
+                <DropdownMenuCheckboxItem key={col.id} checked={isVisible(col.id)} onCheckedChange={() => toggleColumn(col.id)} className="flex-row-reverse text-right text-xs font-bold rounded-xl py-2 cursor-pointer">{col.label}</DropdownMenuCheckboxItem>
               ))}
             </DropdownMenuContent>
           </DropdownMenu>
-          <div className="flex p-1.5 bg-muted/40 rounded-[1.5rem] h-12 flex-row-reverse shrink-0 shadow-inner">
-            <Button variant={viewMode === 'table' ? 'default' : 'ghost'} size="icon" onClick={() => setViewMode('table')} className={cn("h-9 w-10 rounded-xl transition-all", viewMode === 'table' && "shadow-md")}><ListIcon className="h-4 w-4" /></Button>
-            <Button variant={viewMode === 'cards' ? 'default' : 'ghost'} size="icon" onClick={() => setViewMode('cards')} className={cn("h-9 w-10 rounded-xl transition-all", viewMode === 'cards' && "shadow-md")}><LayoutGrid className="h-4 w-4" /></Button>
-            <Button variant={viewMode === 'kanban' ? 'default' : 'ghost'} size="icon" onClick={() => setViewMode('kanban')} className={cn("h-9 w-10 rounded-xl transition-all", viewMode === 'kanban' && "shadow-md")}><Columns className="h-4 w-4" /></Button>
-          </div>
+        </div>
+        
+        <div className="relative flex-1 w-full text-right">
+          <Search className="absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input placeholder="חפש מינוי לפי שם או קטגוריה..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="pr-11 h-11 text-sm text-right bg-muted/20 border-none rounded-2xl focus:ring-2 focus:ring-primary/20 transition-all font-medium" />
         </div>
       </div>
       
@@ -380,19 +380,19 @@ export function SubscriptionList() {
       <AddSubscriptionModal open={isModalOpen} onOpenChange={(val) => { setIsModalOpen(val); if (!val) setSelectedSub(null); }} subscription={selectedSub} />
       
       <AlertDialog open={!!deleteConfirmId} onOpenChange={(open) => !open && setDeleteConfirmId(null)}>
-        <AlertDialogContent className="text-right rounded-[2.5rem] border-none shadow-2xl p-10" dir="rtl">
+        <AlertDialogContent className="text-right rounded-3xl border-none shadow-2xl p-8" dir="rtl">
           <AlertDialogHeader className="items-center">
             <div className="h-20 w-20 rounded-full bg-destructive/10 flex items-center justify-center text-destructive mb-6">
               <AlertTriangle className="h-10 w-10" />
             </div>
             <AlertDialogTitle className="text-2xl font-black text-center">מחיקת מינוי לצמיתות?</AlertDialogTitle>
-            <AlertDialogDescription className="text-center text-muted-foreground text-base leading-relaxed">
+            <AlertDialogDescription className="text-center text-muted-foreground text-sm leading-relaxed">
               האם אתה בטוח שברצונך למחוק את המינוי? פעולה זו היא סופית ולא ניתן יהיה לשחזר את המידע הקשור אליו.
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter className="sm:justify-center flex flex-row-reverse gap-4 mt-8">
-            <AlertDialogAction onClick={() => { if (deleteConfirmId) deleteSubscription(deleteConfirmId); setDeleteConfirmId(null); }} className="bg-destructive hover:bg-destructive/90 rounded-full px-10 h-14 font-black text-lg shadow-xl shadow-destructive/20 transition-all active:scale-95">כן, מחק מינוי</AlertDialogAction>
-            <AlertDialogCancel className="rounded-full h-14 px-10 font-bold text-lg border-2">ביטול</AlertDialogCancel>
+          <AlertDialogFooter className="flex flex-row-reverse gap-3 mt-8 justify-center">
+            <AlertDialogAction onClick={() => { if (deleteConfirmId) deleteSubscription(deleteConfirmId); setDeleteConfirmId(null); }} className="bg-destructive hover:bg-destructive/90 rounded-full px-8 h-12 font-black text-base shadow-xl shadow-destructive/20 transition-all active:scale-95">כן, מחק מינוי</AlertDialogAction>
+            <AlertDialogCancel className="rounded-full h-12 px-8 font-bold text-base border-2">ביטול</AlertDialogCancel>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
