@@ -1,3 +1,4 @@
+
 "use client"
 
 import * as React from "react"
@@ -8,7 +9,7 @@ import { VoiceCreator } from "@/components/gen-ai/voice-creator"
 import { AIRecommendations } from "@/components/gen-ai/recommendations"
 import { SubscriptionsAtRisk } from "@/components/dashboard/risk-widget"
 import { Button } from "@/components/ui/button"
-import { Plus, Download, TrendingUp, Calendar, Lightbulb, Hourglass, FileText, ShieldCheck } from "lucide-react"
+import { Plus, Download, TrendingUp, Calendar, Lightbulb, Hourglass, FileText, ShieldCheck, Zap } from "lucide-react"
 import { Toaster } from "@/components/ui/toaster"
 import { AddSubscriptionModal } from "@/components/subscription/add-subscription-modal"
 import { useSubscriptions } from "@/context/subscriptions-context"
@@ -58,48 +59,78 @@ export default function Home() {
     <div className="min-h-screen flex flex-col bg-[#F8F9FA] dark:bg-zinc-950">
       <SetupWizard />
       <TopNav />
-      <main className="flex-1 container mx-auto p-4 md:p-8 space-y-8 animate-fade-in pb-20">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <main className="flex-1 container mx-auto p-4 md:p-8 space-y-8 animate-fade-in pb-20 overflow-x-hidden">
+        {/* Header Section */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="text-right">
             <h1 className="text-4xl font-black tracking-tight text-foreground">שלום, {settings.userName.split(' ')[0]}! 👋</h1>
-            <p className="text-muted-foreground mt-1">המערכת מעודכנת. יש לך {subscriptions.length} מינויים רשומים.</p>
+            <p className="text-muted-foreground mt-1 text-lg">המערכת מעודכנת. יש לך {subscriptions.length} מינויים רשומים.</p>
           </div>
           <div className="flex items-center gap-3 flex-row-reverse">
-            <Button onClick={() => setIsAddModalOpen(true)} className="rounded-full google-btn gap-2 shadow-lg h-12 px-6">
+            <Button onClick={() => setIsAddModalOpen(true)} className="rounded-full google-btn gap-2 shadow-lg h-12 px-8">
               <Plus className="h-5 w-5" /> הוסף מינוי
             </Button>
-            <Button variant="outline" onClick={handleGenerateDraft} className="rounded-full gap-2 border-primary/20 hover:bg-primary/5 text-primary h-12">
+            <Button variant="outline" onClick={handleGenerateDraft} className="rounded-full gap-2 border-primary/20 hover:bg-primary/5 text-primary h-12 px-6 bg-white">
               <FileText className="h-4 w-4" /> טיוטת מייל
             </Button>
-            <Button variant="ghost" onClick={exportData} className="rounded-full gap-2 text-muted-foreground h-12">
+            <Button variant="ghost" onClick={exportData} className="rounded-full gap-2 text-muted-foreground h-12 px-4">
               <Download className="h-4 w-4" /> ייצוא
             </Button>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <Card className="md:col-span-2 border-none card-shadow bg-gradient-to-br from-primary to-blue-700 text-white rounded-[2rem] overflow-hidden">
-            <CardContent className="p-8 flex items-center justify-between flex-row-reverse">
-              <div className="text-right space-y-2">
-                <h3 className="text-2xl font-bold">פעולה מהירה 🐼</h3>
-                <p className="opacity-80">צריך להוסיף מינוי מהר? פשוט תגיד לו או סרוק את החשבונית.</p>
-                <div className="flex gap-3 pt-4 justify-end">
-                  <Button variant="secondary" onClick={() => setIsAddModalOpen(true)} className="rounded-full font-bold shadow-lg">סרוק חשבונית AI</Button>
-                  <Button variant="outline" className="rounded-full border-white text-white hover:bg-white/10 font-bold">הוספה קולית</Button>
+        {/* Quick Actions & AI Card Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Quick Action Card - FIXED LAYOUT */}
+          <Card className="lg:col-span-2 border-none card-shadow bg-gradient-to-br from-primary to-blue-700 text-white rounded-[2.5rem] overflow-hidden relative group">
+            <CardContent className="p-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-8 h-full">
+              <div className="text-right space-y-4 z-10 flex-1">
+                <div className="flex items-center gap-3 justify-end mb-2">
+                  <h3 className="text-3xl font-black">פעולה מהירה 🐼</h3>
+                </div>
+                <p className="text-lg opacity-90 leading-relaxed max-w-lg">
+                  צריך להוסיף מינוי מהר? פשוט תגיד ל-Panda AI או סרוק את החשבונית שקיבלת במייל.
+                </p>
+                <div className="flex flex-wrap gap-4 pt-4 justify-end">
+                  <Button 
+                    variant="secondary" 
+                    onClick={() => setIsAddModalOpen(true)} 
+                    className="rounded-full font-black px-8 py-6 shadow-xl text-primary hover:bg-white transition-all scale-105 hover:scale-110 active:scale-95"
+                  >
+                    <ShieldCheck className="ml-2 h-5 w-5" /> סרוק חשבונית AI
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    className="rounded-full border-white/40 text-white hover:bg-white/10 font-bold px-8 py-6 transition-all"
+                  >
+                    <Zap className="ml-2 h-5 w-5" /> הוספה קולית
+                  </Button>
                 </div>
               </div>
-              <div className="bg-white/20 p-6 rounded-3xl hidden sm:block">
-                <ShieldCheck className="h-16 w-16" />
+              
+              {/* Decorative Icon - Fixed overlap */}
+              <div className="relative hidden md:flex items-center justify-center">
+                <div className="bg-white/10 p-8 rounded-[2.5rem] backdrop-blur-sm border border-white/20 shadow-inner group-hover:scale-110 transition-transform duration-500">
+                  <ShieldCheck className="h-20 w-20 text-white" />
+                </div>
+                {/* Accent blobs */}
+                <div className="absolute -top-4 -right-4 w-12 h-12 bg-blue-400/30 rounded-full blur-xl animate-pulse" />
+                <div className="absolute -bottom-4 -left-4 w-16 h-16 bg-white/20 rounded-full blur-xl animate-pulse" />
               </div>
             </CardContent>
           </Card>
-          <AIRecommendations />
+
+          {/* AI Recommendations - Fixed height */}
+          <div className="h-full">
+            <AIRecommendations />
+          </div>
         </div>
 
+        {/* Stats Grid - FIXED OVERLAP */}
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           <StatCard 
             title='סה"כ חודשי (משוקלל)' 
-            value={totalMonthlyILS.toLocaleString(undefined, { minimumFractionDigits: 2 })} 
+            value={totalMonthlyILS.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} 
             symbol="₪"
             icon={<TrendingUp className="text-primary h-6 w-6" />}
             trend="↓ 12%"
@@ -130,15 +161,17 @@ export default function Home() {
           />
         </div>
 
+        {/* Middle Section: Charts & List */}
         <div className="grid gap-8 lg:grid-cols-3">
           <div className="lg:col-span-2 space-y-8">
             <DashboardCharts />
             <div className="flex items-center justify-between pt-4">
-              <h2 className="text-2xl font-bold text-right w-full text-foreground">מינויים אחרונים</h2>
+              <h2 className="text-2xl font-black text-right w-full text-foreground border-r-4 border-primary pr-4">מינויים אחרונים</h2>
             </div>
             <SubscriptionList />
           </div>
 
+          {/* Sidebar Components */}
           <div className="space-y-8">
             <SubscriptionsAtRisk />
             <VoiceCreator />
@@ -146,13 +179,18 @@ export default function Home() {
         </div>
       </main>
 
-      <footer className="border-t bg-white dark:bg-zinc-900 py-10 text-center mt-auto">
-        <div className="container mx-auto">
-          <div className="flex items-center justify-center gap-2 font-bold text-primary mb-4">
-            <span className="bg-primary text-white h-8 w-8 rounded-lg flex items-center justify-center">🐼</span>
-            <span className="text-xl">PandaSub IL</span>
+      <footer className="border-t bg-white dark:bg-zinc-900 py-12 text-center mt-auto">
+        <div className="container mx-auto px-4">
+          <div className="flex items-center justify-center gap-3 font-bold text-primary mb-6">
+            <div className="bg-primary text-white h-10 w-10 rounded-2xl flex items-center justify-center text-xl shadow-lg shadow-primary/20">🐼</div>
+            <span className="text-2xl font-black tracking-tight">PandaSub IL</span>
           </div>
-          <p className="text-sm text-muted-foreground">© 2025 כל הזכויות שמורות. נבנה עבורך באהבה.</p>
+          <p className="text-base text-muted-foreground font-medium mb-2">© 2025 כל הזכויות שמורות. נבנה עבורך באהבה בישראל.</p>
+          <div className="flex justify-center gap-6 text-sm text-primary/60 font-bold">
+            <a href="#" className="hover:text-primary transition-colors">תנאי שימוש</a>
+            <a href="#" className="hover:text-primary transition-colors">מדיניות פרטיות</a>
+            <a href="#" className="hover:text-primary transition-colors">צרו קשר</a>
+          </div>
         </div>
       </footer>
       <AddSubscriptionModal open={isAddModalOpen} onOpenChange={setIsAddModalOpen} />
@@ -163,21 +201,21 @@ export default function Home() {
 
 function StatCard({ title, value, symbol, icon, trend, trendDesc, color }: any) {
   return (
-    <Card className="card-shadow border-none rounded-2xl overflow-hidden group transition-all animate-slide-in dark:bg-zinc-900">
-      <CardContent className="p-6 text-right">
-        <div className="flex items-center justify-between mb-4 flex-row-reverse">
-          <span className="text-sm font-medium text-muted-foreground">{title}</span>
-          <div className={`p-2 rounded-xl ${color} group-hover:scale-110 transition-transform`}>
+    <Card className="card-shadow border-none rounded-[2rem] overflow-hidden group transition-all animate-slide-in dark:bg-zinc-900 bg-white">
+      <CardContent className="p-8 text-right">
+        <div className="flex items-center justify-between mb-6 flex-row-reverse">
+          <div className={`p-3 rounded-2xl ${color} group-hover:scale-110 transition-transform duration-300 shadow-sm`}>
             {icon}
           </div>
+          <span className="text-sm font-bold text-muted-foreground uppercase tracking-widest">{title}</span>
         </div>
-        <div className="flex items-baseline justify-end gap-2 flex-row-reverse">
-          <div className="text-3xl font-black text-foreground">{value}</div>
-          {symbol && <div className="text-xl font-bold text-primary">{symbol}</div>}
+        <div className="flex items-baseline justify-end gap-2 flex-row-reverse mb-2">
+          <div className="text-4xl font-black text-foreground tabular-nums">{value}</div>
+          {symbol && <div className="text-2xl font-black text-primary ml-1">{symbol}</div>}
         </div>
-        <div className="mt-2 flex items-center gap-1 flex-row-reverse justify-end">
-          {trend && <span className="text-sm font-bold text-green-500">{trend}</span>}
-          <span className="text-xs text-muted-foreground">{trendDesc}</span>
+        <div className="mt-4 flex items-center gap-2 flex-row-reverse justify-start">
+          {trend && <span className="text-sm font-black text-green-500 bg-green-50 px-2 py-0.5 rounded-full">{trend}</span>}
+          <span className="text-xs font-bold text-muted-foreground opacity-70">{trendDesc}</span>
         </div>
       </CardContent>
     </Card>
