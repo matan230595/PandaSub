@@ -94,14 +94,14 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
   const [settings, setSettings] = useState<UserSettings>(DEFAULT_SETTINGS);
   const audioContextRef = useRef<AudioContext | null>(null);
   
-  const { user } = useUser();
+  const { user, isUserLoading } = useUser();
   const db = useFirestore();
 
   useEffect(() => {
-    if (!db || !user) {
+    if (isUserLoading || !db || !user) {
       const saved = localStorage.getItem('panda_subs_v11');
       if (saved) setSubscriptions(JSON.parse(saved));
-      else setSubscriptions(SAMPLE_SUBSCRIPTIONS);
+      else if (!user && !isUserLoading) setSubscriptions(SAMPLE_SUBSCRIPTIONS);
       return;
     }
 
@@ -129,7 +129,7 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
       unsubscribe();
       unsubscribeSettings();
     }
-  }, [db, user]);
+  }, [db, user, isUserLoading]);
 
   useEffect(() => {
     localStorage.setItem('panda_subs_v11', JSON.stringify(subscriptions));
@@ -142,6 +142,7 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
   };
 
   const initAudio = () => {
+    if (typeof window === 'undefined') return null;
     if (!audioContextRef.current) {
       audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
     }
@@ -156,6 +157,7 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
     if (!settings.soundEnabled) return;
     try {
       const ctx = initAudio();
+      if (!ctx) return;
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
       osc.type = 'sine';
@@ -196,7 +198,6 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
       const existingIds = new Set(prev.map(n => n.id));
       const added = newNotifications.filter(n => !existingIds.has(n.id));
       if (added.length > 0) {
-        // We only play sound if the user has already interacted with the app
         playNotificationSound();
       }
       return [...added, ...prev].slice(0, 20);

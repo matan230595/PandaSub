@@ -36,10 +36,9 @@ export function AIRecommendations({ compact = false }: { compact?: boolean }) {
       "overflow-hidden border-none shadow-lg rounded-3xl bg-white dark:bg-zinc-900 h-full flex flex-col",
       compact ? "min-h-[160px]" : "min-h-[280px]"
     )} dir="rtl">
-      {/* Header with gradient and RTL alignment - Matches Quick Action */}
       <CardHeader className="bg-gradient-to-br from-primary to-blue-700 text-white border-b-0 p-6">
-        <div className="flex items-center justify-between gap-4">
-          <div className="flex items-center gap-4">
+        <div className="flex items-center justify-between gap-4 flex-row-reverse">
+          <div className="flex items-center gap-4 flex-row-reverse">
             <div className="bg-white/20 p-2.5 rounded-2xl shadow-sm border border-white/10">
               <Sparkles className="text-white h-5 w-5" />
             </div>

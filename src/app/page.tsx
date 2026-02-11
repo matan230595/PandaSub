@@ -9,7 +9,7 @@ import { VoiceCreator } from "@/components/gen-ai/voice-creator"
 import { AIRecommendations } from "@/components/gen-ai/recommendations"
 import { SubscriptionsAtRisk } from "@/components/dashboard/risk-widget"
 import { Button } from "@/components/ui/button"
-import { Plus, Download, TrendingUp, Calendar, Lightbulb, Hourglass, FileText, ShieldCheck, Zap } from "lucide-react"
+import { Plus, TrendingUp, Calendar, Lightbulb, Hourglass, FileText, ShieldCheck, Zap } from "lucide-react"
 import { AddSubscriptionModal } from "@/components/subscription/add-subscription-modal"
 import { useSubscriptions } from "@/context/subscriptions-context"
 import { Card, CardContent } from "@/components/ui/card"
@@ -21,7 +21,7 @@ import Link from "next/link"
 
 export default function Home() {
   const [isAddModalOpen, setIsAddModalOpen] = React.useState(false)
-  const { subscriptions, exportData, settings, convertAmount } = useSubscriptions()
+  const { subscriptions, settings, convertAmount } = useSubscriptions()
   const { user, isUserLoading } = useUser()
   const { toast } = useToast()
 
@@ -71,13 +71,12 @@ export default function Home() {
       <TopNav />
       <main className="flex-1 container mx-auto p-4 md:p-8 space-y-8 animate-fade-in pb-24 max-w-7xl overflow-x-hidden">
         
-        {/* Header Section */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="text-right">
             <h1 className="text-2xl md:text-3xl font-black tracking-tight text-foreground">שלום, {settings.userName.split(' ')[0]}! 👋</h1>
             <p className="text-muted-foreground mt-1 text-sm md:text-base font-medium">יש לך {subscriptions.length} מינויים רשומים במערכת.</p>
           </div>
-          <div className="flex items-center gap-3 justify-start md:justify-end">
+          <div className="flex items-center gap-3 justify-start md:justify-end flex-row-reverse">
             <Button onClick={() => setIsAddModalOpen(true)} className="rounded-full google-btn gap-2 shadow-lg h-11 px-6 text-sm font-black">
               <Plus className="h-5 w-5" /> הוסף מינוי
             </Button>
@@ -87,15 +86,14 @@ export default function Home() {
           </div>
         </div>
 
-        {/* 1. Stats Grid (Top) */}
+        {/* 1. Stats Grid (Top) - Reordered to top as requested */}
         <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
           <StatCard 
             title='סה"כ חודשי' 
             value={totalMonthlyILS.toLocaleString(undefined, { maximumFractionDigits: 0 })} 
             symbol="₪"
             icon={<TrendingUp className="text-primary h-5 w-5" />}
-            trend="12%"
-            trendDir="down"
+            trendDesc="הוצאה חודשית ממוצעת"
             color="bg-primary/10"
           />
           <StatCard 
@@ -110,37 +108,34 @@ export default function Home() {
             value={`1,420`} 
             symbol="₪"
             icon={<Lightbulb className="text-[#FF9800] h-5 w-5" />}
-            trendDesc="לפי Panda AI"
+            trendDesc="לפי ניתוח Panda AI"
             color="bg-[#FF9800]/10"
           />
           <StatCard 
             title='תקופות ניסיון' 
             value={`${trialCount}`} 
             icon={<Hourglass className="text-[#E91E63] h-5 w-5" />}
-            trendDesc="דורש תשומת לב"
+            trendDesc="דורש החלטה בקרוב"
             color="bg-[#E91E63]/10"
           />
         </div>
 
-        {/* 2. AI Insights (2/3) & Quick Actions (1/3) */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch">
-          <div className="lg:col-span-2 min-w-0">
+        {/* 2. AI Insights (2/3) & Quick Actions (1/3) - Sized correctly */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-2">
             <AIRecommendations />
           </div>
-          <div className="lg:col-span-1 min-w-0">
-            <Card className="border-none shadow-xl bg-gradient-to-br from-primary to-blue-700 text-white rounded-[2rem] overflow-hidden relative group h-full">
-              <CardContent className="p-8 flex flex-col justify-between h-full text-right">
-                <div className="space-y-2">
-                  <div className="inline-flex items-center gap-2 bg-white/20 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest">
-                    AI Automation
-                  </div>
-                  <h3 className="text-2xl font-black leading-tight">פעולה מהירה 🐼</h3>
-                  <p className="text-sm opacity-90 leading-relaxed font-medium">
-                    עדכן את המערכת במהירות בעזרת כלי ה-AI שלנו.
+          <div className="lg:col-span-1">
+            <Card className="border-none shadow-xl bg-gradient-to-br from-primary to-blue-700 text-white rounded-[2rem] overflow-hidden relative h-full flex flex-col justify-center">
+              <CardContent className="p-6 md:p-8 text-right space-y-6">
+                <div>
+                  <h3 className="text-xl font-black mb-1">פעולה מהירה 🐼</h3>
+                  <p className="text-xs opacity-90 leading-relaxed font-medium">
+                    נהל את המינויים שלך בעזרת כלי ה-AI שלנו.
                   </p>
                 </div>
                 
-                <div className="flex flex-col gap-3 mt-6">
+                <div className="flex flex-col gap-3">
                   <Button 
                     variant="secondary" 
                     onClick={() => setIsAddModalOpen(true)} 
@@ -154,10 +149,6 @@ export default function Home() {
                   >
                     <Zap className="ml-2 h-5 w-5" /> הוספה קולית
                   </Button>
-                </div>
-                
-                <div className="absolute -left-6 -bottom-6 opacity-10 pointer-events-none">
-                  <ShieldCheck className="h-32 w-32 text-white stroke-[1]" />
                 </div>
               </CardContent>
             </Card>
@@ -183,7 +174,7 @@ export default function Home() {
 
       <footer className="border-t bg-white dark:bg-zinc-900 py-12 text-center mt-auto">
         <div className="container mx-auto px-4">
-          <div className="flex items-center justify-center gap-2 font-bold text-primary mb-4">
+          <div className="flex items-center justify-center gap-2 font-bold text-primary mb-4 flex-row-reverse">
             <div className="bg-primary text-white h-10 w-10 rounded-2xl flex items-center justify-center text-xl shadow-lg">🐼</div>
             <span className="text-2xl font-black tracking-tight">PandaSub IL</span>
           </div>
@@ -195,7 +186,7 @@ export default function Home() {
   )
 }
 
-function StatCard({ title, value, symbol, icon, trend, trendDir, trendDesc, color }: any) {
+function StatCard({ title, value, symbol, icon, trendDesc, color }: any) {
   const fontSize = value.length > 8 ? 'text-xl' : value.length > 5 ? 'text-2xl' : 'text-3xl md:text-4xl';
 
   return (
@@ -219,16 +210,8 @@ function StatCard({ title, value, symbol, icon, trend, trendDir, trendDesc, colo
           </div>
         </div>
 
-        <div className="flex items-center gap-2 justify-end mt-2">
+        <div className="flex items-center justify-end mt-2">
           <span className="text-[10px] font-bold text-muted-foreground opacity-70 truncate">{trendDesc}</span>
-          {trend && (
-            <span className={cn(
-              "text-[10px] font-black px-2 py-0.5 rounded-full flex items-center gap-1",
-              trendDir === 'down' ? "bg-green-50 text-green-600" : "bg-red-50 text-red-600"
-            )}>
-              {trendDir === 'down' ? '↓' : '↑'} {trend}
-            </span>
-          )}
         </div>
       </CardContent>
     </Card>

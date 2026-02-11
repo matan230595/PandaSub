@@ -4,13 +4,13 @@
 import * as React from "react"
 import { useRouter } from "next/navigation"
 import { useAuth, useUser } from "@/firebase"
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signInAnonymously } from "firebase/auth"
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from "firebase/auth"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useToast } from "@/hooks/use-toast"
-import { Loader2, Mail, Lock, UserPlus, LogIn, Ghost } from "lucide-react"
+import { Loader2, Mail, Lock, UserPlus, LogIn } from "lucide-react"
 
 export default function LoginPage() {
   const [email, setEmail] = React.useState("")
@@ -44,18 +44,6 @@ export default function LoginPage() {
     }
   }
 
-  const handleAnonymous = async () => {
-    setIsLoading(true)
-    try {
-      await signInAnonymously(auth)
-      toast({ title: "מחובר כאורח", description: "המידע שלך יישמר בדפדפן זה." })
-    } catch (error: any) {
-      toast({ variant: "destructive", title: "שגיאה", description: error.message })
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#F8F9FA] p-4" dir="rtl">
       <Card className="w-full max-w-md rounded-[2.5rem] shadow-2xl border-none overflow-hidden bg-white">
@@ -71,7 +59,7 @@ export default function LoginPage() {
               <Input id="email" type="email" placeholder="example@mail.com" value={email} onChange={(e) => setEmail(e.target.value)} required className="rounded-xl h-12 text-right" />
             </div>
             <div className="space-y-2 text-right">
-              <Label htmlFor="password" id="password-label" className="font-bold flex items-center gap-2 justify-end">סיסמה <Lock className="h-4 w-4" /></Label>
+              <Label htmlFor="password" class="font-bold flex items-center gap-2 justify-end">סיסמה <Lock className="h-4 w-4" /></Label>
               <Input id="password" type="password" placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} required className="rounded-xl h-12 text-right" />
             </div>
             <Button type="submit" disabled={isLoading} className="w-full h-14 rounded-full font-black text-lg google-btn">
@@ -81,13 +69,6 @@ export default function LoginPage() {
           <div className="mt-6 flex flex-col gap-3">
             <Button variant="ghost" onClick={() => setIsRegistering(!isRegistering)} className="rounded-full font-bold">
               {isRegistering ? "כבר יש לי חשבון? התחבר" : "אין לך חשבון? הירשם עכשיו"}
-            </Button>
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center"><span className="w-full border-t"></span></div>
-              <div className="relative flex justify-center text-xs uppercase"><span className="bg-white px-2 text-muted-foreground font-bold">או</span></div>
-            </div>
-            <Button variant="outline" onClick={handleAnonymous} disabled={isLoading} className="w-full h-12 rounded-full border-primary/20 text-primary font-bold gap-2">
-              <Ghost className="h-5 w-5" /> המשך כאורח
             </Button>
           </div>
         </CardContent>

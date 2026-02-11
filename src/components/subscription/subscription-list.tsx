@@ -21,22 +21,8 @@ import {
   Clock,
   Search,
   Trash2,
-  Copy,
-  MoreVertical,
-  ExternalLink,
-  GripVertical,
-  Settings2,
   AlertTriangle
 } from "lucide-react"
-import { 
-  DropdownMenu, 
-  DropdownMenuTrigger,
-  DropdownMenuSeparator,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuCheckboxItem,
-  DropdownMenuLabel
-} from "@/components/ui/dropdown-menu"
 import { 
   AlertDialog,
   AlertDialogAction,
@@ -47,37 +33,25 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
-import { CATEGORY_METADATA, STATUS_METADATA, Subscription, SubscriptionCategory, SubscriptionStatus, CANCELLATION_LINKS } from "@/app/lib/subscription-store"
+import { CATEGORY_METADATA, STATUS_METADATA, Subscription, SubscriptionCategory, SubscriptionStatus } from "@/app/lib/subscription-store"
 import { useSubscriptions } from "@/context/subscriptions-context"
-import { useToast } from "@/hooks/use-toast"
-import { Card, CardContent, CardFooter } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { AddSubscriptionModal } from "./add-subscription-modal"
 import { cn } from "@/lib/utils"
 import { format, differenceInDays } from "date-fns"
 import { he } from "date-fns/locale"
 
-const ALL_COLUMNS = [
-  { id: 'name', label: 'שם המינוי' },
-  { id: 'category', label: 'קטגוריה' },
-  { id: 'amount', label: 'סכום' },
-  { id: 'renewalDate', label: 'תאריך חידוש' },
-  { id: 'status', label: 'סטטוס' },
-  { id: 'paymentMethod', label: 'אמצעי תשלום' },
-]
-
 export function SubscriptionList() {
-  const { subscriptions, deleteSubscription, duplicateSubscription, updateSubscription, settings, updateSettings, convertAmount } = useSubscriptions()
-  const { toast } = useToast()
+  const { subscriptions, deleteSubscription, settings, updateSettings } = useSubscriptions()
   
   const [viewMode, setViewMode] = React.useState<'table' | 'cards' | 'kanban'>('cards')
   const [selectedSub, setSelectedSub] = React.useState<Subscription | null>(null)
   const [isModalOpen, setIsModalOpen] = React.useState(false)
   const [searchTerm, setSearchTerm] = React.useState("")
-  const [categoryFilter, setCategoryFilter] = React.useState<SubscriptionCategory | 'all'>('all')
-  const [statusFilter, setStatusFilter] = React.useState<SubscriptionStatus | 'all'>('all')
+  const [categoryFilter] = React.useState<SubscriptionCategory | 'all'>('all')
+  const [statusFilter] = React.useState<SubscriptionStatus | 'all'>('all')
   const [deleteConfirmId, setDeleteConfirmId] = React.useState<string | null>(null)
-  const [draggedId, setDraggedId] = React.useState<string | null>(null)
 
   const filteredSubs = subscriptions.filter(sub => {
     const matchesSearch = sub.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -92,26 +66,7 @@ export function SubscriptionList() {
     setIsModalOpen(true)
   }
 
-  const toggleColumn = (columnId: string) => {
-    const current = settings.visibleColumns || []
-    const next = current.includes(columnId)
-      ? current.filter(id => id !== columnId)
-      : [...current, columnId]
-    updateSettings({ visibleColumns: next })
-  }
-
   const isVisible = (columnId: string) => (settings.visibleColumns || []).includes(columnId)
-
-  const handleCancelClick = (sub: Subscription) => {
-    const nameKey = Object.keys(CANCELLATION_LINKS).find(k => sub.name.toLowerCase().includes(k));
-    const cancelUrl = CANCELLATION_LINKS[nameKey || ""];
-    if (cancelUrl) {
-      window.open(cancelUrl, '_blank');
-      toast({ title: "פותח דף ביטול", description: `מעביר אותך לדף הביטול הרשמי של ${sub.name}` });
-    } else {
-      toast({ title: "לא נמצא לינק", description: "לא הצלחנו למצוא דף ביטול אוטומטי למינוי זה.", variant: "destructive" });
-    }
-  }
 
   const renderCountdown = (sub: Subscription) => {
     const today = new Date()
@@ -129,7 +84,7 @@ export function SubscriptionList() {
     else { progress = 20; color = "bg-green-500"; textClass = "text-green-600"; }
     return (
       <div className="space-y-1 w-full mt-1">
-        <div className="flex justify-between items-center text-[9px] font-bold">
+        <div className="flex justify-between items-center text-[9px] font-bold flex-row-reverse">
           <span className={cn("flex items-center gap-1", textClass)}>
             <Clock className="h-2.5 w-2.5" />
             {daysLeft <= 0 ? "היום!" : `בעוד ${daysLeft} ימ'`}
@@ -142,9 +97,9 @@ export function SubscriptionList() {
   }
 
   return (
-    <div className="space-y-6 min-w-0 max-w-full overflow-hidden">
+    <div className="space-y-6 min-w-0 max-w-full overflow-hidden" dir="rtl">
       <div className="bg-white p-3 md:p-4 rounded-[2rem] shadow-md border border-border/50 flex flex-col lg:flex-row gap-4 items-center">
-        <div className="flex items-center gap-3 w-full lg:w-auto shrink-0">
+        <div className="flex items-center gap-3 w-full lg:w-auto shrink-0 flex-row-reverse">
           <div className="flex p-1.5 bg-muted/40 rounded-2xl h-11 flex-row-reverse shrink-0 shadow-inner">
             <Button variant={viewMode === 'table' ? 'default' : 'ghost'} size="icon" onClick={() => setViewMode('table')} className={cn("h-8 w-9 rounded-lg transition-all", viewMode === 'table' && "shadow-md")}><ListIcon className="h-4 w-4" /></Button>
             <Button variant={viewMode === 'cards' ? 'default' : 'ghost'} size="icon" onClick={() => setViewMode('cards')} className={cn("h-8 w-9 rounded-lg transition-all", viewMode === 'cards' && "shadow-md")}><LayoutGrid className="h-4 w-4" /></Button>
@@ -156,7 +111,7 @@ export function SubscriptionList() {
           <Input placeholder="חפש מינוי..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="pr-11 h-11 text-sm text-right bg-muted/20 border-none rounded-2xl focus:ring-2 focus:ring-primary/20 transition-all font-medium" />
         </div>
       </div>
-      <div className="min-h-[400px] max-w-full overflow-x-auto custom-scrollbar">
+      <div className="min-h-[400px] max-w-full overflow-hidden">
         {viewMode === 'table' && (
           <div className="rounded-[1.5rem] border border-border/50 shadow-xl bg-white overflow-hidden">
             <div className="overflow-x-auto">
@@ -194,7 +149,7 @@ export function SubscriptionList() {
               <Card key={sub.id} className="border-none shadow-md hover:shadow-xl rounded-[1.5rem] bg-white overflow-hidden transition-all cursor-pointer" onClick={() => handleEdit(sub)}>
                 <div className="h-1.5 w-full" style={{ backgroundColor: CATEGORY_METADATA[sub.category].color }} />
                 <CardContent className="p-5">
-                  <div className="flex justify-between items-start mb-4">
+                  <div className="flex justify-between items-start mb-4 flex-row-reverse">
                     <div className="h-10 w-10 rounded-xl flex items-center justify-center text-xl" style={{ backgroundColor: `${CATEGORY_METADATA[sub.category].color}15` }}>{CATEGORY_METADATA[sub.category].icon}</div>
                     <div className="text-right">
                       <h3 className="text-base font-black truncate max-w-[150px]">{sub.name}</h3>
@@ -221,7 +176,7 @@ export function SubscriptionList() {
           </div>
         )}
         {viewMode === 'kanban' && (
-          <div className="flex gap-6 overflow-x-auto pb-8 custom-scrollbar min-w-full">
+          <div className="flex gap-6 overflow-x-auto pb-8 custom-scrollbar min-w-full flex-row-reverse">
             {['trial', 'active', 'frozen', 'cancelled'].map(status => {
               const items = filteredSubs.filter(s => s.status === status)
               return (
@@ -233,11 +188,14 @@ export function SubscriptionList() {
                   <div className="bg-muted/10 rounded-3xl p-3 space-y-4 min-h-[500px] border-2 border-dashed border-muted/30">
                     {items.map(sub => (
                       <Card key={sub.id} className="p-4 rounded-2xl bg-white shadow-sm border-none cursor-pointer" onClick={() => handleEdit(sub)}>
-                        <div className="flex justify-between items-center mb-3">
+                        <div className="flex justify-between items-center mb-3 flex-row-reverse">
                            <span className="text-xl">{CATEGORY_METADATA[sub.category].icon}</span>
                            <span className="font-black text-xs truncate max-w-[100px] text-right">{sub.name}</span>
                         </div>
-                        <div className="text-sm font-black text-primary text-right tabular-nums">{sub.amount}{sub.currency}</div>
+                        <div className="text-sm font-black text-primary text-right tabular-nums flex flex-row-reverse gap-1">
+                          {sub.amount}
+                          <span className="text-xs">{sub.currency}</span>
+                        </div>
                       </Card>
                     ))}
                   </div>
