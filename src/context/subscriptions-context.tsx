@@ -1,3 +1,4 @@
+
 "use client"
 
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
@@ -15,6 +16,7 @@ interface UserSettings {
   userName: string;
   userEmail: string;
   userPhone: string;
+  visibleColumns: string[];
 }
 
 interface Notification {
@@ -65,7 +67,8 @@ const DEFAULT_SETTINGS: UserSettings = {
   language: 'he',
   userName: 'ישראל ישראלי',
   userEmail: 'israel@example.com',
-  userPhone: '050-1234567'
+  userPhone: '050-1234567',
+  visibleColumns: ['name', 'amount', 'renewalDate', 'status', 'category', 'paymentMethod']
 };
 
 export function SubscriptionsProvider({ children }: { children: React.ReactNode }) {
@@ -76,7 +79,7 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
   const audioContextRef = useRef<AudioContext | null>(null);
 
   useEffect(() => {
-    const saved = localStorage.getItem('panda_subs_v7');
+    const saved = localStorage.getItem('panda_subs_v8');
     const wizardState = localStorage.getItem('panda_wizard');
     const savedSettings = localStorage.getItem('panda_settings');
     
@@ -92,7 +95,7 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
     }
 
     if (savedSettings) {
-      setSettings(JSON.parse(savedSettings));
+      setSettings(prev => ({ ...prev, ...JSON.parse(savedSettings) }));
     }
 
     if (wizardState === 'complete') {
@@ -113,7 +116,7 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
 
   useEffect(() => {
     if (subscriptions.length > 0) {
-      localStorage.setItem('panda_subs_v7', encrypt(JSON.stringify(subscriptions)));
+      localStorage.setItem('panda_subs_v8', encrypt(JSON.stringify(subscriptions)));
     }
     checkReminders();
   }, [subscriptions]);
@@ -160,22 +163,6 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
           type: diffDays <= 1 ? 'critical' : 'warning',
           priority: diffDays <= 1 ? 'critical' : 'high'
         });
-      }
-
-      if (sub.status === 'trial' && sub.trialEndsAt) {
-        const trialEnd = new Date(sub.trialEndsAt);
-        const trialDiff = Math.ceil((trialEnd.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-        if (trialDiff <= 3 && trialDiff >= 0) {
-          newNotifications.push({
-            id: `trial-end-${sub.id}-${today.getDate()}`,
-            title: `תקופת ניסיון מסתיימת: ${sub.name}`,
-            message: `שים לב, תקופת הניסיון מסתיימת בעוד ${trialDiff} ימים. אל תשכח לבטל אם אינך מעוניין להמשיך.`,
-            date: today.toISOString(),
-            read: false,
-            type: 'critical',
-            priority: 'critical'
-          });
-        }
       }
     });
 

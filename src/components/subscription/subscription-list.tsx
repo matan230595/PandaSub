@@ -1,3 +1,4 @@
+
 "use client"
 
 import * as React from "react"
@@ -27,14 +28,19 @@ import {
   CreditCard,
   RefreshCw,
   MoreVertical,
-  CalendarDays
+  CalendarDays,
+  Settings2,
+  ChevronDown,
+  GripVertical
 } from "lucide-react"
 import { 
   DropdownMenu, 
   DropdownMenuTrigger,
   DropdownMenuSeparator,
   DropdownMenuContent,
-  DropdownMenuItem
+  DropdownMenuItem,
+  DropdownMenuCheckboxItem,
+  DropdownMenuLabel
 } from "@/components/ui/dropdown-menu"
 import { 
   AlertDialog,
@@ -56,8 +62,19 @@ import { cn } from "@/lib/utils"
 import { format, differenceInDays } from "date-fns"
 import { he } from "date-fns/locale"
 
+const ALL_COLUMNS = [
+  { id: 'name', label: 'שם המינוי' },
+  { id: 'category', label: 'קטגוריה' },
+  { id: 'amount', label: 'סכום' },
+  { id: 'renewalDate', label: 'תאריך חידוש' },
+  { id: 'status', label: 'סטטוס' },
+  { id: 'paymentMethod', label: 'אמצעי תשלום' },
+  { id: 'priority', label: 'עדיפות' },
+  { id: 'billingCycle', label: 'מחזור' },
+]
+
 export function SubscriptionList() {
-  const { subscriptions, deleteSubscription, duplicateSubscription } = useSubscriptions()
+  const { subscriptions, deleteSubscription, duplicateSubscription, updateSubscription, settings, updateSettings } = useSubscriptions()
   const { toast } = useToast()
   
   const [viewMode, setViewMode] = React.useState<'table' | 'cards' | 'kanban'>('cards')
@@ -67,6 +84,9 @@ export function SubscriptionList() {
   const [categoryFilter, setCategoryFilter] = React.useState<SubscriptionCategory | 'all'>('all')
   const [statusFilter, setStatusFilter] = React.useState<SubscriptionStatus | 'all'>('all')
   const [deleteConfirmId, setDeleteConfirmId] = React.useState<string | null>(null)
+
+  // גרירה ושחרור פשוטה
+  const [draggedId, setDraggedId] = React.useState<string | null>(null)
 
   const filteredSubs = subscriptions.filter(sub => {
     const matchesSearch = sub.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -82,6 +102,16 @@ export function SubscriptionList() {
     setIsModalOpen(true)
   }
 
+  const toggleColumn = (columnId: string) => {
+    const current = settings.visibleColumns || []
+    const next = current.includes(columnId)
+      ? current.filter(id => id !== columnId)
+      : [...current, columnId]
+    updateSettings({ visibleColumns: next })
+  }
+
+  const isVisible = (columnId: string) => (settings.visibleColumns || []).includes(columnId)
+
   const renderCountdown = (sub: Subscription) => {
     const today = new Date()
     const renewal = new Date(sub.renewalDate)
@@ -92,37 +122,27 @@ export function SubscriptionList() {
     let textClass = "text-green-600"
 
     if (daysLeft <= 0) {
-      progress = 100
-      color = "bg-destructive animate-pulse"
-      textClass = "text-destructive font-black"
+      progress = 100; color = "bg-destructive animate-pulse"; textClass = "text-destructive font-black";
     } else if (daysLeft <= 3) {
-      progress = 90
-      color = "bg-destructive animate-pulse"
-      textClass = "text-destructive font-bold"
+      progress = 90; color = "bg-destructive animate-pulse"; textClass = "text-destructive font-bold";
     } else if (daysLeft <= 7) {
-      progress = 70
-      color = "bg-orange-500"
-      textClass = "text-orange-600 font-bold"
+      progress = 70; color = "bg-orange-500"; textClass = "text-orange-600 font-bold";
     } else if (daysLeft <= 14) {
-      progress = 40
-      color = "bg-blue-500"
-      textClass = "text-blue-600 font-bold"
+      progress = 40; color = "bg-blue-500"; textClass = "text-blue-600 font-bold";
     } else {
-      progress = 20
-      color = "bg-green-500"
-      textClass = "text-green-600"
+      progress = 20; color = "bg-green-500"; textClass = "text-green-600";
     }
 
     return (
-      <div className="space-y-2 w-full mt-2">
+      <div className="space-y-1.5 w-full mt-1">
         <div className="flex justify-between items-center text-[10px] font-bold">
           <span className={cn("flex items-center gap-1", textClass)}>
             <Clock className="h-3 w-3" />
             {daysLeft <= 0 ? "היום!" : `בעוד ${daysLeft} ימים`}
           </span>
-          <span className="text-muted-foreground">{progress}%</span>
+          <span className="text-muted-foreground opacity-50">{progress}%</span>
         </div>
-        <Progress value={progress} className="h-1.5" indicatorClassName={color} />
+        <Progress value={progress} className="h-1 rounded-full" indicatorClassName={color} />
       </div>
     )
   }
@@ -152,9 +172,6 @@ export function SubscriptionList() {
                     <Badge variant="outline" className="text-[10px] px-2 border-primary/20 bg-primary/5 text-primary">
                       {sub.billingCycle === 'monthly' ? 'חודשי' : 'שנתי'}
                     </Badge>
-                    {sub.priority && sub.priority !== 'none' && (
-                      <div className="h-2 w-2 rounded-full" style={{ backgroundColor: PRIORITY_CONFIG[sub.priority as keyof typeof PRIORITY_CONFIG].color }} />
-                    )}
                   </div>
                 </div>
               </div>
@@ -207,23 +224,6 @@ export function SubscriptionList() {
             </div>
 
             {renderCountdown(sub)}
-
-            <div className="space-y-3 mt-6">
-              <div className="flex items-center justify-between flex-row-reverse text-xs">
-                <span className="font-bold text-muted-foreground">שיטת תשלום:</span>
-                <span className="font-black text-foreground">{sub.paymentMethod || 'לא הוגדר'}</span>
-              </div>
-              <div className="flex items-center justify-between flex-row-reverse text-xs">
-                <span className="font-bold text-muted-foreground">תזכורות:</span>
-                <div className="flex gap-1 flex-row-reverse">
-                  {(sub.reminderDays || [3]).map(day => (
-                    <Badge key={day} variant="secondary" className="text-[9px] px-1.5 rounded-md">
-                      {day === 0 ? 'היום' : `${day} ימים`}
-                    </Badge>
-                  ))}
-                </div>
-              </div>
-            </div>
           </CardContent>
           
           <CardFooter className="bg-muted/10 border-t p-4 flex justify-between items-center flex-row-reverse">
@@ -233,9 +233,6 @@ export function SubscriptionList() {
             >
               {STATUS_METADATA[sub.status].label}
             </Badge>
-            <div className="text-[10px] font-bold text-muted-foreground italic">
-              עודכן: {sub.lastUsed ? format(new Date(sub.lastUsed), 'dd/MM/yy') : 'מעולם לא'}
-            </div>
           </CardFooter>
         </Card>
       ))}
@@ -245,12 +242,14 @@ export function SubscriptionList() {
   const renderTable = () => (
     <div className="rounded-[2rem] border-none card-shadow bg-white overflow-hidden animate-fade-in mb-12">
       <Table>
-        <TableHeader className="bg-muted/30 h-14">
+        <TableHeader className="bg-muted/10 h-14">
           <TableRow>
-            <TableHead className="text-right font-black">מינוי</TableHead>
-            <TableHead className="text-right font-black">סכום</TableHead>
-            <TableHead className="text-right font-black">חידוש וסטטוס זמן</TableHead>
-            <TableHead className="text-right font-black">סטטוס</TableHead>
+            {isVisible('name') && <TableHead className="text-right font-black w-[200px]">מינוי</TableHead>}
+            {isVisible('category') && <TableHead className="text-right font-black">קטגוריה</TableHead>}
+            {isVisible('amount') && <TableHead className="text-right font-black">סכום</TableHead>}
+            {isVisible('renewalDate') && <TableHead className="text-right font-black">תאריך חידוש</TableHead>}
+            {isVisible('status') && <TableHead className="text-right font-black">סטטוס</TableHead>}
+            {isVisible('paymentMethod') && <TableHead className="text-right font-black">תשלום</TableHead>}
             <TableHead className="text-center font-black">פעולות</TableHead>
           </TableRow>
         </TableHeader>
@@ -258,31 +257,81 @@ export function SubscriptionList() {
           {filteredSubs.map((sub) => (
             <TableRow 
               key={sub.id} 
-              className="cursor-pointer hover:bg-primary/[0.02] h-16 border-b border-border/50"
-              onClick={() => handleEdit(sub)}
+              className="group h-16 border-b border-border/50 hover:bg-primary/[0.01]"
             >
-              <TableCell className="text-right">
-                <div className="flex items-center gap-3 flex-row-reverse justify-end">
-                  <span className="text-xl">{CATEGORY_METADATA[sub.category].icon}</span>
-                  <div className="flex flex-col text-right">
-                    <span className="font-black text-sm">{sub.name}</span>
-                    <span className="text-[10px] text-muted-foreground">{sub.billingCycle === 'monthly' ? 'חודשי' : 'שנתי'}</span>
+              {isVisible('name') && (
+                <TableCell className="p-2">
+                  <Input 
+                    value={sub.name} 
+                    onChange={(e) => updateSubscription(sub.id, { name: e.target.value })}
+                    className="border-none bg-transparent hover:bg-muted/50 focus:bg-white focus:ring-1 focus:ring-primary/20 font-black h-9 text-sm"
+                  />
+                </TableCell>
+              )}
+              {isVisible('category') && (
+                <TableCell className="p-2">
+                  <select 
+                    value={sub.category} 
+                    onChange={(e) => updateSubscription(sub.id, { category: e.target.value as SubscriptionCategory })}
+                    className="w-full border-none bg-transparent hover:bg-muted/50 h-9 rounded-md text-sm px-2 cursor-pointer outline-none"
+                  >
+                    {Object.entries(CATEGORY_METADATA).map(([key, val]) => (
+                      <option key={key} value={key}>{val.icon} {val.label}</option>
+                    ))}
+                  </select>
+                </TableCell>
+              )}
+              {isVisible('amount') && (
+                <TableCell className="p-2">
+                  <div className="relative">
+                    <Input 
+                      type="number"
+                      value={sub.amount} 
+                      onChange={(e) => updateSubscription(sub.id, { amount: parseFloat(e.target.value) })}
+                      className="border-none bg-transparent hover:bg-muted/50 focus:bg-white focus:ring-1 focus:ring-primary/20 font-bold h-9 text-sm pr-7"
+                    />
+                    <span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs opacity-40">₪</span>
                   </div>
-                </div>
-              </TableCell>
-              <TableCell className="text-right font-black text-primary">{sub.amount} {sub.currency}</TableCell>
-              <TableCell className="text-right min-w-[200px]">
-                {renderCountdown(sub)}
-              </TableCell>
-              <TableCell className="text-right">
-                <Badge className="text-[10px] px-2 rounded-full border-none font-black" style={{ backgroundColor: STATUS_METADATA[sub.status].color, color: 'white' }}>
-                  {STATUS_METADATA[sub.status].label}
-                </Badge>
-              </TableCell>
-              <TableCell onClick={(e) => e.stopPropagation()} className="text-center">
-                <div className="flex items-center justify-center gap-2">
-                  <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl hover:bg-primary/5 hover:text-primary" onClick={() => handleEdit(sub)}><Edit2 className="h-4 w-4" /></Button>
-                  <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl hover:bg-destructive/5 hover:text-destructive text-destructive" onClick={() => setDeleteConfirmId(sub.id)}><Trash2 className="h-4 w-4" /></Button>
+                </TableCell>
+              )}
+              {isVisible('renewalDate') && (
+                <TableCell className="p-2">
+                  <Input 
+                    type="date"
+                    value={sub.renewalDate} 
+                    onChange={(e) => updateSubscription(sub.id, { renewalDate: e.target.value })}
+                    className="border-none bg-transparent hover:bg-muted/50 focus:bg-white focus:ring-1 focus:ring-primary/20 h-9 text-sm"
+                  />
+                </TableCell>
+              )}
+              {isVisible('status') && (
+                <TableCell className="p-2">
+                  <select 
+                    value={sub.status} 
+                    onChange={(e) => updateSubscription(sub.id, { status: e.target.value as SubscriptionStatus })}
+                    className="w-full border-none bg-transparent hover:bg-muted/50 h-9 rounded-md text-sm px-2 font-bold cursor-pointer outline-none"
+                    style={{ color: STATUS_METADATA[sub.status].color }}
+                  >
+                    {Object.entries(STATUS_METADATA).map(([key, val]) => (
+                      <option key={key} value={key}>{val.label}</option>
+                    ))}
+                  </select>
+                </TableCell>
+              )}
+              {isVisible('paymentMethod') && (
+                <TableCell className="p-2">
+                   <Input 
+                    value={sub.paymentMethod || ""} 
+                    placeholder="לא הוגדר"
+                    onChange={(e) => updateSubscription(sub.id, { paymentMethod: e.target.value })}
+                    className="border-none bg-transparent hover:bg-muted/50 focus:bg-white focus:ring-1 focus:ring-primary/20 h-9 text-sm opacity-70 italic"
+                  />
+                </TableCell>
+              )}
+              <TableCell className="text-center p-2">
+                <div className="flex items-center justify-center gap-1">
+                  <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg" onClick={() => handleEdit(sub)}><Edit2 className="h-3 w-3" /></Button>
+                  <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg text-destructive" onClick={() => setDeleteConfirmId(sub.id)}><Trash2 className="h-3 w-3" /></Button>
                 </div>
               </TableCell>
             </TableRow>
@@ -292,6 +341,17 @@ export function SubscriptionList() {
     </div>
   )
 
+  // Drag and Drop Logic
+  const handleDragStart = (id: string) => setDraggedId(id)
+  const handleDragOver = (e: React.DragEvent) => e.preventDefault()
+  const handleDrop = (newStatus: SubscriptionStatus) => {
+    if (draggedId) {
+      updateSubscription(draggedId, { status: newStatus })
+      setDraggedId(null)
+      toast({ title: "סטטוס עודכן", description: `המינוי הועבר ל${STATUS_METADATA[newStatus].label}` })
+    }
+  }
+
   const renderKanban = () => {
     const statuses: SubscriptionStatus[] = ['trial', 'active', 'frozen', 'cancelled']
     return (
@@ -299,14 +359,32 @@ export function SubscriptionList() {
         {statuses.map(status => {
           const items = filteredSubs.filter(s => s.status === status)
           return (
-            <div key={status} className="flex-shrink-0 w-80 flex flex-col gap-4 snap-center">
-              <div className="flex items-center justify-between px-4 py-3 bg-white rounded-2xl shadow-sm border-r-4" style={{ borderRightColor: STATUS_METADATA[status].color }}>
-                <h3 className="font-black text-sm">{STATUS_METADATA[status].label}</h3>
-                <Badge variant="secondary" className="rounded-full bg-muted/50">{items.length}</Badge>
+            <div 
+              key={status} 
+              className="flex-shrink-0 w-80 flex flex-col gap-4 snap-center"
+              onDragOver={handleDragOver}
+              onDrop={() => handleDrop(status)}
+            >
+              <div className="flex items-center justify-between px-5 py-4 bg-white rounded-3xl shadow-sm border-r-4 border-l border-t border-b" style={{ borderRightColor: STATUS_METADATA[status].color }}>
+                <div className="flex items-center gap-2">
+                  <div className="h-2 w-2 rounded-full" style={{ backgroundColor: STATUS_METADATA[status].color }} />
+                  <h3 className="font-black text-sm">{STATUS_METADATA[status].label}</h3>
+                </div>
+                <Badge variant="secondary" className="rounded-full bg-muted/50 text-[10px]">{items.length}</Badge>
               </div>
-              <div className="bg-muted/20 rounded-[2rem] p-3 space-y-4 min-h-[600px] border-2 border-dashed border-muted">
+              
+              <div className="bg-muted/20 rounded-[2.5rem] p-3 space-y-4 min-h-[600px] border-2 border-dashed border-muted/50 transition-colors group-hover:border-primary/20">
                 {items.map(sub => (
-                  <Card key={sub.id} className="p-4 rounded-2xl bg-white shadow-md border-none cursor-pointer transition-all hover:scale-[1.03]" onClick={() => handleEdit(sub)}>
+                  <Card 
+                    key={sub.id} 
+                    draggable
+                    onDragStart={() => handleDragStart(sub.id)}
+                    className="p-5 rounded-[1.8rem] bg-white shadow-md border-none cursor-grab active:cursor-grabbing transition-all hover:scale-[1.03] group/item relative overflow-hidden" 
+                    onClick={() => handleEdit(sub)}
+                  >
+                    <div className="absolute top-2 left-2 opacity-0 group-hover/item:opacity-30 transition-opacity">
+                      <GripVertical className="h-4 w-4" />
+                    </div>
                     <div className="flex justify-between items-center flex-row-reverse mb-3">
                       <div className="flex items-center gap-2 flex-row-reverse">
                          <span className="text-lg">{CATEGORY_METADATA[sub.category].icon}</span>
@@ -317,6 +395,11 @@ export function SubscriptionList() {
                     {renderCountdown(sub)}
                   </Card>
                 ))}
+                {items.length === 0 && (
+                  <div className="h-full flex items-center justify-center opacity-20 py-20 italic text-sm">
+                    גרור לכאן...
+                  </div>
+                )}
               </div>
             </div>
           )
@@ -327,23 +410,46 @@ export function SubscriptionList() {
 
   return (
     <div className="space-y-6">
-      <div className="bg-white p-4 rounded-[2rem] shadow-lg border border-border/50 flex flex-col lg:flex-row gap-4 items-center">
+      <div className="bg-white p-4 rounded-[2.5rem] shadow-lg border border-border/50 flex flex-col lg:flex-row gap-4 items-center">
         <div className="relative flex-1 w-full">
           <Search className="absolute right-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
           <Input 
             placeholder="חפש מינוי, קטגוריה או שיטת תשלום..." 
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pr-12 h-12 text-base text-right bg-muted/30 border-none rounded-2xl focus:ring-primary/20" 
+            className="pr-12 h-12 text-base text-right bg-muted/20 border-none rounded-2xl focus:ring-primary/10" 
           />
         </div>
         
-        <div className="flex items-center gap-3 w-full lg:w-auto">
+        <div className="flex items-center gap-2 w-full lg:w-auto">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="rounded-2xl h-12 gap-2 border-primary/10 bg-primary/5 text-primary font-bold px-6">
+              <Button variant="outline" className="rounded-2xl h-12 gap-2 border-primary/10 bg-primary/5 text-primary font-bold px-5">
+                <Settings2 className="h-4 w-4" /> 
+                ניהול עמודות
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="text-right rounded-2xl p-2 w-56">
+              <DropdownMenuLabel className="text-right">בחר עמודות להצגה</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              {ALL_COLUMNS.map((col) => (
+                <DropdownMenuCheckboxItem
+                  key={col.id}
+                  checked={isVisible(col.id)}
+                  onCheckedChange={() => toggleColumn(col.id)}
+                  className="flex-row-reverse text-right"
+                >
+                  {col.label}
+                </DropdownMenuCheckboxItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="rounded-2xl h-12 gap-2 border-primary/10 bg-primary/5 text-primary font-bold px-5">
                 <Filter className="h-4 w-4" /> 
-                {categoryFilter === 'all' ? 'כל הקטגוריות' : CATEGORY_METADATA[categoryFilter].label}
+                {categoryFilter === 'all' ? 'קטגוריות' : CATEGORY_METADATA[categoryFilter].label}
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="text-right rounded-2xl p-2 w-56">
@@ -358,7 +464,7 @@ export function SubscriptionList() {
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <div className="flex p-1.5 bg-muted/50 rounded-2xl h-12">
+          <div className="flex p-1.5 bg-muted/30 rounded-2xl h-12">
             <Button variant={viewMode === 'table' ? 'default' : 'ghost'} size="icon" onClick={() => setViewMode('table')} className="h-9 w-9 rounded-xl"><ListIcon className="h-4 w-4" /></Button>
             <Button variant={viewMode === 'cards' ? 'default' : 'ghost'} size="icon" onClick={() => setViewMode('cards')} className="h-9 w-9 rounded-xl"><LayoutGrid className="h-4 w-4" /></Button>
             <Button variant={viewMode === 'kanban' ? 'default' : 'ghost'} size="icon" onClick={() => setViewMode('kanban')} className="h-9 w-9 rounded-xl"><Columns className="h-4 w-4" /></Button>
@@ -389,7 +495,7 @@ export function SubscriptionList() {
               פעולה זו לא ניתנת לביטול. כל ההיסטוריה והתזכורות של המינוי יימחקו לנצח.
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter className="sm:justify-center flex-row-reverse gap-4 mt-10">
+          <AlertDialogFooter className="sm:justify-center flex flex-row-reverse gap-4 mt-10">
             <AlertDialogAction onClick={() => { if (deleteConfirmId) deleteSubscription(deleteConfirmId); setDeleteConfirmId(null); toast({ title: "המינוי נמחק בהצלחה", variant: "destructive" }); }} className="bg-destructive hover:bg-destructive/90 rounded-full px-12 h-14 text-lg font-black shadow-xl shadow-destructive/20">
               כן, מחק מינוי
             </AlertDialogAction>
