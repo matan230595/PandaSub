@@ -10,7 +10,7 @@ import { useSubscriptions } from "@/context/subscriptions-context"
 import { Skeleton } from "@/components/ui/skeleton"
 import { cn } from "@/lib/utils"
 
-export function AIRecommendations({ compact = false }: { compact?: boolean }) {
+export function AIRecommendations() {
   const { subscriptions, convertAmount } = useSubscriptions()
   const [loading, setLoading] = React.useState(false)
   const [results, setResults] = React.useState<string | null>(null)
@@ -32,13 +32,10 @@ export function AIRecommendations({ compact = false }: { compact?: boolean }) {
   }
 
   return (
-    <Card className={cn(
-      "overflow-hidden border-none shadow-lg rounded-3xl bg-white dark:bg-zinc-900 h-full flex flex-col",
-      compact ? "min-h-[160px]" : "min-h-[280px]"
-    )} dir="rtl">
+    <Card className="overflow-hidden border-none shadow-lg rounded-[2rem] bg-white dark:bg-zinc-900 h-full flex flex-col min-h-[280px]" dir="rtl">
       <CardHeader className="bg-gradient-to-br from-primary to-blue-700 text-white border-b-0 p-6">
-        <div className="flex items-center justify-between gap-4 flex-row-reverse">
-          <div className="flex items-center gap-4 flex-row-reverse">
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
             <div className="bg-white/20 p-2.5 rounded-2xl shadow-sm border border-white/10">
               <Sparkles className="text-white h-5 w-5" />
             </div>

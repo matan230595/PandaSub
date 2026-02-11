@@ -76,17 +76,17 @@ export default function Home() {
             <h1 className="text-2xl md:text-3xl font-black tracking-tight text-foreground">שלום, {settings.userName.split(' ')[0]}! 👋</h1>
             <p className="text-muted-foreground mt-1 text-sm md:text-base font-medium">יש לך {subscriptions.length} מינויים רשומים במערכת.</p>
           </div>
-          <div className="flex items-center gap-3 justify-start md:justify-end flex-row-reverse">
-            <Button onClick={() => setIsAddModalOpen(true)} className="rounded-full google-btn gap-2 shadow-lg h-11 px-6 text-sm font-black">
-              <Plus className="h-5 w-5" /> הוסף מינוי
-            </Button>
+          <div className="flex items-center gap-3 justify-start md:justify-end">
             <Button variant="outline" onClick={handleGenerateDraft} className="rounded-full gap-2 border-primary/20 hover:bg-primary/5 text-primary h-11 px-5 bg-white text-sm font-bold shadow-sm">
               <FileText className="h-4 w-4" /> טיוטה
+            </Button>
+            <Button onClick={() => setIsAddModalOpen(true)} className="rounded-full google-btn gap-2 shadow-lg h-11 px-6 text-sm font-black">
+              <Plus className="h-5 w-5" /> הוסף מינוי
             </Button>
           </div>
         </div>
 
-        {/* 1. Stats Grid (Top) - Reordered to top as requested */}
+        {/* 1. Stats Grid (Top) */}
         <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
           <StatCard 
             title='סה"כ חודשי' 
@@ -120,39 +120,34 @@ export default function Home() {
           />
         </div>
 
-        {/* 2. AI Insights (2/3) & Quick Actions (1/3) - Sized correctly */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2">
-            <AIRecommendations />
-          </div>
-          <div className="lg:col-span-1">
-            <Card className="border-none shadow-xl bg-gradient-to-br from-primary to-blue-700 text-white rounded-[2rem] overflow-hidden relative h-full flex flex-col justify-center">
-              <CardContent className="p-6 md:p-8 text-right space-y-6">
-                <div>
-                  <h3 className="text-xl font-black mb-1">פעולה מהירה 🐼</h3>
-                  <p className="text-xs opacity-90 leading-relaxed font-medium">
-                    נהל את המינויים שלך בעזרת כלי ה-AI שלנו.
-                  </p>
-                </div>
-                
-                <div className="flex flex-col gap-3">
-                  <Button 
-                    variant="secondary" 
-                    onClick={() => setIsAddModalOpen(true)} 
-                    className="rounded-full font-black h-12 shadow-lg bg-white text-primary hover:bg-zinc-100 transition-all border-none text-sm"
-                  >
-                    <ShieldCheck className="ml-2 h-5 w-5" /> סריקת AI
-                  </Button>
-                  <Button 
-                    variant="outline"
-                    className="rounded-full border-2 border-white text-white hover:bg-white/10 font-black h-12 transition-all text-sm bg-transparent"
-                  >
-                    <Zap className="ml-2 h-5 w-5" /> הוספה קולית
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+        {/* 2. AI Insights (1/2) & Quick Actions (1/2) - Compact & Symmetrical */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
+          <AIRecommendations />
+          <Card className="border-none shadow-xl bg-gradient-to-br from-primary to-blue-700 text-white rounded-[2rem] overflow-hidden relative min-h-[280px] flex flex-col justify-center">
+            <CardContent className="p-8 text-right space-y-6">
+              <div>
+                <h3 className="text-2xl font-black mb-2 flex items-center gap-2 justify-end">פעולה מהירה 🐼</h3>
+                <p className="text-sm opacity-90 leading-relaxed font-medium">
+                  נהל את המינויים שלך בעזרת כלי ה-AI שלנו לחיסכון מקסימלי.
+                </p>
+              </div>
+              
+              <div className="flex flex-col sm:flex-row gap-4 justify-end">
+                <Button 
+                  onClick={() => setIsAddModalOpen(true)} 
+                  className="rounded-full font-black h-14 shadow-lg bg-white text-primary hover:bg-zinc-100 transition-all border-none text-base px-8 order-2 sm:order-1"
+                >
+                  <ShieldCheck className="ml-2 h-5 w-5" /> סריקת AI
+                </Button>
+                <Button 
+                  variant="outline"
+                  className="rounded-full border-2 border-white text-white hover:bg-white/10 font-black h-14 transition-all text-base bg-transparent px-8 order-1 sm:order-2"
+                >
+                  <Zap className="ml-2 h-5 w-5" /> הוספה קולית
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
         {/* 3. Main Content Area */}
@@ -174,7 +169,7 @@ export default function Home() {
 
       <footer className="border-t bg-white dark:bg-zinc-900 py-12 text-center mt-auto">
         <div className="container mx-auto px-4">
-          <div className="flex items-center justify-center gap-2 font-bold text-primary mb-4 flex-row-reverse">
+          <div className="flex items-center justify-center gap-2 font-bold text-primary mb-4">
             <div className="bg-primary text-white h-10 w-10 rounded-2xl flex items-center justify-center text-xl shadow-lg">🐼</div>
             <span className="text-2xl font-black tracking-tight">PandaSub IL</span>
           </div>
@@ -202,7 +197,7 @@ function StatCard({ title, value, symbol, icon, trendDesc, color }: any) {
         </div>
         
         <div className="flex flex-col items-end gap-1 mb-2">
-          <div className="flex items-baseline justify-end gap-1.5 tabular-nums overflow-hidden w-full flex-row-reverse">
+          <div className="flex items-baseline justify-start gap-1.5 tabular-nums overflow-hidden w-full flex-row-reverse">
              <div className={cn("font-black text-foreground leading-none", fontSize)}>
               {value}
             </div>

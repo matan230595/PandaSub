@@ -59,7 +59,7 @@ export default function LoginPage() {
               <Input id="email" type="email" placeholder="example@mail.com" value={email} onChange={(e) => setEmail(e.target.value)} required className="rounded-xl h-12 text-right" />
             </div>
             <div className="space-y-2 text-right">
-              <Label htmlFor="password" class="font-bold flex items-center gap-2 justify-end">סיסמה <Lock className="h-4 w-4" /></Label>
+              <Label htmlFor="password" className="font-bold flex items-center gap-2 justify-end">סיסמה <Lock className="h-4 w-4" /></Label>
               <Input id="password" type="password" placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} required className="rounded-xl h-12 text-right" />
             </div>
             <Button type="submit" disabled={isLoading} className="w-full h-14 rounded-full font-black text-lg google-btn">
