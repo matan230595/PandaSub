@@ -1,4 +1,3 @@
-
 "use client"
 
 import * as React from "react"
@@ -50,7 +49,7 @@ export default function LoginPage() {
         <div className="bg-primary p-8 text-center text-white">
           <div className="bg-white/20 h-20 w-20 rounded-[1.5rem] flex items-center justify-center text-4xl shadow-lg mx-auto mb-4">🐼</div>
           <CardTitle className="text-3xl font-black">PandaSub IL</CardTitle>
-          <CardDescription className="text-white/80 font-medium">ניהול מינויים חכם לעידן החדש</CardDescription>
+          <CardDescription className="text-white/80 font-medium text-center">ניהול מינויים חכם לעידן החדש</CardDescription>
         </div>
         <CardContent className="p-8">
           <form onSubmit={handleAuth} className="space-y-6">

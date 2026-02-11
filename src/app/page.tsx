@@ -1,4 +1,3 @@
-
 "use client"
 
 import * as React from "react"
@@ -56,7 +55,7 @@ export default function Home() {
         <Card className="w-full max-w-md p-8 text-center rounded-[2rem] shadow-2xl border-none">
           <div className="bg-primary text-white h-20 w-20 rounded-[2rem] flex items-center justify-center text-4xl shadow-xl mx-auto mb-6">🐼</div>
           <h1 className="text-3xl font-black mb-4">ברוכים הבאים ל-PandaSub</h1>
-          <p className="text-muted-foreground mb-8">התחבר כדי לנהל את המינויים שלך בצורה חכמה ולחסוך כסף.</p>
+          <p className="text-muted-foreground mb-8 text-center">התחבר כדי לנהל את המינויים שלך בצורה חכמה ולחסוך כסף.</p>
           <Link href="/login" className="w-full">
             <Button className="w-full google-btn h-14 rounded-full text-lg font-bold">התחבר עכשיו</Button>
           </Link>
@@ -120,28 +119,26 @@ export default function Home() {
           />
         </div>
 
-        {/* 2. AI Insights & Quick Actions (Side by Side - Compact) */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
+        {/* 2. AI Insights & Quick Actions (Side by Side) */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
           <AIRecommendations />
-          <Card className="border-none shadow-xl bg-gradient-to-br from-primary to-blue-700 text-white rounded-[2rem] overflow-hidden relative min-h-[220px] flex flex-col justify-center">
+          <Card className="border-none shadow-xl bg-gradient-to-br from-primary to-blue-700 text-white rounded-[2rem] overflow-hidden flex flex-col justify-center min-h-[160px]">
             <CardContent className="p-6 text-right space-y-4">
               <div>
                 <h3 className="text-xl font-black mb-1 flex items-center gap-2 justify-end">פעולה מהירה 🐼</h3>
-                <p className="text-xs opacity-90 leading-relaxed font-medium">
-                  נהל את המינויים שלך בעזרת כלי ה-AI שלנו.
-                </p>
+                <p className="text-xs opacity-90 leading-relaxed font-medium">נהל את המינויים שלך בעזרת כלי ה-AI שלנו.</p>
               </div>
               
               <div className="flex flex-col sm:flex-row gap-3 justify-end">
                 <Button 
                   onClick={() => setIsAddModalOpen(true)} 
-                  className="rounded-full font-black h-12 shadow-lg bg-white text-primary hover:bg-zinc-100 transition-all border-none text-sm px-6 order-2 sm:order-1"
+                  className="rounded-full font-black h-11 shadow-lg bg-white text-primary hover:bg-zinc-100 transition-all border-none text-xs px-6"
                 >
                   <ShieldCheck className="ml-2 h-4 w-4" /> סריקת AI
                 </Button>
                 <Button 
                   variant="outline"
-                  className="rounded-full border-2 border-white/50 text-white hover:bg-white/10 font-black h-12 transition-all text-sm bg-transparent px-6 order-1 sm:order-2"
+                  className="rounded-full border-2 border-white/50 text-white hover:bg-white/10 font-black h-11 transition-all text-xs bg-transparent px-6"
                 >
                   <Zap className="ml-2 h-4 w-4" /> הוספה קולית
                 </Button>
@@ -197,11 +194,11 @@ function StatCard({ title, value, symbol, icon, trendDesc, color }: any) {
         </div>
         
         <div className="flex flex-col items-start gap-1 mb-2">
-          <div className="flex items-baseline justify-start gap-1.5 tabular-nums overflow-hidden w-full">
+          <div className="flex items-baseline justify-start gap-1.5 tabular-nums overflow-hidden w-full flex-row-reverse">
+            {symbol && <div className="text-xl font-black text-primary mb-0.5 ml-1">{symbol}</div>}
             <div className={cn("font-black text-foreground leading-none", fontSize)}>
               {value}
             </div>
-            {symbol && <div className="text-xl font-black text-primary mb-0.5">{symbol}</div>}
           </div>
         </div>
 

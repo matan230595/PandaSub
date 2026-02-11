@@ -1,23 +1,21 @@
-
 'use client';
 
 import { firebaseConfig } from '@/firebase/config';
-import { initializeApp, getApps, FirebaseApp } from 'firebase/app';
-import { getAuth } from 'firebase/auth';
-import { getFirestore } from 'firebase/firestore';
+import { initializeApp, getApps, getApp, FirebaseApp } from 'firebase/app';
+import { getAuth, Auth } from 'firebase/auth';
+import { getFirestore, Firestore } from 'firebase/firestore';
 
 /**
- * Initializes Firebase services correctly. 
- * Hardened to prevent 'reading properties of undefined' errors.
+ * Singleton initialization for Firebase services.
+ * Ensures that getAuth() and getFirestore() are always called with a valid app instance.
  */
 export function initializeFirebase() {
   let app: FirebaseApp;
   
-  const apps = getApps();
-  if (apps.length > 0) {
-    app = apps[0];
-  } else {
+  if (getApps().length === 0) {
     app = initializeApp(firebaseConfig);
+  } else {
+    app = getApp();
   }
   
   return {

@@ -1,4 +1,3 @@
-
 "use client"
 
 import * as React from "react"
@@ -43,22 +42,18 @@ import { format, differenceInDays } from "date-fns"
 import { he } from "date-fns/locale"
 
 export function SubscriptionList() {
-  const { subscriptions, deleteSubscription, settings, updateSettings } = useSubscriptions()
+  const { subscriptions, deleteSubscription, settings } = useSubscriptions()
   
   const [viewMode, setViewMode] = React.useState<'table' | 'cards' | 'kanban'>('cards')
   const [selectedSub, setSelectedSub] = React.useState<Subscription | null>(null)
   const [isModalOpen, setIsModalOpen] = React.useState(false)
   const [searchTerm, setSearchTerm] = React.useState("")
-  const [categoryFilter] = React.useState<SubscriptionCategory | 'all'>('all')
-  const [statusFilter] = React.useState<SubscriptionStatus | 'all'>('all')
   const [deleteConfirmId, setDeleteConfirmId] = React.useState<string | null>(null)
 
   const filteredSubs = subscriptions.filter(sub => {
     const matchesSearch = sub.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          CATEGORY_METADATA[sub.category].label.includes(searchTerm);
-    const matchesCategory = categoryFilter === 'all' || sub.category === categoryFilter;
-    const matchesStatus = statusFilter === 'all' || sub.status === statusFilter;
-    return matchesSearch && matchesCategory && matchesStatus;
+    return matchesSearch;
   })
 
   const handleEdit = (sub: Subscription) => {
@@ -159,9 +154,9 @@ export function SubscriptionList() {
                   <div className="grid grid-cols-2 gap-3 mb-4">
                     <div className="bg-muted/30 p-2.5 rounded-xl text-right border border-muted/50">
                       <div className="text-[9px] font-bold text-muted-foreground uppercase mb-0.5">סכום</div>
-                      <div className="text-lg font-black text-primary truncate tabular-nums leading-none flex items-baseline justify-start gap-1">
+                      <div className="text-lg font-black text-primary truncate tabular-nums leading-none flex items-baseline justify-start gap-1 flex-row-reverse">
+                        <span className="text-xs font-bold mr-1">{sub.currency}</span>
                         {sub.amount}
-                        <span className="text-xs font-bold">{sub.currency}</span>
                       </div>
                     </div>
                     <div className="bg-muted/30 p-2.5 rounded-xl text-right border border-muted/50">
@@ -192,9 +187,9 @@ export function SubscriptionList() {
                            <span className="text-xl">{CATEGORY_METADATA[sub.category].icon}</span>
                            <span className="font-black text-xs truncate max-w-[100px] text-right">{sub.name}</span>
                         </div>
-                        <div className="text-sm font-black text-primary text-right tabular-nums flex gap-1 justify-start">
+                        <div className="text-sm font-black text-primary text-right tabular-nums flex gap-1 justify-start flex-row-reverse">
+                          <span className="text-xs mr-1">{sub.currency}</span>
                           {sub.amount}
-                          <span className="text-xs">{sub.currency}</span>
                         </div>
                       </Card>
                     ))}

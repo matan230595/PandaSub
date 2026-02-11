@@ -1,10 +1,9 @@
-
 "use client"
 
 import * as React from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { Sparkles, RefreshCcw, CheckCircle2 } from "lucide-react"
+import { Sparkles, RefreshCcw } from "lucide-react"
 import { subscriptionRecommendation } from "@/ai/flows/ai-subscription-recommendations"
 import { useSubscriptions } from "@/context/subscriptions-context"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -32,7 +31,7 @@ export function AIRecommendations() {
   }
 
   return (
-    <Card className="overflow-hidden border-none shadow-lg rounded-[2rem] bg-white dark:bg-zinc-900 h-full flex flex-col min-h-[220px]" dir="rtl">
+    <Card className="overflow-hidden border-none shadow-lg rounded-[2rem] bg-white dark:bg-zinc-900 h-full flex flex-col min-h-[160px]" dir="rtl">
       <CardHeader className="bg-gradient-to-br from-primary to-blue-700 text-white border-b-0 p-5">
         <div className="flex items-center justify-between gap-4 flex-row-reverse">
           <div className="flex items-center gap-3">
