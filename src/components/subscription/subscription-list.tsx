@@ -222,8 +222,8 @@ export function SubscriptionList() {
   )
 
   const renderTable = () => (
-    <div className="rounded-[2rem] border-none card-shadow bg-white overflow-hidden animate-fade-in mb-12">
-      <div className="overflow-x-auto">
+    <div className="rounded-[2rem] border-none card-shadow bg-white overflow-hidden animate-fade-in mb-12 w-full max-w-full overflow-x-auto">
+      <div className="min-w-[800px]">
         <Table>
           <TableHeader className="bg-muted/10 h-12">
             <TableRow>
@@ -302,7 +302,7 @@ export function SubscriptionList() {
   const renderKanban = () => {
     const statuses: SubscriptionStatus[] = ['trial', 'active', 'frozen', 'cancelled']
     return (
-      <div className="w-full overflow-x-auto pb-6 scrollbar-hide">
+      <div className="w-full max-w-full overflow-x-auto pb-6 scrollbar-hide">
         <div className="flex gap-6 min-w-[1200px] flex-row-reverse px-2">
           {statuses.map(status => {
             const items = filteredSubs.filter(s => s.status === status)
@@ -344,7 +344,7 @@ export function SubscriptionList() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 w-full max-w-full overflow-x-hidden">
       <div className="bg-white p-3 md:p-4 rounded-[2.5rem] shadow-lg border border-border/50 flex flex-col lg:flex-row gap-4 items-center flex-row-reverse">
         <div className="relative flex-1 w-full text-right">
           <Search className="absolute right-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
@@ -366,7 +366,7 @@ export function SubscriptionList() {
           </div>
         </div>
       </div>
-      <div className="min-h-[400px]">
+      <div className="min-h-[400px] w-full max-w-full">
         {viewMode === 'table' && renderTable()}
         {viewMode === 'cards' && renderCards()}
         {viewMode === 'kanban' && renderKanban()}

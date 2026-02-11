@@ -16,6 +16,7 @@ import { useSubscriptions } from "@/context/subscriptions-context"
 import { Card, CardContent } from "@/components/ui/card"
 import { SetupWizard } from "@/components/setup-wizard"
 import { useToast } from "@/hooks/use-toast"
+import { cn } from "@/lib/utils"
 
 export default function Home() {
   const [isAddModalOpen, setIsAddModalOpen] = React.useState(false)
@@ -56,7 +57,7 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#F8F9FA] dark:bg-zinc-950">
+    <div className="min-h-screen flex flex-col bg-[#F8F9FA] dark:bg-zinc-950 overflow-x-hidden">
       <SetupWizard />
       <TopNav />
       <main className="flex-1 container mx-auto p-4 md:p-8 space-y-6 animate-fade-in pb-20 overflow-x-hidden">
@@ -79,9 +80,9 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Quick Actions & AI Card Grid - Optimized Design */}
+        {/* Quick Actions & AI Card Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <Card className="lg:col-span-2 border-none card-shadow bg-gradient-to-br from-primary to-blue-700 text-white rounded-[2.5rem] overflow-hidden relative group">
+          <Card className="lg:col-span-2 border-none card-shadow bg-gradient-to-br from-primary to-blue-700 text-white rounded-[2.5rem] overflow-hidden relative group min-h-[200px]">
             <CardContent className="p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 h-full">
               <div className="text-right space-y-3 z-10 flex-1 w-full">
                 <h3 className="text-2xl font-black">פעולה מהירה 🐼</h3>
@@ -113,12 +114,12 @@ export default function Home() {
             </CardContent>
           </Card>
 
-          <div className="h-full min-h-[250px]">
+          <div className="h-full min-h-[200px]">
             <AIRecommendations />
           </div>
         </div>
 
-        {/* Stats Grid - Fixed Overlap and Text Scaling */}
+        {/* Stats Grid */}
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           <StatCard 
             title='סה"כ חודשי (משוקלל)' 
@@ -153,14 +154,17 @@ export default function Home() {
           />
         </div>
 
-        {/* Middle Section: Charts & List */}
+        {/* Middle Section: Charts & List - Critical Fix for Overflow */}
         <div className="grid gap-8 lg:grid-cols-3">
-          <div className="lg:col-span-2 space-y-6">
+          <div className="lg:col-span-2 space-y-6 min-w-0">
             <DashboardCharts />
             <div className="flex items-center justify-between pt-4">
               <h2 className="text-2xl font-black text-right w-full text-foreground border-r-4 border-primary pr-4">מינויים אחרונים</h2>
             </div>
-            <SubscriptionList />
+            {/* The list container must have min-w-0 to allow internal overflow-x-auto to work in a flex/grid layout */}
+            <div className="w-full min-w-0">
+              <SubscriptionList />
+            </div>
           </div>
 
           {/* Sidebar Components */}
@@ -187,7 +191,6 @@ export default function Home() {
 }
 
 function StatCard({ title, value, symbol, icon, trend, trendDesc, color }: any) {
-  // Dynamic font size based on value length to prevent overflow
   const fontSize = value.length > 8 ? 'text-xl' : value.length > 5 ? 'text-2xl' : 'text-3xl md:text-4xl';
 
   return (
@@ -201,7 +204,7 @@ function StatCard({ title, value, symbol, icon, trend, trendDesc, color }: any) 
             <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest truncate max-w-[120px]">{title}</span>
           </div>
           <div className="flex items-baseline justify-start flex-row-reverse mb-1 gap-1 overflow-hidden">
-            <div className={`font-black text-foreground tabular-nums truncate ${fontSize}`}>
+            <div className={cn("font-black text-foreground tabular-nums truncate", fontSize)}>
               {value}
             </div>
             {symbol && <div className="text-xl font-black text-primary shrink-0">{symbol}</div>}
