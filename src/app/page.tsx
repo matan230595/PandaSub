@@ -59,7 +59,7 @@ export default function Home() {
     <div className="min-h-screen flex flex-col bg-[#F8F9FA] dark:bg-zinc-950">
       <SetupWizard />
       <TopNav />
-      <main className="flex-1 container mx-auto p-4 md:p-8 space-y-6 animate-fade-in pb-20">
+      <main className="flex-1 container mx-auto p-4 md:p-8 space-y-6 animate-fade-in pb-20 overflow-x-hidden">
         
         {/* Header Section */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -80,47 +80,47 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Quick Action Banner */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 min-w-0">
-          <Card className="lg:col-span-2 border-none shadow-xl bg-gradient-to-br from-primary to-blue-700 text-white rounded-[2rem] overflow-hidden relative group min-h-[180px]">
-            <CardContent className="p-6 md:p-8 flex flex-col md:flex-row justify-between items-center gap-6 h-full relative z-10">
-              <div className="text-right space-y-2 flex-1">
-                <div className="inline-flex items-center gap-2 bg-white/20 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest mb-1">
+        {/* Action Row - Fixed stretching */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+          <Card className="lg:col-span-2 border-none shadow-xl bg-gradient-to-br from-primary to-blue-700 text-white rounded-[2rem] overflow-hidden relative group">
+            <CardContent className="p-6 md:p-10 flex flex-col md:flex-row justify-between items-center gap-8 relative z-10">
+              <div className="text-right space-y-3 flex-1">
+                <div className="inline-flex items-center gap-2 bg-white/20 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest">
                   Panda AI Automation
                 </div>
-                <h3 className="text-xl md:text-2xl font-black">פעולה מהירה 🐼</h3>
-                <p className="text-xs md:text-sm opacity-90 leading-relaxed max-w-md font-medium">
-                  סרוק חשבונית או אמור ל-Panda AI להוסיף מינוי חדש באופן מיידי.
+                <h3 className="text-2xl md:text-3xl font-black">פעולה מהירה 🐼</h3>
+                <p className="text-sm md:text-base opacity-90 leading-relaxed max-w-xl font-medium">
+                  סרוק חשבונית או אמור ל-Panda AI להוסיף מינוי חדש באופן מיידי. אנחנו נדאג לכל הפרטים.
                 </p>
-                <div className="flex flex-wrap gap-3 pt-3">
+                <div className="flex flex-wrap gap-4 pt-4">
                   <Button 
                     variant="secondary" 
                     onClick={() => setIsAddModalOpen(true)} 
-                    className="rounded-full font-black px-6 h-10 shadow-lg bg-white text-primary hover:bg-zinc-100 transition-all border-none"
+                    className="rounded-full font-black px-8 h-12 shadow-xl bg-white text-primary hover:bg-zinc-100 transition-all border-none text-base"
                   >
-                    <ShieldCheck className="ml-2 h-4 w-4" /> סריקת AI
+                    <ShieldCheck className="ml-2 h-5 w-5" /> סריקת AI
                   </Button>
                   <Button 
                     variant="outline"
-                    className="rounded-full border-2 border-white/50 text-white hover:bg-white/10 font-black px-6 h-10 transition-all"
+                    className="rounded-full border-2 border-white/50 text-white hover:bg-white/10 font-black px-8 h-12 transition-all text-base"
                   >
-                    <Zap className="ml-2 h-4 w-4" /> הוספה קולית
+                    <Zap className="ml-2 h-5 w-5" /> הוספה קולית
                   </Button>
                 </div>
               </div>
               <div className="opacity-20 md:opacity-30 pointer-events-none shrink-0">
-                <ShieldCheck className="h-24 w-24 md:h-32 md:w-32 text-white stroke-[1]" />
+                <ShieldCheck className="h-32 w-32 md:h-48 md:w-48 text-white stroke-[1]" />
               </div>
             </CardContent>
           </Card>
 
-          <div className="min-w-0 h-full">
+          <div className="h-full">
             <AIRecommendations />
           </div>
         </div>
 
         {/* Stats Grid */}
-        <div className="grid gap-4 grid-cols-2 lg:grid-cols-4 min-w-0">
+        <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
           <StatCard 
             title='סה"כ חודשי' 
             value={totalMonthlyILS.toLocaleString(undefined, { maximumFractionDigits: 0 })} 
@@ -155,12 +155,12 @@ export default function Home() {
 
         {/* Main Content Area */}
         <div className="grid gap-8 lg:grid-cols-3 min-w-0">
-          <div className="lg:col-span-2 space-y-6 min-w-0 overflow-hidden">
+          <div className="lg:col-span-2 space-y-6 min-w-0">
             <DashboardCharts />
             <div className="flex items-center justify-between pt-2">
               <h2 className="text-xl font-black text-right w-full text-foreground border-r-4 border-primary pr-3">ניהול מינויים פעילים</h2>
             </div>
-            <div className="w-full min-w-0">
+            <div className="w-full min-w-0 overflow-hidden">
               <SubscriptionList />
             </div>
           </div>
@@ -191,7 +191,7 @@ function StatCard({ title, value, symbol, icon, trend, trendDesc, color }: any) 
   const fontSize = value.length > 8 ? 'text-lg' : value.length > 5 ? 'text-xl' : 'text-2xl md:text-3xl';
 
   return (
-    <Card className="shadow-sm border-none rounded-[1.5rem] overflow-hidden group transition-all hover:shadow-md dark:bg-zinc-900 bg-white h-full min-w-0">
+    <Card className="shadow-sm border-none rounded-[1.5rem] overflow-hidden group transition-all hover:shadow-md dark:bg-zinc-900 bg-white h-full">
       <CardContent className="p-5 text-right flex flex-col justify-between h-full">
         <div>
           <div className="flex items-center justify-between mb-3">
@@ -200,7 +200,7 @@ function StatCard({ title, value, symbol, icon, trend, trendDesc, color }: any) 
             </div>
             <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest truncate ml-2">{title}</span>
           </div>
-          <div className="flex items-baseline justify-end gap-1 tabular-nums">
+          <div className="flex items-baseline justify-end gap-1.5 tabular-nums flex-wrap">
             <div className={cn("font-black text-foreground leading-none", fontSize)}>
               {value}
             </div>
