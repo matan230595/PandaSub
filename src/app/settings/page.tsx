@@ -272,7 +272,7 @@ export default function SettingsPage() {
 
                   <div className="p-6 rounded-3xl border border-destructive/20 bg-destructive/5 space-y-4 text-right">
                     <h4 className="font-bold text-destructive flex items-center gap-2 justify-end">מחיקת חשבון <Trash2 className="h-4 w-4" /></h4>
-                    <p className="text-xs text-muted-foreground">פעולה זו תמחק את כל המידע שלך לצמיתות.</p>
+                    <p className="text-xs text-muted-foreground">הופעה זו תמחק את כל המידע שלך לצמיתות.</p>
                     <Button variant="outline" onClick={() => setShowDeleteAllAlert(true)} className="w-full rounded-xl border-destructive/20 text-destructive font-bold">
                       מחק הכל לצמיתות
                     </Button>
