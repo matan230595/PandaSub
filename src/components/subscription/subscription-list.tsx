@@ -151,7 +151,7 @@ export function SubscriptionList() {
   }
 
   const renderCards = () => (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 animate-fade-in mb-12">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 animate-fade-in mb-12 min-w-0">
       {filteredSubs.map(sub => (
         <Card 
           key={sub.id} 
@@ -295,7 +295,7 @@ export function SubscriptionList() {
   const renderKanban = () => {
     const statuses: SubscriptionStatus[] = ['trial', 'active', 'frozen', 'cancelled']
     return (
-      <div className="w-full max-w-full overflow-x-auto pb-8 custom-scrollbar">
+      <div className="w-full max-w-full overflow-x-auto pb-8 custom-scrollbar min-w-0">
         <div className="flex gap-6 min-w-[1100px] px-2">
           {statuses.map(status => {
             const items = filteredSubs.filter(s => s.status === status)
@@ -342,7 +342,7 @@ export function SubscriptionList() {
   }
 
   return (
-    <div className="space-y-6 w-full max-w-full overflow-hidden">
+    <div className="space-y-6 w-full max-w-full overflow-hidden min-w-0">
       <div className="bg-white p-3 md:p-4 rounded-[2rem] shadow-md border border-border/50 flex flex-col lg:flex-row gap-4 items-center">
         <div className="flex items-center gap-3 w-full lg:w-auto">
           <div className="flex p-1.5 bg-muted/40 rounded-2xl h-11 flex-row-reverse shrink-0 shadow-inner">
@@ -371,7 +371,7 @@ export function SubscriptionList() {
         </div>
       </div>
       
-      <div className="min-h-[400px] w-full max-w-full overflow-hidden">
+      <div className="min-h-[400px] w-full max-w-full overflow-hidden min-w-0">
         {viewMode === 'table' && renderTable()}
         {viewMode === 'cards' && renderCards()}
         {viewMode === 'kanban' && renderKanban()}
