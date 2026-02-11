@@ -79,7 +79,7 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Quick Actions & AI Card Grid - Compacted */}
+        {/* Quick Actions & AI Card Grid - Optimized Design */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <Card className="lg:col-span-2 border-none card-shadow bg-gradient-to-br from-primary to-blue-700 text-white rounded-[2.5rem] overflow-hidden relative group">
             <CardContent className="p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 h-full">
@@ -118,7 +118,7 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Stats Grid - Fixed Overlap */}
+        {/* Stats Grid - Fixed Overlap and Text Scaling */}
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           <StatCard 
             title='סה"כ חודשי (משוקלל)' 
@@ -187,20 +187,25 @@ export default function Home() {
 }
 
 function StatCard({ title, value, symbol, icon, trend, trendDesc, color }: any) {
+  // Dynamic font size based on value length to prevent overflow
+  const fontSize = value.length > 8 ? 'text-xl' : value.length > 5 ? 'text-2xl' : 'text-3xl md:text-4xl';
+
   return (
-    <Card className="card-shadow border-none rounded-[2rem] overflow-hidden group transition-all dark:bg-zinc-900 bg-white">
-      <CardContent className="p-6 text-right">
-        <div className="flex items-center justify-between mb-4 flex-row-reverse">
-          <div className={`p-2.5 rounded-2xl ${color} group-hover:scale-110 transition-transform duration-300`}>
-            {icon}
+    <Card className="card-shadow border-none rounded-[2rem] overflow-hidden group transition-all dark:bg-zinc-900 bg-white h-full">
+      <CardContent className="p-6 text-right flex flex-col justify-between h-full">
+        <div>
+          <div className="flex items-center justify-between mb-4 flex-row-reverse">
+            <div className={`p-2.5 rounded-2xl ${color} group-hover:scale-110 transition-transform duration-300 shadow-sm`}>
+              {icon}
+            </div>
+            <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest truncate max-w-[120px]">{title}</span>
           </div>
-          <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest truncate max-w-[120px]">{title}</span>
-        </div>
-        <div className="flex items-baseline justify-start flex-row-reverse mb-1 gap-1 overflow-hidden">
-          <div className={`font-black text-foreground tabular-nums truncate ${value.length > 6 ? 'text-2xl' : 'text-3xl md:text-4xl'}`}>
-            {value}
+          <div className="flex items-baseline justify-start flex-row-reverse mb-1 gap-1 overflow-hidden">
+            <div className={`font-black text-foreground tabular-nums truncate ${fontSize}`}>
+              {value}
+            </div>
+            {symbol && <div className="text-xl font-black text-primary shrink-0">{symbol}</div>}
           </div>
-          {symbol && <div className="text-xl font-black text-primary shrink-0">{symbol}</div>}
         </div>
         <div className="mt-3 flex items-center gap-2 flex-row-reverse justify-start">
           {trend && <span className="text-[10px] font-black text-green-500 bg-green-50 px-2 py-0.5 rounded-full">{trend}</span>}

@@ -150,7 +150,7 @@ export function SubscriptionList() {
           </span>
           <span className="text-muted-foreground opacity-50">{progress}%</span>
         </div>
-        <Progress value={progress} className="h-1 rounded-full" indicatorclassname={color} />
+        <Progress value={progress} className="h-1 rounded-full" indicatorClassName={color} />
       </div>
     )
   }
@@ -227,12 +227,12 @@ export function SubscriptionList() {
         <Table>
           <TableHeader className="bg-muted/10 h-12">
             <TableRow>
-              {isVisible('name') && <TableHead className="text-right font-black">מינוי</TableHead>}
-              {isVisible('category') && <TableHead className="text-right font-black">קטגוריה</TableHead>}
-              {isVisible('amount') && <TableHead className="text-right font-black">סכום</TableHead>}
-              {isVisible('renewalDate') && <TableHead className="text-right font-black">תאריך</TableHead>}
-              {isVisible('status') && <TableHead className="text-right font-black">סטטוס</TableHead>}
-              <TableHead className="text-center font-black">פעולות</TableHead>
+              {isVisible('name') && <TableHead className="text-right font-black w-[200px]">מינוי</TableHead>}
+              {isVisible('category') && <TableHead className="text-right font-black w-[150px]">קטגוריה</TableHead>}
+              {isVisible('amount') && <TableHead className="text-right font-black w-[120px]">סכום</TableHead>}
+              {isVisible('renewalDate') && <TableHead className="text-right font-black w-[150px]">תאריך</TableHead>}
+              {isVisible('status') && <TableHead className="text-right font-black w-[120px]">סטטוס</TableHead>}
+              <TableHead className="text-center font-black w-[100px]">פעולות</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>

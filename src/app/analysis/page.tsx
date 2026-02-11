@@ -45,69 +45,34 @@ export default function AnalysisPage() {
         </div>
 
         <div className="grid gap-6 md:grid-cols-3">
-          <Card className="card-shadow border-none rounded-3xl bg-gradient-to-br from-primary to-blue-700 text-white overflow-hidden">
-            <CardContent className="p-6 md:p-8 text-right relative">
-              <div className="flex items-center justify-between mb-4 flex-row-reverse">
-                <div className="bg-white/20 p-2.5 rounded-2xl">
-                  <Wallet className="h-5 w-5" />
-                </div>
-                <span className="text-xs font-bold opacity-80 uppercase tracking-wider">הוצאה חודשית משוקללת</span>
-              </div>
-              <div className="flex items-baseline justify-end gap-1 flex-row-reverse overflow-hidden">
-                <span className={`font-black truncate ${totalMonthly > 9999 ? 'text-2xl' : 'text-4xl'}`}>
-                  {totalMonthly.toLocaleString(undefined, { maximumFractionDigits: 0 })}
-                </span>
-                <span className="text-xl font-bold shrink-0">₪</span>
-              </div>
-              <div className="mt-4 flex items-center gap-2 justify-end text-xs font-bold">
-                <span className="bg-white/20 px-2 py-0.5 rounded-full flex items-center gap-1">
-                  12.5%+ <ArrowUpRight className="h-3 w-3" />
-                </span>
-                <span className="opacity-70">מהחודש שעבר</span>
-              </div>
-            </CardContent>
-          </Card>
+          <StatCard 
+            title="הוצאה חודשית משוקללת"
+            value={totalMonthly.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+            symbol="₪"
+            icon={<Wallet className="h-5 w-5" />}
+            trend="12.5%+"
+            trendDesc="מהחודש שעבר"
+            primary
+          />
 
-          <Card className="card-shadow border-none rounded-3xl bg-white dark:bg-zinc-900">
-            <CardContent className="p-6 md:p-8 text-right">
-              <div className="flex items-center justify-between mb-4 flex-row-reverse">
-                <div className="bg-green-100 p-2.5 rounded-2xl text-green-600">
-                  <DollarSign className="h-5 w-5" />
-                </div>
-                <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">ממוצע למינוי</span>
-              </div>
-              <div className="flex items-baseline justify-end gap-1 flex-row-reverse overflow-hidden">
-                <span className="text-3xl font-black text-foreground truncate">
-                  {(subscriptions.length > 0 ? totalMonthly / subscriptions.length : 0).toFixed(0)}
-                </span>
-                <span className="text-xl font-bold text-foreground shrink-0">₪</span>
-              </div>
-              <div className="mt-4 flex items-center gap-2 justify-end text-[10px] font-bold text-green-600">
-                <span className="bg-green-50 px-2 py-0.5 rounded-full flex items-center gap-1">
-                  4.2%- <ArrowDownRight className="h-3 w-3" />
-                </span>
-                <span className="text-muted-foreground">התייעלות במחיר</span>
-              </div>
-            </CardContent>
-          </Card>
+          <StatCard 
+            title="ממוצע למינוי"
+            value={(subscriptions.length > 0 ? totalMonthly / subscriptions.length : 0).toFixed(0)}
+            symbol="₪"
+            icon={<DollarSign className="h-5 w-5" />}
+            trend="4.2%-"
+            trendDesc="התייעלות במחיר"
+            green
+          />
 
-          <Card className="card-shadow border-none rounded-3xl bg-white dark:bg-zinc-900">
-            <CardContent className="p-6 md:p-8 text-right">
-              <div className="flex items-center justify-between mb-4 flex-row-reverse">
-                <div className="bg-orange-100 p-2.5 rounded-2xl text-orange-600">
-                  <TrendingUp className="h-5 w-5" />
-                </div>
-                <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">הוצאה שנתית חזויה</span>
-              </div>
-              <div className="flex items-baseline justify-end gap-1 flex-row-reverse overflow-hidden">
-                <span className={`font-black text-foreground truncate ${totalMonthly * 12 > 99999 ? 'text-xl md:text-2xl' : 'text-3xl md:text-4xl'}`}>
-                  {(totalMonthly * 12).toLocaleString(undefined, { maximumFractionDigits: 0 })}
-                </span>
-                <span className="text-xl font-bold text-foreground shrink-0">₪</span>
-              </div>
-              <div className="mt-4 text-[10px] font-medium text-muted-foreground truncate">כולל חישוב אינפלציה וחידושים</div>
-            </CardContent>
-          </Card>
+          <StatCard 
+            title="הוצאה שנתית חזויה"
+            value={(totalMonthly * 12).toLocaleString(undefined, { maximumFractionDigits: 0 })}
+            symbol="₪"
+            icon={<TrendingUp className="h-5 w-5" />}
+            trendDesc="כולל אינפלציה וחידושים"
+            orange
+          />
         </div>
 
         <DashboardCharts />
@@ -188,5 +153,52 @@ export default function AnalysisPage() {
         </div>
       </main>
     </div>
+  )
+}
+
+function StatCard({ title, value, symbol, icon, trend, trendDesc, primary, green, orange }: any) {
+  const fontSize = value.length > 8 ? 'text-xl' : value.length > 5 ? 'text-2xl' : 'text-3xl md:text-4xl';
+  
+  return (
+    <Card className={cn(
+      "card-shadow border-none rounded-3xl overflow-hidden h-full",
+      primary ? "bg-gradient-to-br from-primary to-blue-700 text-white" : "bg-white dark:bg-zinc-900"
+    )}>
+      <CardContent className="p-6 md:p-8 text-right flex flex-col justify-between h-full">
+        <div>
+          <div className="flex items-center justify-between mb-4 flex-row-reverse">
+            <div className={cn(
+              "p-2.5 rounded-2xl",
+              primary ? "bg-white/20" : green ? "bg-green-100 text-green-600" : orange ? "bg-orange-100 text-orange-600" : "bg-muted"
+            )}>
+              {icon}
+            </div>
+            <span className={cn(
+              "text-[10px] font-bold uppercase tracking-wider",
+              primary ? "opacity-80" : "text-muted-foreground"
+            )}>{title}</span>
+          </div>
+          <div className="flex items-baseline justify-end gap-1 flex-row-reverse overflow-hidden">
+            <span className={cn("font-black tabular-nums truncate", fontSize, !primary && "text-foreground")}>
+              {value}
+            </span>
+            {symbol && <span className={cn("text-xl font-bold shrink-0", !primary && "text-foreground")}>{symbol}</span>}
+          </div>
+        </div>
+        <div className="mt-4 flex items-center gap-2 justify-end">
+          {trend && (
+            <span className={cn(
+              "px-2 py-0.5 rounded-full text-[10px] font-bold flex items-center gap-1",
+              primary ? "bg-white/20" : green ? "bg-green-50 text-green-600" : "bg-muted"
+            )}>
+              {trend} {trend.includes('+') ? <ArrowUpRight className="h-3 w-3" /> : <ArrowDownRight className="h-3 w-3" />}
+            </span>
+          )}
+          <span className={cn("text-[10px] font-bold truncate", primary ? "opacity-70" : "text-muted-foreground")}>
+            {trendDesc}
+          </span>
+        </div>
+      </CardContent>
+    </Card>
   )
 }
