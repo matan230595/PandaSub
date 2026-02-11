@@ -301,8 +301,8 @@ export function SubscriptionList() {
   const renderKanban = () => {
     const statuses: SubscriptionStatus[] = ['trial', 'active', 'frozen', 'cancelled']
     return (
-      <div className="w-full max-w-full overflow-x-auto pb-6 scrollbar-hide" dir="ltr">
-        <div className="flex gap-6 min-w-[1200px] flex-row-reverse px-2" dir="rtl">
+      <div className="w-full max-w-full overflow-x-auto pb-6 scrollbar-hide">
+        <div className="flex gap-6 min-w-[1200px] flex-row-reverse px-2">
           {statuses.map(status => {
             const items = filteredSubs.filter(s => s.status === status)
             return (

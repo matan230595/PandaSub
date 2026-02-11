@@ -59,7 +59,7 @@ export default function Home() {
     <div className="min-h-screen flex flex-col bg-[#F8F9FA] dark:bg-zinc-950 overflow-x-hidden">
       <SetupWizard />
       <TopNav />
-      <main className="flex-1 container mx-auto p-4 md:p-8 space-y-6 animate-fade-in pb-20 overflow-x-hidden">
+      <main className="flex-1 container mx-auto p-4 md:p-8 space-y-6 animate-fade-in pb-20">
         {/* Header Section */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="text-right">
@@ -81,24 +81,24 @@ export default function Home() {
 
         {/* Quick Actions & AI Card Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <Card className="lg:col-span-2 border-none card-shadow bg-gradient-to-br from-primary to-blue-700 text-white rounded-[2.5rem] overflow-hidden relative group min-h-[140px]">
-            <CardContent className="p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 h-full">
-              <div className="text-right space-y-3 z-10 flex-1 w-full">
+          <Card className="lg:col-span-2 border-none card-shadow bg-gradient-to-br from-primary to-blue-700 text-white rounded-[2.5rem] overflow-hidden relative group">
+            <CardContent className="p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6">
+              <div className="text-right space-y-3 z-10 flex-1">
                 <h3 className="text-xl font-black">פעולה מהירה 🐼</h3>
-                <p className="text-sm opacity-90 leading-relaxed max-w-lg">
-                  צריך להוסיף מינוי? אמור ל-Panda AI או סרוק את החשבונית.
+                <p className="text-sm opacity-90 leading-relaxed max-w-md">
+                  צריך להוסיף מינוי? אמור ל-Panda AI או סרוק את החשבונית לסנכרון מיידי.
                 </p>
-                <div className="flex flex-wrap gap-3 pt-1 justify-end">
+                <div className="flex flex-wrap gap-3 pt-2 justify-end">
                   <Button 
                     variant="secondary" 
                     onClick={() => setIsAddModalOpen(true)} 
-                    className="rounded-full font-bold px-5 h-10 shadow-xl text-primary bg-white hover:bg-zinc-100 transition-all text-xs"
+                    className="rounded-full font-bold px-6 h-10 shadow-xl bg-white text-primary hover:bg-zinc-100 transition-all border-none"
                   >
                     <ShieldCheck className="ml-2 h-4 w-4" /> סריקת AI
                   </Button>
                   <Button 
                     variant="outline" 
-                    className="rounded-full border-white/40 text-white hover:bg-white/10 font-bold px-5 h-10 transition-all bg-transparent text-xs"
+                    className="rounded-full border-white/40 text-white hover:bg-white/10 font-bold px-6 h-10 transition-all bg-transparent"
                   >
                     <Zap className="ml-2 h-4 w-4" /> הוספה קולית
                   </Button>
@@ -113,7 +113,7 @@ export default function Home() {
             </CardContent>
           </Card>
 
-          <div className="h-full min-h-[140px] min-w-0">
+          <div className="h-full min-h-[140px]">
             <AIRecommendations />
           </div>
         </div>
