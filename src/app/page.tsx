@@ -10,17 +10,19 @@ import { AIRecommendations } from "@/components/gen-ai/recommendations"
 import { SubscriptionsAtRisk } from "@/components/dashboard/risk-widget"
 import { Button } from "@/components/ui/button"
 import { Plus, Download, TrendingUp, Calendar, Lightbulb, Hourglass, FileText, ShieldCheck, Zap } from "lucide-react"
-import { Toaster } from "@/components/ui/toaster"
 import { AddSubscriptionModal } from "@/components/subscription/add-subscription-modal"
 import { useSubscriptions } from "@/context/subscriptions-context"
 import { Card, CardContent } from "@/components/ui/card"
 import { SetupWizard } from "@/components/setup-wizard"
 import { useToast } from "@/hooks/use-toast"
 import { cn } from "@/lib/utils"
+import { useUser } from "@/firebase"
+import Link from "next/link"
 
 export default function Home() {
   const [isAddModalOpen, setIsAddModalOpen] = React.useState(false)
   const { subscriptions, exportData, settings, convertAmount } = useSubscriptions()
+  const { user, isUserLoading } = useUser()
   const { toast } = useToast()
 
   const totalMonthlyILS = subscriptions
@@ -40,27 +42,34 @@ export default function Home() {
   const handleGenerateDraft = () => {
     const activeSubs = subscriptions.filter(s => s.status === 'active' || s.status === 'trial');
     const total = activeSubs.reduce((sum, s) => sum + convertAmount(s.amount, s.currency), 0);
-    
     const subListText = activeSubs.map(s => `• ${s.name}: ${s.amount}${s.currency} (≈ ₪${convertAmount(s.amount, s.currency).toFixed(1)})`).join('\n');
-    
     const subject = encodeURIComponent("סיכום מינויים שבועי - PandaSub IL");
-    const body = encodeURIComponent(
-      `שלום ${settings.userName},\n\nלהלן סיכום המינויים הפעילים שלך:\n\n${subListText}\n\nסה"כ חודשי (משוקלל): ₪${total.toLocaleString()}\n\nנשלח מ-PandaSub IL`
-    );
-
+    const body = encodeURIComponent(`שלום ${settings.userName},\n\nלהלן סיכום המינויים הפעילים שלך:\n\n${subListText}\n\nסה"כ חודשי (משוקלל): ₪${total.toLocaleString()}\n\nנשלח מ-PandaSub IL`);
     window.location.href = `mailto:${settings.userEmail}?subject=${subject}&body=${body}`;
-    
-    toast({
-      title: "טיוטת מייל נוצרה",
-      description: "אפליקציית המייל נפתחה עם הנתונים המומרים שלך.",
-    })
+    toast({ title: "טיוטת מייל נוצרה", description: "אפליקציית המייל נפתחה עם הנתונים המומרים שלך." })
+  }
+
+  if (isUserLoading) return null;
+  if (!user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#F8F9FA] p-4">
+        <Card className="w-full max-w-md p-8 text-center rounded-[2rem] shadow-2xl border-none">
+          <div className="bg-primary text-white h-20 w-20 rounded-[2rem] flex items-center justify-center text-4xl shadow-xl mx-auto mb-6">🐼</div>
+          <h1 className="text-3xl font-black mb-4">ברוכים הבאים ל-PandaSub</h1>
+          <p className="text-muted-foreground mb-8">התחבר כדי לנהל את המינויים שלך בצורה חכמה ולחסוך כסף.</p>
+          <Link href="/login" className="w-full">
+            <Button className="w-full google-btn h-14 rounded-full text-lg font-bold">התחבר עכשיו</Button>
+          </Link>
+        </Card>
+      </div>
+    )
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#F8F9FA] dark:bg-zinc-950" dir="rtl">
+    <div className="min-h-screen flex flex-col bg-[#F8F9FA] dark:bg-zinc-950">
       <SetupWizard />
       <TopNav />
-      <main className="flex-1 container mx-auto p-4 md:p-8 space-y-8 animate-fade-in pb-24 max-w-7xl">
+      <main className="flex-1 container mx-auto p-4 md:p-8 space-y-8 animate-fade-in pb-24 max-w-7xl overflow-x-hidden">
         
         {/* Header Section */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -68,20 +77,17 @@ export default function Home() {
             <h1 className="text-2xl md:text-3xl font-black tracking-tight text-foreground">שלום, {settings.userName.split(' ')[0]}! 👋</h1>
             <p className="text-muted-foreground mt-1 text-sm md:text-base font-medium">יש לך {subscriptions.length} מינויים רשומים במערכת.</p>
           </div>
-          <div className="flex items-center gap-3 justify-end">
+          <div className="flex items-center gap-3 justify-start md:justify-end">
             <Button onClick={() => setIsAddModalOpen(true)} className="rounded-full google-btn gap-2 shadow-lg h-11 px-6 text-sm font-black">
               <Plus className="h-5 w-5" /> הוסף מינוי
             </Button>
             <Button variant="outline" onClick={handleGenerateDraft} className="rounded-full gap-2 border-primary/20 hover:bg-primary/5 text-primary h-11 px-5 bg-white text-sm font-bold shadow-sm">
               <FileText className="h-4 w-4" /> טיוטה
             </Button>
-            <Button variant="ghost" onClick={exportData} className="rounded-full gap-2 text-muted-foreground h-11 px-4 text-sm font-bold hidden sm:flex">
-              <Download className="h-4 w-4" /> ייצוא
-            </Button>
           </div>
         </div>
 
-        {/* Stats Grid - REDESIGNED */}
+        {/* 1. Stats Grid (Top) */}
         <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
           <StatCard 
             title='סה"כ חודשי' 
@@ -116,15 +122,14 @@ export default function Home() {
           />
         </div>
 
-        {/* AI Insights & Quick Actions - REDESIGNED ORDER & RATIO */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-          <div className="lg:col-span-2 min-w-0 h-full">
+        {/* 2. AI Insights (2/3) & Quick Actions (1/3) */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch">
+          <div className="lg:col-span-2 min-w-0">
             <AIRecommendations />
           </div>
-          
           <div className="lg:col-span-1 min-w-0">
-            <Card className="border-none shadow-xl bg-gradient-to-br from-primary to-blue-700 text-white rounded-[2rem] overflow-hidden relative group h-auto">
-              <CardContent className="p-8 flex flex-col gap-6 text-right">
+            <Card className="border-none shadow-xl bg-gradient-to-br from-primary to-blue-700 text-white rounded-[2rem] overflow-hidden relative group h-full">
+              <CardContent className="p-8 flex flex-col justify-between h-full text-right">
                 <div className="space-y-2">
                   <div className="inline-flex items-center gap-2 bg-white/20 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest">
                     AI Automation
@@ -135,7 +140,7 @@ export default function Home() {
                   </p>
                 </div>
                 
-                <div className="flex flex-col gap-3">
+                <div className="flex flex-col gap-3 mt-6">
                   <Button 
                     variant="secondary" 
                     onClick={() => setIsAddModalOpen(true)} 
@@ -159,7 +164,7 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Main Content Area */}
+        {/* 3. Main Content Area */}
         <div className="grid gap-8 lg:grid-cols-3">
           <div className="lg:col-span-2 space-y-8 min-w-0">
             <DashboardCharts />
@@ -186,13 +191,12 @@ export default function Home() {
         </div>
       </footer>
       <AddSubscriptionModal open={isAddModalOpen} onOpenChange={setIsAddModalOpen} />
-      <Toaster />
     </div>
   )
 }
 
 function StatCard({ title, value, symbol, icon, trend, trendDir, trendDesc, color }: any) {
-  const fontSize = value.length > 8 ? 'text-2xl' : value.length > 5 ? 'text-3xl' : 'text-4xl';
+  const fontSize = value.length > 8 ? 'text-xl' : value.length > 5 ? 'text-2xl' : 'text-3xl md:text-4xl';
 
   return (
     <Card className="shadow-sm border-none rounded-[2rem] overflow-hidden group transition-all hover:shadow-xl dark:bg-zinc-900 bg-white h-full card-shadow">
@@ -206,16 +210,17 @@ function StatCard({ title, value, symbol, icon, trend, trendDir, trendDesc, colo
           </div>
         </div>
         
-        <div className="flex flex-col items-start gap-1 mb-2">
-          <div className="flex items-baseline justify-start gap-1.5 tabular-nums overflow-hidden w-full">
-            <div className={cn("font-black text-foreground leading-none", fontSize)}>
+        <div className="flex flex-col items-end gap-1 mb-2">
+          <div className="flex items-baseline justify-end gap-1.5 tabular-nums overflow-hidden w-full flex-row-reverse">
+             <div className={cn("font-black text-foreground leading-none", fontSize)}>
               {value}
             </div>
             {symbol && <div className="text-xl font-black text-primary mb-0.5">{symbol}</div>}
           </div>
         </div>
 
-        <div className="flex items-center gap-2 justify-start mt-2">
+        <div className="flex items-center gap-2 justify-end mt-2">
+          <span className="text-[10px] font-bold text-muted-foreground opacity-70 truncate">{trendDesc}</span>
           {trend && (
             <span className={cn(
               "text-[10px] font-black px-2 py-0.5 rounded-full flex items-center gap-1",
@@ -224,7 +229,6 @@ function StatCard({ title, value, symbol, icon, trend, trendDir, trendDesc, colo
               {trendDir === 'down' ? '↓' : '↑'} {trend}
             </span>
           )}
-          <span className="text-[10px] font-bold text-muted-foreground opacity-70 truncate">{trendDesc}</span>
         </div>
       </CardContent>
     </Card>

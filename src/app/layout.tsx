@@ -1,9 +1,11 @@
+
 import type {Metadata, Viewport} from 'next';
 import './globals.css';
 import { SubscriptionsProvider } from '@/context/subscriptions-context';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/app-sidebar';
 import { FirebaseClientProvider } from '@/firebase/client-provider';
+import { Toaster } from "@/components/ui/toaster";
 
 export const metadata: Metadata = {
   title: 'PandaSub IL - ניהול מינויים חכם',
@@ -44,13 +46,14 @@ export default function RootLayout({
             <SidebarProvider>
               <div className="flex min-h-screen w-full relative">
                 <AppSidebar />
-                <div className="flex-1 flex flex-col min-w-0 overflow-x-hidden">
+                <div className="flex-1 flex flex-col min-w-0 overflow-x-hidden relative">
                   {children}
                 </div>
               </div>
             </SidebarProvider>
           </SubscriptionsProvider>
         </FirebaseClientProvider>
+        <Toaster />
       </body>
     </html>
   );
