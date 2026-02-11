@@ -84,7 +84,7 @@ export const SAMPLE_SUBSCRIPTIONS: Subscription[] = [
     category: 'streaming',
     amount: 31.9,
     currency: '₪',
-    renewalDate: new Date(new Date().setDate(new Date().getDate() + 0)).toISOString().split('T')[0],
+    renewalDate: new Date(new Date().setDate(new Date().getDate() + 10)).toISOString().split('T')[0],
     billingCycle: 'monthly',
     paymentMethod: 'Mastercard 1234',
     reminderDays: [3, 0],

@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { Progress } from "@/components/ui/progress"
 import { 
   Edit2, 
   LayoutGrid,
@@ -25,7 +26,8 @@ import {
   AlertTriangle,
   CreditCard,
   RefreshCw,
-  MoreVertical
+  MoreVertical,
+  CalendarDays
 } from "lucide-react"
 import { 
   DropdownMenu, 
@@ -51,7 +53,7 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { AddSubscriptionModal } from "./add-subscription-modal"
 import { cn } from "@/lib/utils"
-import { format } from "date-fns"
+import { format, differenceInDays } from "date-fns"
 import { he } from "date-fns/locale"
 
 export function SubscriptionList() {
@@ -80,36 +82,47 @@ export function SubscriptionList() {
     setIsModalOpen(true)
   }
 
-  const calculateDaysLeft = (date: string) => {
-    const today = new Date()
-    today.setHours(0, 0, 0, 0)
-    const renewal = new Date(date)
-    renewal.setHours(0, 0, 0, 0)
-    const diff = renewal.getTime() - today.getTime()
-    return Math.ceil(diff / (1000 * 60 * 60 * 24))
-  }
-
   const renderCountdown = (sub: Subscription) => {
-    const daysLeft = calculateDaysLeft(sub.renewalDate)
+    const today = new Date()
+    const renewal = new Date(sub.renewalDate)
+    const daysLeft = differenceInDays(renewal, today)
     
-    if (daysLeft < 0) return <span className="text-destructive font-black">פג תוקף</span>
-    if (daysLeft === 0) return (
-      <div className="flex items-center gap-1 font-black text-xs text-primary animate-pulse">
-        <Clock className="h-3 w-3" />
-        היום!
-      </div>
-    )
-    
-    // סולם צבעים חכם ודינמי
-    let colorClass = "text-green-600"
-    if (daysLeft <= 3) colorClass = "text-destructive animate-bounce"
-    else if (daysLeft <= 7) colorClass = "text-orange-500"
-    else if (daysLeft <= 14) colorClass = "text-blue-500"
+    let progress = 100
+    let color = "bg-green-500"
+    let textClass = "text-green-600"
+
+    if (daysLeft <= 0) {
+      progress = 100
+      color = "bg-destructive animate-pulse"
+      textClass = "text-destructive font-black"
+    } else if (daysLeft <= 3) {
+      progress = 90
+      color = "bg-destructive animate-pulse"
+      textClass = "text-destructive font-bold"
+    } else if (daysLeft <= 7) {
+      progress = 70
+      color = "bg-orange-500"
+      textClass = "text-orange-600 font-bold"
+    } else if (daysLeft <= 14) {
+      progress = 40
+      color = "bg-blue-500"
+      textClass = "text-blue-600 font-bold"
+    } else {
+      progress = 20
+      color = "bg-green-500"
+      textClass = "text-green-600"
+    }
 
     return (
-      <div className={cn("flex items-center gap-1 font-black text-xs transition-colors duration-500", colorClass)}>
-        <Clock className="h-3 w-3" />
-        עוד {daysLeft} ימים
+      <div className="space-y-2 w-full mt-2">
+        <div className="flex justify-between items-center text-[10px] font-bold">
+          <span className={cn("flex items-center gap-1", textClass)}>
+            <Clock className="h-3 w-3" />
+            {daysLeft <= 0 ? "היום!" : `בעוד ${daysLeft} ימים`}
+          </span>
+          <span className="text-muted-foreground">{progress}%</span>
+        </div>
+        <Progress value={progress} className="h-1.5" indicatorClassName={color} />
       </div>
     )
   }
@@ -190,17 +203,18 @@ export function SubscriptionList() {
                 <div className="text-base font-bold text-foreground">
                   {format(new Date(sub.renewalDate), 'd בMMMM', { locale: he })}
                 </div>
-                {renderCountdown(sub)}
               </div>
             </div>
 
-            <div className="space-y-3">
+            {renderCountdown(sub)}
+
+            <div className="space-y-3 mt-6">
               <div className="flex items-center justify-between flex-row-reverse text-xs">
                 <span className="font-bold text-muted-foreground">שיטת תשלום:</span>
                 <span className="font-black text-foreground">{sub.paymentMethod || 'לא הוגדר'}</span>
               </div>
               <div className="flex items-center justify-between flex-row-reverse text-xs">
-                <span className="font-bold text-muted-foreground">תזכורות פעילות:</span>
+                <span className="font-bold text-muted-foreground">תזכורות:</span>
                 <div className="flex gap-1 flex-row-reverse">
                   {(sub.reminderDays || [3]).map(day => (
                     <Badge key={day} variant="secondary" className="text-[9px] px-1.5 rounded-md">
@@ -220,7 +234,7 @@ export function SubscriptionList() {
               {STATUS_METADATA[sub.status].label}
             </Badge>
             <div className="text-[10px] font-bold text-muted-foreground italic">
-              עודכן לאחרונה: {sub.lastUsed ? format(new Date(sub.lastUsed), 'dd/MM/yy') : 'מעולם לא'}
+              עודכן: {sub.lastUsed ? format(new Date(sub.lastUsed), 'dd/MM/yy') : 'מעולם לא'}
             </div>
           </CardFooter>
         </Card>
@@ -234,10 +248,8 @@ export function SubscriptionList() {
         <TableHeader className="bg-muted/30 h-14">
           <TableRow>
             <TableHead className="text-right font-black">מינוי</TableHead>
-            <TableHead className="text-right font-black">קטגוריה</TableHead>
             <TableHead className="text-right font-black">סכום</TableHead>
-            <TableHead className="text-right font-black">שיטת תשלום</TableHead>
-            <TableHead className="text-right font-black">חידוש</TableHead>
+            <TableHead className="text-right font-black">חידוש וסטטוס זמן</TableHead>
             <TableHead className="text-right font-black">סטטוס</TableHead>
             <TableHead className="text-center font-black">פעולות</TableHead>
           </TableRow>
@@ -258,18 +270,9 @@ export function SubscriptionList() {
                   </div>
                 </div>
               </TableCell>
-              <TableCell className="text-right">
-                <Badge variant="outline" className="text-[10px] px-2 py-0.5 rounded-lg border-primary/20 text-primary">
-                  {CATEGORY_METADATA[sub.category].label}
-                </Badge>
-              </TableCell>
               <TableCell className="text-right font-black text-primary">{sub.amount} {sub.currency}</TableCell>
-              <TableCell className="text-right text-xs font-bold text-muted-foreground">{sub.paymentMethod || '-'}</TableCell>
-              <TableCell className="text-right">
-                <div className="flex flex-col text-right">
-                  <span className="text-xs font-bold">{new Date(sub.renewalDate).toLocaleDateString('he-IL')}</span>
-                  {renderCountdown(sub)}
-                </div>
+              <TableCell className="text-right min-w-[200px]">
+                {renderCountdown(sub)}
               </TableCell>
               <TableCell className="text-right">
                 <Badge className="text-[10px] px-2 rounded-full border-none font-black" style={{ backgroundColor: STATUS_METADATA[sub.status].color, color: 'white' }}>
@@ -311,10 +314,7 @@ export function SubscriptionList() {
                       </div>
                       <span className="text-xs font-black text-primary">{sub.amount}₪</span>
                     </div>
-                    <div className="flex justify-between items-center flex-row-reverse">
-                       <span className="text-[10px] text-muted-foreground font-bold">{sub.paymentMethod || 'ללא שיטה'}</span>
-                       {renderCountdown(sub)}
-                    </div>
+                    {renderCountdown(sub)}
                   </Card>
                 ))}
               </div>
