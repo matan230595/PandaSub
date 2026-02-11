@@ -50,7 +50,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
-import { CATEGORY_METADATA, STATUS_METADATA, Subscription, SubscriptionCategory, SubscriptionStatus, PRIORITY_CONFIG, CANCELLATION_LINKS } from "@/app/lib/subscription-store"
+import { CATEGORY_METADATA, STATUS_METADATA, Subscription, SubscriptionCategory, SubscriptionStatus, CANCELLATION_LINKS } from "@/app/lib/subscription-store"
 import { useSubscriptions } from "@/context/subscriptions-context"
 import { useToast } from "@/hooks/use-toast"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
@@ -118,7 +118,9 @@ export function SubscriptionList() {
 
   const renderCountdown = (sub: Subscription) => {
     const today = new Date()
+    today.setHours(0,0,0,0)
     const renewal = new Date(sub.renewalDate)
+    renewal.setHours(0,0,0,0)
     const daysLeft = differenceInDays(renewal, today)
     
     let progress = 100
@@ -128,7 +130,7 @@ export function SubscriptionList() {
     if (daysLeft <= 0) {
       progress = 100; color = "bg-destructive animate-pulse"; textClass = "text-destructive font-black";
     } else if (daysLeft <= 3) {
-      progress = 90; color = "bg-destructive animate-pulse"; textClass = "text-destructive font-bold";
+      progress = 90; color = "bg-destructive"; textClass = "text-destructive font-bold";
     } else if (daysLeft <= 7) {
       progress = 70; color = "bg-orange-500"; textClass = "text-orange-600 font-bold";
     } else if (daysLeft <= 14) {
@@ -139,7 +141,7 @@ export function SubscriptionList() {
 
     return (
       <div className="space-y-1.5 w-full mt-1">
-        <div className="flex justify-between items-center text-[10px] font-bold">
+        <div className="flex justify-between items-center text-[10px] font-bold flex-row-reverse">
           <span className={cn("flex items-center gap-1", textClass)}>
             <Clock className="h-3 w-3" />
             {daysLeft <= 0 ? "היום!" : `בעוד ${daysLeft} ימים`}
@@ -181,31 +183,18 @@ export function SubscriptionList() {
               </div>
               
               <div className="flex gap-1">
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  className="rounded-full h-8 w-8 hover:bg-primary/5"
-                  onClick={(e) => { e.stopPropagation(); handleEdit(sub); }}
-                >
+                <Button variant="ghost" size="icon" className="rounded-full h-8 w-8" onClick={(e) => { e.stopPropagation(); handleEdit(sub); }}>
                   <Edit2 className="h-4 w-4 text-muted-foreground" />
                 </Button>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
-                    <Button variant="ghost" size="icon" className="rounded-full h-8 w-8">
-                      <MoreVertical className="h-4 w-4" />
-                    </Button>
+                    <Button variant="ghost" size="icon" className="rounded-full h-8 w-8"><MoreVertical className="h-4 w-4" /></Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="rounded-2xl p-2 text-right">
-                    <DropdownMenuItem onClick={() => handleCancelClick(sub)} className="flex-row-reverse gap-2 rounded-xl text-primary font-bold">
-                      <ExternalLink className="h-4 w-4" /> בטל מינוי (בוט)
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => duplicateSubscription(sub.id)} className="flex-row-reverse gap-2 rounded-xl">
-                      <Copy className="h-4 w-4" /> שכפל מינוי
-                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleCancelClick(sub)} className="flex-row-reverse gap-2 rounded-xl text-primary font-bold"><ExternalLink className="h-4 w-4" /> בטל מינוי</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => duplicateSubscription(sub.id)} className="flex-row-reverse gap-2 rounded-xl"><Copy className="h-4 w-4" /> שכפל</DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={() => { setDeleteConfirmId(sub.id); }} className="flex-row-reverse gap-2 rounded-xl text-destructive">
-                      <Trash2 className="h-4 w-4" /> מחק מינוי
-                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setDeleteConfirmId(sub.id)} className="flex-row-reverse gap-2 rounded-xl text-destructive"><Trash2 className="h-4 w-4" /> מחק</DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>
@@ -213,38 +202,20 @@ export function SubscriptionList() {
             
             <div className="grid grid-cols-2 gap-4 mb-6">
               <div className="bg-muted/30 p-4 rounded-2xl text-right">
-                <div className="text-[10px] font-bold text-muted-foreground uppercase mb-1 flex items-center gap-1 flex-row-reverse">
-                   סכום חיוב <CreditCard className="h-3 w-3" />
-                </div>
-                <div className="text-2xl font-black text-primary">
-                  {sub.amount} <span className="text-sm font-bold">{sub.currency}</span>
-                </div>
-                {sub.currency !== '₪' && (
-                  <div className="text-[10px] text-muted-foreground mt-1">
-                    ≈ ₪{convertAmount(sub.amount, sub.currency).toFixed(1)}
-                  </div>
-                )}
+                <div className="text-[10px] font-bold text-muted-foreground uppercase mb-1 flex items-center gap-1 flex-row-reverse">סכום חיוב <CreditCard className="h-3 w-3" /></div>
+                <div className="text-2xl font-black text-primary">{sub.amount} <span className="text-sm font-bold">{sub.currency}</span></div>
+                {sub.currency !== '₪' && <div className="text-[10px] text-muted-foreground mt-1">≈ ₪{convertAmount(sub.amount, sub.currency).toFixed(1)}</div>}
               </div>
               <div className="bg-muted/30 p-4 rounded-2xl text-right">
-                <div className="text-[10px] font-bold text-muted-foreground uppercase mb-1 flex items-center gap-1 flex-row-reverse">
-                   חידוש קרוב <RefreshCw className="h-3 w-3" />
-                </div>
-                <div className="text-base font-bold text-foreground">
-                  {format(new Date(sub.renewalDate), 'd בMMMM', { locale: he })}
-                </div>
+                <div className="text-[10px] font-bold text-muted-foreground uppercase mb-1 flex items-center gap-1 flex-row-reverse">חידוש קרוב <RefreshCw className="h-3 w-3" /></div>
+                <div className="text-base font-bold text-foreground">{format(new Date(sub.renewalDate), 'd בMMMM', { locale: he })}</div>
               </div>
             </div>
-
             {renderCountdown(sub)}
           </CardContent>
           
           <CardFooter className="bg-muted/10 border-t p-4 flex justify-between items-center flex-row-reverse">
-            <Badge 
-              style={{ backgroundColor: STATUS_METADATA[sub.status].color, color: 'white' }} 
-              className="rounded-full px-3 py-0.5 text-[10px] font-black border-none"
-            >
-              {STATUS_METADATA[sub.status].label}
-            </Badge>
+            <Badge style={{ backgroundColor: STATUS_METADATA[sub.status].color, color: 'white' }} className="rounded-full px-3 py-0.5 text-[10px] font-black border-none">{STATUS_METADATA[sub.status].label}</Badge>
           </CardFooter>
         </Card>
       ))}
@@ -266,10 +237,7 @@ export function SubscriptionList() {
         </TableHeader>
         <TableBody>
           {filteredSubs.map((sub) => (
-            <TableRow 
-              key={sub.id} 
-              className="group h-16 border-b border-border/50 hover:bg-primary/[0.01]"
-            >
+            <TableRow key={sub.id} className="group h-16 border-b border-border/50 hover:bg-primary/[0.01]">
               {isVisible('name') && (
                 <TableCell className="p-2">
                   <Input 
@@ -307,32 +275,20 @@ export function SubscriptionList() {
               )}
               {isVisible('renewalDate') && (
                 <TableCell className="p-2">
-                  <Input 
-                    type="date"
-                    value={sub.renewalDate} 
-                    onChange={(e) => updateSubscription(sub.id, { renewalDate: e.target.value })}
-                    className="border-none bg-transparent hover:bg-muted/50 focus:bg-white focus:ring-1 focus:ring-primary/20 h-9 text-sm text-right"
-                  />
+                  <Input type="date" value={sub.renewalDate} onChange={(e) => updateSubscription(sub.id, { renewalDate: e.target.value })} className="border-none bg-transparent hover:bg-muted/50 h-9 text-sm text-right" />
                 </TableCell>
               )}
               {isVisible('status') && (
                 <TableCell className="p-2">
-                  <select 
-                    value={sub.status} 
-                    onChange={(e) => updateSubscription(sub.id, { status: e.target.value as SubscriptionStatus })}
-                    className="w-full border-none bg-transparent hover:bg-muted/50 h-9 rounded-md text-sm px-2 font-bold cursor-pointer outline-none text-right"
-                    style={{ color: STATUS_METADATA[sub.status].color }}
-                  >
-                    {Object.entries(STATUS_METADATA).map(([key, val]) => (
-                      <option key={key} value={key}>{val.label}</option>
-                    ))}
+                  <select value={sub.status} onChange={(e) => updateSubscription(sub.id, { status: e.target.value as SubscriptionStatus })} className="w-full border-none bg-transparent hover:bg-muted/50 h-9 rounded-md text-sm px-2 font-bold cursor-pointer outline-none text-right" style={{ color: STATUS_METADATA[sub.status].color }}>
+                    {Object.entries(STATUS_METADATA).map(([key, val]) => <option key={key} value={key}>{val.label}</option>)}
                   </select>
                 </TableCell>
               )}
               <TableCell className="text-center p-2">
                 <div className="flex items-center justify-center gap-1">
-                  <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg" onClick={() => handleEdit(sub)}><Edit2 className="h-3 w-3" /></Button>
-                  <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg text-destructive" onClick={() => setDeleteConfirmId(sub.id)}><Trash2 className="h-3 w-3" /></Button>
+                  <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleEdit(sub)}><Edit2 className="h-3 w-3" /></Button>
+                  <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => setDeleteConfirmId(sub.id)}><Trash2 className="h-3 w-3" /></Button>
                 </div>
               </TableCell>
             </TableRow>
@@ -342,16 +298,6 @@ export function SubscriptionList() {
     </div>
   )
 
-  const handleDragStart = (id: string) => setDraggedId(id)
-  const handleDragOver = (e: React.DragEvent) => e.preventDefault()
-  const handleDrop = (newStatus: SubscriptionStatus) => {
-    if (draggedId) {
-      updateSubscription(draggedId, { status: newStatus })
-      setDraggedId(null)
-      toast({ title: "סטטוס עודכן", description: `המינוי הועבר ל${STATUS_METADATA[newStatus].label}` })
-    }
-  }
-
   const renderKanban = () => {
     const statuses: SubscriptionStatus[] = ['trial', 'active', 'frozen', 'cancelled']
     return (
@@ -359,32 +305,18 @@ export function SubscriptionList() {
         {statuses.map(status => {
           const items = filteredSubs.filter(s => s.status === status)
           return (
-            <div 
-              key={status} 
-              className="flex-shrink-0 w-80 flex flex-col gap-4 snap-center"
-              onDragOver={handleDragOver}
-              onDrop={() => handleDrop(status)}
-            >
+            <div key={status} className="flex-shrink-0 w-80 flex flex-col gap-4 snap-center" onDragOver={(e) => e.preventDefault()} onDrop={() => { if(draggedId) { updateSubscription(draggedId, { status }); setDraggedId(null); } }}>
               <div className="flex items-center justify-between px-5 py-4 bg-white rounded-3xl shadow-sm border-r-4" style={{ borderRightColor: STATUS_METADATA[status].color }}>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 flex-row-reverse">
                   <div className="h-2 w-2 rounded-full" style={{ backgroundColor: STATUS_METADATA[status].color }} />
                   <h3 className="font-black text-sm">{STATUS_METADATA[status].label}</h3>
                 </div>
                 <Badge variant="secondary" className="rounded-full bg-muted/50 text-[10px]">{items.length}</Badge>
               </div>
-              
-              <div className="bg-muted/20 rounded-[2.5rem] p-3 space-y-4 min-h-[600px] border-2 border-dashed border-muted/50 transition-colors">
+              <div className="bg-muted/20 rounded-[2.5rem] p-3 space-y-4 min-h-[600px] border-2 border-dashed border-muted/50">
                 {items.map(sub => (
-                  <Card 
-                    key={sub.id} 
-                    draggable
-                    onDragStart={() => handleDragStart(sub.id)}
-                    className="p-5 rounded-[1.8rem] bg-white shadow-md border-none cursor-grab active:cursor-grabbing transition-all hover:scale-[1.03] group/item relative overflow-hidden" 
-                    onClick={() => handleEdit(sub)}
-                  >
-                    <div className="absolute top-2 left-2 opacity-0 group-hover/item:opacity-30 transition-opacity">
-                      <GripVertical className="h-4 w-4" />
-                    </div>
+                  <Card key={sub.id} draggable onDragStart={() => setDraggedId(sub.id)} className="p-5 rounded-[1.8rem] bg-white shadow-md border-none cursor-grab active:cursor-grabbing group/item relative overflow-hidden" onClick={() => handleEdit(sub)}>
+                    <div className="absolute top-2 left-2 opacity-30"><GripVertical className="h-4 w-4" /></div>
                     <div className="flex justify-between items-center flex-row-reverse mb-3">
                       <div className="flex items-center gap-2 flex-row-reverse">
                          <span className="text-lg">{CATEGORY_METADATA[sub.category].icon}</span>
@@ -405,94 +337,42 @@ export function SubscriptionList() {
 
   return (
     <div className="space-y-6">
-      <div className="bg-white p-4 rounded-[2.5rem] shadow-lg border border-border/50 flex flex-col lg:flex-row gap-4 items-center">
+      <div className="bg-white p-4 rounded-[2.5rem] shadow-lg border border-border/50 flex flex-col lg:flex-row gap-4 items-center flex-row-reverse">
         <div className="relative flex-1 w-full text-right">
           <Search className="absolute right-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-          <Input 
-            placeholder="חפש מינוי, קטגוריה או שיטת תשלום..." 
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="pr-12 h-12 text-base text-right bg-muted/20 border-none rounded-2xl focus:ring-primary/10" 
-          />
+          <Input placeholder="חיפוש מהיר..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="pr-12 h-12 text-base text-right bg-muted/20 border-none rounded-2xl" />
         </div>
-        
-        <div className="flex items-center gap-2 w-full lg:w-auto">
+        <div className="flex items-center gap-2 w-full lg:w-auto flex-row-reverse">
           <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="rounded-2xl h-12 gap-2 border-primary/10 bg-primary/5 text-primary font-bold px-5">
-                <Settings2 className="h-4 w-4" /> ניהול עמודות
-              </Button>
-            </DropdownMenuTrigger>
+            <DropdownMenuTrigger asChild><Button variant="outline" className="rounded-2xl h-12 gap-2 border-primary/10 bg-primary/5 text-primary font-bold px-5"><Settings2 className="h-4 w-4" /> עמודות</Button></DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="text-right rounded-2xl p-2 w-56">
-              <DropdownMenuLabel className="text-right">בחר עמודות להצגה</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              {ALL_COLUMNS.map((col) => (
-                <DropdownMenuCheckboxItem
-                  key={col.id}
-                  checked={isVisible(col.id)}
-                  onCheckedChange={() => toggleColumn(col.id)}
-                  className="flex-row-reverse text-right"
-                >
-                  {col.label}
-                </DropdownMenuCheckboxItem>
+              {ALL_COLUMNS.map(col => (
+                <DropdownMenuCheckboxItem key={col.id} checked={isVisible(col.id)} onCheckedChange={() => toggleColumn(col.id)} className="flex-row-reverse text-right">{col.label}</DropdownMenuCheckboxItem>
               ))}
             </DropdownMenuContent>
           </DropdownMenu>
-
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="rounded-2xl h-12 gap-2 border-primary/10 bg-primary/5 text-primary font-bold px-5">
-                <Filter className="h-4 w-4" /> 
-                {categoryFilter === 'all' ? 'קטגוריות' : CATEGORY_METADATA[categoryFilter].label}
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="text-right rounded-2xl p-2 w-56">
-              <DropdownMenuItem onClick={() => setCategoryFilter('all')} className="text-right rounded-xl">כל הקטגוריות</DropdownMenuItem>
-              <DropdownMenuSeparator />
-              {Object.entries(CATEGORY_METADATA).map(([key, val]) => (
-                <DropdownMenuItem key={key} onClick={() => setCategoryFilter(key as any)} className="text-right flex-row-reverse gap-3 rounded-xl">
-                  {val.icon} {val.label}
-                  {categoryFilter === key && <Check className="h-4 w-4 mr-auto text-primary" />}
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
-
-          <div className="flex p-1.5 bg-muted/30 rounded-2xl h-12">
+          <div className="flex p-1.5 bg-muted/30 rounded-2xl h-12 flex-row-reverse">
             <Button variant={viewMode === 'table' ? 'default' : 'ghost'} size="icon" onClick={() => setViewMode('table')} className="h-9 w-9 rounded-xl"><ListIcon className="h-4 w-4" /></Button>
             <Button variant={viewMode === 'cards' ? 'default' : 'ghost'} size="icon" onClick={() => setViewMode('cards')} className="h-9 w-9 rounded-xl"><LayoutGrid className="h-4 w-4" /></Button>
             <Button variant={viewMode === 'kanban' ? 'default' : 'ghost'} size="icon" onClick={() => setViewMode('kanban')} className="h-9 w-9 rounded-xl"><Columns className="h-4 w-4" /></Button>
           </div>
         </div>
       </div>
-
       <div className="min-h-[400px]">
         {viewMode === 'table' && renderTable()}
         {viewMode === 'cards' && renderCards()}
         {viewMode === 'kanban' && renderKanban()}
       </div>
-
-      <AddSubscriptionModal 
-        open={isModalOpen} 
-        onOpenChange={(val) => { setIsModalOpen(val); if (!val) setSelectedSub(null); }} 
-        subscription={selectedSub} 
-      />
-
+      <AddSubscriptionModal open={isModalOpen} onOpenChange={(val) => { setIsModalOpen(val); if (!val) setSelectedSub(null); }} subscription={selectedSub} />
       <AlertDialog open={!!deleteConfirmId} onOpenChange={(open) => !open && setDeleteConfirmId(null)}>
         <AlertDialogContent className="text-right rounded-[2.5rem] border-none shadow-2xl p-10" dir="rtl">
           <AlertDialogHeader className="items-center">
-            <div className="h-24 w-24 rounded-full bg-destructive/10 flex items-center justify-center text-destructive mb-6 animate-pulse">
-              <AlertTriangle className="h-12 w-12" />
-            </div>
-            <AlertDialogTitle className="text-3xl font-black">מחיקת מינוי סופית?</AlertDialogTitle>
-            <AlertDialogDescription className="text-center text-muted-foreground text-lg leading-relaxed">
-              פעולה זו לא ניתנת לביטול. כל ההיסטוריה והתזכורות של המינוי יימחקו לנצח.
-            </AlertDialogDescription>
+            <div className="h-24 w-24 rounded-full bg-destructive/10 flex items-center justify-center text-destructive mb-6"><AlertTriangle className="h-12 w-12" /></div>
+            <AlertDialogTitle className="text-3xl font-black">מחיקה סופית?</AlertDialogTitle>
+            <AlertDialogDescription className="text-center text-muted-foreground text-lg">האם אתה בטוח שברצונך למחוק את המינוי? לא ניתן לשחזר את המידע.</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="sm:justify-center flex flex-row-reverse gap-4 mt-10">
-            <AlertDialogAction onClick={() => { if (deleteConfirmId) deleteSubscription(deleteConfirmId); setDeleteConfirmId(null); toast({ title: "המינוי נמחק בהצלחה", variant: "destructive" }); }} className="bg-destructive hover:bg-destructive/90 rounded-full px-12 h-14 text-lg font-black shadow-xl shadow-destructive/20">
-              כן, מחק מינוי
-            </AlertDialogAction>
+            <AlertDialogAction onClick={() => { if (deleteConfirmId) deleteSubscription(deleteConfirmId); setDeleteConfirmId(null); }} className="bg-destructive hover:bg-destructive/90 rounded-full px-12 h-14 text-lg font-black">כן, מחק</AlertDialogAction>
             <AlertDialogCancel className="rounded-full h-14 px-12 text-lg font-bold">ביטול</AlertDialogCancel>
           </AlertDialogFooter>
         </AlertDialogContent>

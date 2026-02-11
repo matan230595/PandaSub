@@ -71,7 +71,6 @@ const DEFAULT_SETTINGS: UserSettings = {
   visibleColumns: ['name', 'amount', 'renewalDate', 'status', 'category', 'paymentMethod']
 };
 
-// Simulated exchange rates for prototype
 const EXCHANGE_RATES: Record<string, number> = {
   '₪': 1,
   'ILS': 1,
@@ -89,7 +88,7 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
   const audioContextRef = useRef<AudioContext | null>(null);
 
   useEffect(() => {
-    const saved = localStorage.getItem('panda_subs_v9');
+    const saved = localStorage.getItem('panda_subs_v10');
     const wizardState = localStorage.getItem('panda_wizard');
     const savedSettings = localStorage.getItem('panda_settings');
     
@@ -126,7 +125,7 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
 
   useEffect(() => {
     if (subscriptions.length > 0) {
-      localStorage.setItem('panda_subs_v9', encrypt(JSON.stringify(subscriptions)));
+      localStorage.setItem('panda_subs_v10', encrypt(JSON.stringify(subscriptions)));
     }
     checkReminders();
   }, [subscriptions]);
@@ -147,33 +146,31 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
       const gain = ctx.createGain();
       osc.type = 'sine';
       osc.frequency.setValueAtTime(880, ctx.currentTime);
-      osc.frequency.exponentialRampToValueAtTime(440, ctx.currentTime + 0.1);
       gain.gain.setValueAtTime(0.1, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1);
       osc.connect(gain);
       gain.connect(ctx.destination);
       osc.start();
       osc.stop(ctx.currentTime + 0.1);
-    } catch (e) {
-      console.warn("Could not play notification sound", e);
-    }
+    } catch (e) {}
   };
 
   const checkReminders = () => {
     const today = new Date();
+    today.setHours(0, 0, 0, 0);
     const newNotifications: Notification[] = [];
 
     subscriptions.forEach(sub => {
       const renewalDate = new Date(sub.renewalDate);
+      renewalDate.setHours(0,0,0,0);
       const diffDays = Math.ceil((renewalDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
       
       const activeReminders = sub.reminderDays || [3];
       if (activeReminders.includes(diffDays)) {
         newNotifications.push({
-          id: `renewal-rem-${sub.id}-${diffDays}-${today.getDate()}`,
-          title: diffDays === 0 ? `היום: חיוב עבור ${sub.name}` : `תזכורת: חיוב עבור ${sub.name} בעוד ${diffDays} ימים`,
-          message: `סכום לחיוב: ${sub.amount} ${sub.currency}. שיטת תשלום: ${sub.paymentMethod || 'לא צוינה'}`,
-          date: today.toISOString(),
+          id: `renewal-${sub.id}-${diffDays}-${today.getDate()}`,
+          title: diffDays === 0 ? `היום חיוב: ${sub.name}` : `חיוב עבור ${sub.name} בעוד ${diffDays} ימים`,
+          message: `סכום: ${sub.amount}${sub.currency}. וודא שהכל מוכן!`,
+          date: new Date().toISOString(),
           read: false,
           type: diffDays <= 1 ? 'critical' : 'warning',
           priority: diffDays <= 1 ? 'critical' : 'high'
@@ -185,7 +182,7 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
       const existingIds = new Set(prev.map(n => n.id));
       const added = newNotifications.filter(n => !existingIds.has(n.id));
       if (added.length > 0) playNotificationSound();
-      return [...added, ...prev].slice(0, 30);
+      return [...added, ...prev].slice(0, 20);
     });
   };
 
@@ -209,15 +206,15 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
   const duplicateSubscription = (id: string) => {
     const subToCopy = subscriptions.find(s => s.id === id);
     if (subToCopy) {
-      const { id: _, name, ...rest } = subToCopy;
-      addSubscription({ ...rest, name: `${name} (עותק)` });
+      const { id: _, ...rest } = subToCopy;
+      addSubscription({ ...rest, name: `${subToCopy.name} (עותק)` });
     }
   };
 
   const markAsUsed = (id: string) => {
     const today = new Date().toISOString().split('T')[0];
     setSubscriptions(prev => prev.map(s => 
-      s.id === id ? { ...s, usageCount: (s.usageCount || 0) + 1, lastUsed: today, atRisk: false } : s
+      s.id === id ? { ...s, usageCount: (s.usageCount || 0) + 1, lastUsed: today } : s
     ));
   };
 
@@ -227,15 +224,12 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
   };
 
   const exportData = () => {
-    const headers = ['Name', 'Category', 'Amount', 'Currency', 'Renewal Date', 'Billing Cycle', 'Payment Method', 'Status'];
-    const rows = subscriptions.map(s => [
-      s.name, s.category, s.amount, s.currency, s.renewalDate, s.billingCycle, s.paymentMethod || '', s.status
-    ]);
+    const headers = ['Name', 'Category', 'Amount', 'Currency', 'Renewal Date', 'Cycle', 'Status'];
+    const rows = subscriptions.map(s => [s.name, s.category, s.amount, s.currency, s.renewalDate, s.billingCycle, s.status]);
     const csvContent = "data:text/csv;charset=utf-8,\uFEFF" + [headers, ...rows].map(e => e.join(",")).join("\n");
-    const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", "panda_subscriptions_export.csv");
+    link.setAttribute("href", encodeURI(csvContent));
+    link.setAttribute("download", "panda_export.csv");
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
