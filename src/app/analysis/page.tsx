@@ -9,6 +9,7 @@ import { useSubscriptions } from "@/context/subscriptions-context"
 import { CATEGORY_METADATA } from "@/app/lib/subscription-store"
 import { TrendingUp, DollarSign, Wallet, ArrowUpRight, ArrowDownRight, Activity } from "lucide-react"
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip, Cell } from "recharts"
+import { cn } from "@/lib/utils"
 
 export default function AnalysisPage() {
   const { subscriptions, convertAmount } = useSubscriptions()
