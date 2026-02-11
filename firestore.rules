@@ -1,0 +1,162 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    /**
+     * PANDASUB IL SECURITY RULES ANALYSIS
+     * 
+     * Core Philosophy:
+     * This ruleset implements a strict user-ownership model where users have full control over their own 
+     * data tree. To support "Family Sharing", read access is extended to users belonging to the same 
+     * family group, identified by a denormalized 'familyNameId'.
+     * 
+     * Data Structure:
+     * The hierarchy is primarily user-centric: /users/{userId}/...
+     * Sub-collections include 'subscriptions', 'usageData', 'notifications', 'bankAccounts', and 'transactions'.
+     * A global 'familyNames' collection manages family groups.
+     * 
+     * Key Security Decisions:
+     * 1. Ownership is the primary access pattern. Most data is strictly private to the auth UID.
+     * 2. Family sharing allows members to 'get' and 'list' subscriptions and usage data of other 
+     *    family members, but NOT bank accounts or notifications.
+     * 3. Relational integrity is enforced on creation: the 'userId' or 'id' field in the document 
+     *    must match the path variable to ensure data is correctly scoped.
+     * 4. Destructive operations (update/delete) are strictly limited to the document owner and 
+     *    require the document to exist.
+     * 
+     * Denormalization for Authorization:
+     * To facilitate family sharing, the 'familyNameId' is stored directly on the 'User' document. 
+     * Rules use a helper function to compare the requester's 'familyNameId' with the target user's 
+     * 'familyNameId' to grant shared read access.
+     */
+
+    // --- Helper Functions ---
+
+    /** Checks if the requester is authenticated. */
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    /** Checks if the requester's UID matches the provided userId. */
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    /** Checks if the document exists and the requester is the owner. */
+    function isExistingOwner(userId) {
+      return resource != null && isOwner(userId);
+    }
+
+    /** Fetches the familyId for a specific user. */
+    function getUserFamilyId(uid) {
+      return get(/databases/$(database)/documents/users/$(uid)).data.familyNameId;
+    }
+
+    /** 
+     * Checks if the requester and a target user share the same family. 
+     * Requires reading both user documents. 
+     */
+    function areInSameFamily(targetUserId) {
+      return isSignedIn() && getUserFamilyId(request.auth.uid) != null && getUserFamilyId(request.auth.uid) == getUserFamilyId(targetUserId);
+    }
+
+    // --- Collection Rules ---
+
+    /**
+     * @description Rules for the User profile. Allows self-creation and family-based discovery.
+     * @path /users/{userId}
+     * @allow (create) if auth.uid matches userId.
+     * @deny (update) if attempting to change the user's primary ID.
+     * @principle Ownership for writes; Shared access within families for reads.
+     */
+    match /users/{userId} {
+      allow get: if isOwner(userId) || areInSameFamily(userId);
+      allow list: if isOwner(userId) || areInSameFamily(userId);
+      allow create: if isOwner(userId) && request.resource.data.id == userId;
+      allow update: if isExistingOwner(userId) && request.resource.data.id == resource.data.id;
+      allow delete: if isExistingOwner(userId);
+
+      /**
+       * @description User subscriptions. Viewable by family, manageable only by owner.
+       * @path /users/{userId}/subscriptions/{subscriptionId}
+       * @allow (list) if requester is in the same family as the target userId.
+       * @deny (create) if the internal userId field doesn't match the path.
+       * @principle Path-based ownership with shared family reads.
+       */
+      match /subscriptions/{subscriptionId} {
+        allow get, list: if isOwner(userId) || areInSameFamily(userId);
+        allow create: if isOwner(userId) && request.resource.data.userId == userId;
+        allow update: if isExistingOwner(userId) && request.resource.data.userId == resource.data.userId;
+        allow delete: if isExistingOwner(userId);
+
+        /**
+         * @description Usage data for "Price per Use" metrics. Shared read within family.
+         * @path /users/{userId}/subscriptions/{subscriptionId}/usageData/{usageDataId}
+         * @allow (get) if requester is the owner or family member.
+         * @principle Relational integrity via nested path hierarchy.
+         */
+        match /usageData/{usageDataId} {
+          allow get, list: if isOwner(userId) || areInSameFamily(userId);
+          allow create: if isOwner(userId);
+          allow update: if isExistingOwner(userId);
+          allow delete: if isExistingOwner(userId);
+        }
+      }
+
+      /**
+       * @description Private notifications for the user. Not shared with family.
+       * @path /users/{userId}/notifications/{notificationId}
+       * @allow (get) only if the user is the direct owner.
+       * @principle Strict privacy for personal notifications.
+       */
+      match /notifications/{notificationId} {
+        allow get, list: if isOwner(userId);
+        allow create: if isOwner(userId) && request.resource.data.userId == userId;
+        allow update: if isExistingOwner(userId) && request.resource.data.userId == resource.data.userId;
+        allow delete: if isExistingOwner(userId);
+      }
+
+      /**
+       * @description Linked bank accounts for automation. High sensitivity, no family sharing.
+       * @path /users/{userId}/bankAccounts/{bankAccountId}
+       * @allow (list) if requester is the account owner.
+       * @deny (get) even for family members.
+       * @principle Financial data isolation.
+       */
+      match /bankAccounts/{bankAccountId} {
+        allow get, list: if isOwner(userId);
+        allow create: if isOwner(userId) && request.resource.data.userId == userId;
+        allow update: if isExistingOwner(userId) && request.resource.data.userId == resource.data.userId;
+        allow delete: if isExistingOwner(userId);
+
+        /**
+         * @description Automated bank transactions.
+         * @path /users/{userId}/bankAccounts/{bankAccountId}/transactions/{transactionId}
+         * @allow (create) if the user owns the parent bank account path.
+         * @principle Strict owner-only access to transaction history.
+         */
+        match /transactions/{transactionId} {
+          allow get, list: if isOwner(userId);
+          allow create: if isOwner(userId);
+          allow update: if isExistingOwner(userId);
+          allow delete: if isExistingOwner(userId);
+        }
+      }
+    }
+
+    /**
+     * @description Family group management.
+     * @path /familyNames/{familyNameId}
+     * @allow (get) if signed in (to resolve family names).
+     * @deny (list) to prevent crawling family groups.
+     * @principle Restricted global lookup.
+     */
+    match /familyNames/{familyNameId} {
+      allow get: if isSignedIn();
+      allow list: if false;
+      allow create: if isSignedIn();
+      allow update: if isSignedIn(); // In prototype, allow members to update family name
+      allow delete: if false; // Prevent accidental deletion of family groups
+    }
+  }
+}

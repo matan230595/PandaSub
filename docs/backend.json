@@ -1,0 +1,422 @@
+{
+  "entities": {
+    "User": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "User",
+      "type": "object",
+      "description": "Represents a user of the PandaSub IL application.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the user.",
+          "format": "uuid"
+        },
+        "email": {
+          "type": "string",
+          "description": "Email address of the user.",
+          "format": "email"
+        },
+        "familyNameId": {
+          "type": "string",
+          "description": "Reference to FamilyName. (Relationship: FamilyName 1:N User)"
+        }
+      },
+      "required": [
+        "id",
+        "email"
+      ]
+    },
+    "Subscription": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Subscription",
+      "type": "object",
+      "description": "Represents a user's subscription to a service.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the subscription.",
+          "format": "uuid"
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to User. (Relationship: User 1:N Subscription)"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the subscription service (e.g., Netflix, Spotify)."
+        },
+        "category": {
+          "type": "string",
+          "description": "Category of the subscription (e.g., Streaming, Fitness)."
+        },
+        "renewalDate": {
+          "type": "string",
+          "description": "Date of the next renewal.",
+          "format": "date-time"
+        },
+        "expirationDate": {
+          "type": "string",
+          "description": "Date of the subscription's expiration.",
+          "format": "date-time"
+        },
+        "trialEndDate": {
+          "type": "string",
+          "description": "Date of the end of the trial period, if applicable.",
+          "format": "date-time"
+        },
+        "automaticCancellationDate": {
+          "type": "string",
+          "description": "Date when the subscription should be automatically cancelled.",
+          "format": "date-time"
+        },
+        "price": {
+          "type": "number",
+          "description": "Price of the subscription."
+        },
+        "currency": {
+          "type": "string",
+          "description": "Currency of the subscription price."
+        },
+        "usageDataIds": {
+          "type": "array",
+          "description": "References to UsageData. (Relationship: Subscription 1:N UsageData)",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "name",
+        "category",
+        "renewalDate",
+        "price",
+        "currency"
+      ]
+    },
+    "UsageData": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "UsageData",
+      "type": "object",
+      "description": "Represents usage data for a subscription, used for 'Price per Use' calculations.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the usage data entry.",
+          "format": "uuid"
+        },
+        "subscriptionId": {
+          "type": "string",
+          "description": "Reference to Subscription. (Relationship: Subscription 1:N UsageData)"
+        },
+        "date": {
+          "type": "string",
+          "description": "Date of the usage.",
+          "format": "date-time"
+        },
+        "usageValue": {
+          "type": "number",
+          "description": "The amount of usage (e.g., hours watched, sessions attended)."
+        },
+        "usageUnit": {
+          "type": "string",
+          "description": "The unit of measurement for the usage (e.g., hours, sessions)."
+        }
+      },
+      "required": [
+        "id",
+        "subscriptionId",
+        "date",
+        "usageValue",
+        "usageUnit"
+      ]
+    },
+    "Notification": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Notification",
+      "type": "object",
+      "description": "Represents a push notification sent to the user.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the notification.",
+          "format": "uuid"
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to User. (Relationship: User 1:N Notification)"
+        },
+        "subscriptionId": {
+          "type": "string",
+          "description": "Reference to Subscription. (Relationship: Subscription 1:N Notification)"
+        },
+        "type": {
+          "type": "string",
+          "description": "Type of notification (e.g., expiring, cancellation, new_subscription, price_increase, unused)."
+        },
+        "message": {
+          "type": "string",
+          "description": "The notification message."
+        },
+        "sentAt": {
+          "type": "string",
+          "description": "Timestamp when the notification was sent.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "type",
+        "message",
+        "sentAt"
+      ]
+    },
+    "FamilyName": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "FamilyName",
+      "type": "object",
+      "description": "Represents a group of users that are considered family.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the family.",
+          "format": "uuid"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the family."
+        }
+      },
+      "required": [
+        "id",
+        "name"
+      ]
+    },
+    "BankAccount": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "BankAccount",
+      "type": "object",
+      "description": "Represents a bank account linked to the application for automated billing analysis.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the bank account.",
+          "format": "uuid"
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to User. (Relationship: User 1:N BankAccount)"
+        },
+        "bankName": {
+          "type": "string",
+          "description": "Name of the bank."
+        },
+        "accountNumber": {
+          "type": "string",
+          "description": "Account number."
+        },
+        "lastSync": {
+          "type": "string",
+          "description": "Timestamp of the last successful synchronization with the bank.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "bankName",
+        "accountNumber"
+      ]
+    },
+    "Transaction": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Transaction",
+      "type": "object",
+      "description": "Represents a bank transaction automatically pulled from the bank account.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the transaction.",
+          "format": "uuid"
+        },
+        "bankAccountId": {
+          "type": "string",
+          "description": "Reference to BankAccount. (Relationship: BankAccount 1:N Transaction)"
+        },
+        "date": {
+          "type": "string",
+          "description": "Date of the transaction.",
+          "format": "date-time"
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the transaction."
+        },
+        "amount": {
+          "type": "number",
+          "description": "Amount of the transaction."
+        }
+      },
+      "required": [
+        "id",
+        "bankAccountId",
+        "date",
+        "description",
+        "amount"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/users/{userId}",
+        "definition": {
+          "entityName": "User",
+          "schema": {
+            "$ref": "#/backend/entities/User"
+          },
+          "description": "Stores user profiles. Includes denormalized 'familyNameId' for authorization independence.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier of the user."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/subscriptions/{subscriptionId}",
+        "definition": {
+          "entityName": "Subscription",
+          "schema": {
+            "$ref": "#/backend/entities/Subscription"
+          },
+          "description": "Stores subscription details for each user.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier of the user."
+            },
+            {
+              "name": "subscriptionId",
+              "description": "The unique identifier of the subscription."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/subscriptions/{subscriptionId}/usageData/{usageDataId}",
+        "definition": {
+          "entityName": "UsageData",
+          "schema": {
+            "$ref": "#/backend/entities/UsageData"
+          },
+          "description": "Stores usage data for each subscription.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier of the user."
+            },
+            {
+              "name": "subscriptionId",
+              "description": "The unique identifier of the subscription."
+            },
+            {
+              "name": "usageDataId",
+              "description": "The unique identifier of the usage data entry."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/notifications/{notificationId}",
+        "definition": {
+          "entityName": "Notification",
+          "schema": {
+            "$ref": "#/backend/entities/Notification"
+          },
+          "description": "Stores push notifications for each user.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier of the user."
+            },
+            {
+              "name": "notificationId",
+              "description": "The unique identifier of the notification."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/familyNames/{familyNameId}",
+        "definition": {
+          "entityName": "FamilyName",
+          "schema": {
+            "$ref": "#/backend/entities/FamilyName"
+          },
+          "description": "Stores family names. While not directly used for authorization within the family doc, the familyId is denormalized into the user profile to avoid `get()` calls.",
+          "params": [
+            {
+              "name": "familyNameId",
+              "description": "The unique identifier of the family."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/bankAccounts/{bankAccountId}",
+        "definition": {
+          "entityName": "BankAccount",
+          "schema": {
+            "$ref": "#/backend/entities/BankAccount"
+          },
+          "description": "Stores bank account information for each user.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier of the user."
+            },
+            {
+              "name": "bankAccountId",
+              "description": "The unique identifier of the bank account."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/bankAccounts/{bankAccountId}/transactions/{transactionId}",
+        "definition": {
+          "entityName": "Transaction",
+          "schema": {
+            "$ref": "#/backend/entities/Transaction"
+          },
+          "description": "Stores transaction data for each bank account.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier of the user."
+            },
+            {
+              "name": "bankAccountId",
+              "description": "The unique identifier of the bank account."
+            },
+            {
+              "name": "transactionId",
+              "description": "The unique identifier of the transaction."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "The Firestore data structure is designed to support the PandaSub IL application's features, including subscription management, usage tracking, family sharing, bank integration, and push notifications. The structure emphasizes Authorization Independence, DBAC (Database-Based Access Control), and facilitates secure `list` operations (QAPs - Rules are not Filters). It leverages path-based ownership and denormalization to achieve these goals.\n\n1.  **Authorization Independence:**\n    *   The structure avoids hierarchical authorization dependencies (`get()` calls in security rules) by denormalizing authorization data. For example, the `FamilyName` ID is denormalized into the `User` document, enabling rules to directly verify family membership without querying the `FamilyName` document.\n\n2.  **Structural Segregation:**\n    *   The structure follows the principle of Structural Segregation by storing user-specific data like subscriptions, usage data, bank accounts, and notifications under the `/users/{userId}` path. This ensures that each collection has a homogeneous security posture, simplifying security rules.\n\n3.  **Access Modeling:**\n    *   **Private Data:**  Path-based ownership is used for user-owned data (e.g., `/users/{userId}/subscriptions/{subscriptionId}`).\n    *   **Collaborative Data:** Family sharing is implemented using the `FamilyName` entity, with the `familyNameId` stored in the `User` document. While a full membership map is not required here given the lack of document-level sharing within a family, the family ID is still denormalized.\n    *   **Global Roles (DBAC):**  The application does not require global roles according to the user request.\n\n4.  **Data Clarity and Predictability:**\n    *   The schema for each entity includes explicit data types and descriptions to ensure data clarity. Standardized naming conventions (e.g., `userId`, `subscriptionId`) are used throughout the structure.\n\n**Support for Features:**\n\n*   **Subscription Management:** The `subscriptions` collection stores subscription details, facilitating easy management and retrieval.\n*   **Advanced Expense Analysis:** The `usageData` subcollection under each subscription enables detailed tracking of subscription usage for \"Price per Use\" calculations and expense analysis.\n*   **Real Push Notifications:** The `notifications` collection stores notification data for Firebase Cloud Messaging (FCM) integration.\n*   **Family Sharing:** The `familyNames` collection and the `familyNameId` field in the `User` document enable family sharing capabilities, allowing users to view subscriptions of other family members.\n*   **Bank Automation:** The `bankAccounts` and `transactions` collections support the bank automation feature, storing bank account information and transaction data."
+  }
+}
