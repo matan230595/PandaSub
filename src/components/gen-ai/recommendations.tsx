@@ -34,18 +34,18 @@ export function AIRecommendations({ compact = false }: { compact?: boolean }) {
   return (
     <Card className={cn(
       "overflow-hidden border-none shadow-lg rounded-3xl bg-white dark:bg-zinc-900 h-full flex flex-col",
-      compact ? "min-h-[160px]" : "min-h-[300px]"
+      compact ? "min-h-[160px]" : "min-h-[280px]"
     )} dir="rtl">
-      {/* Header with gradient and RTL alignment */}
-      <CardHeader className="bg-gradient-to-br from-primary to-blue-700 text-white border-b-0 p-6 md:p-8">
+      {/* Header with gradient and RTL alignment - Matches Quick Action */}
+      <CardHeader className="bg-gradient-to-br from-primary to-blue-700 text-white border-b-0 p-6">
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-4">
-            <div className="bg-white/20 p-3 rounded-2xl shadow-sm border border-white/10">
-              <Sparkles className="text-white h-6 w-6" />
+            <div className="bg-white/20 p-2.5 rounded-2xl shadow-sm border border-white/10">
+              <Sparkles className="text-white h-5 w-5" />
             </div>
             <div className="text-right">
-              <CardTitle className="font-black text-xl md:text-2xl">תובנות Panda AI</CardTitle>
-              <CardDescription className="text-sm font-medium mt-1 text-blue-50/80">ניתוח חכם של הרגלי הצריכה שלך</CardDescription>
+              <CardTitle className="font-black text-xl">תובנות Panda AI</CardTitle>
+              <CardDescription className="text-xs font-medium mt-0.5 text-blue-50/80">ניתוח חכם של הרגלי הצריכה</CardDescription>
             </div>
           </div>
           <Button 
@@ -62,57 +62,56 @@ export function AIRecommendations({ compact = false }: { compact?: boolean }) {
       
       <CardContent className="p-0 flex-1 flex flex-col justify-center overflow-hidden bg-muted/5">
         {!results && !loading ? (
-          <div className="text-center animate-fade-in p-8 md:p-12 space-y-8">
-            <div className="relative mx-auto h-24 w-24">
+          <div className="text-center animate-fade-in p-8 space-y-6">
+            <div className="relative mx-auto h-16 w-16">
               <div className="absolute inset-0 bg-primary/10 rounded-full animate-pulse" />
-              <div className="relative h-24 w-24 rounded-full bg-primary/10 flex items-center justify-center text-primary mx-auto border-2 border-primary/20">
-                <Sparkles className="h-12 w-12" />
+              <div className="relative h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center text-primary mx-auto border-2 border-primary/20">
+                <Sparkles className="h-8 w-8" />
               </div>
             </div>
-            <div className="space-y-2">
-              <h4 className="font-black text-xl md:text-2xl">מוכן לחיסכון חכם?</h4>
-              <p className="text-muted-foreground mx-auto font-medium leading-relaxed max-w-sm">
-                ה-AI שלנו יסרוק את המינויים שלך וימצא עבורך כפילויות, חלופות זולות יותר והזדמנויות לחיסכון מיידי.
+            <div className="space-y-1">
+              <h4 className="font-black text-lg">מוכן לחיסכון חכם?</h4>
+              <p className="text-muted-foreground text-xs mx-auto font-medium leading-relaxed max-w-[240px]">
+                ה-AI שלנו יסרוק את המינויים שלך וימצא עבורך הזדמנויות לחיסכון מיידי.
               </p>
             </div>
             <Button 
               onClick={getRecommendations} 
-              className="bg-primary hover:bg-primary/90 rounded-full shadow-xl shadow-primary/20 font-black transition-all hover:scale-105 active:scale-95 px-12 h-14 text-lg"
+              className="bg-primary hover:bg-primary/90 rounded-full shadow-xl shadow-primary/20 font-black px-8 h-12 text-sm"
             >
               צור המלצות עכשיו
             </Button>
           </div>
         ) : loading ? (
-          <div className="p-8 md:p-12 space-y-6">
-            <div className="space-y-3">
-              <Skeleton className="h-4 w-3/4 mr-0 ml-auto rounded-full" />
-              <Skeleton className="h-4 w-full mr-0 ml-auto rounded-full" />
-              <Skeleton className="h-4 w-5/6 mr-0 ml-auto rounded-full" />
-              <Skeleton className="h-4 w-2/3 mr-0 ml-auto rounded-full" />
+          <div className="p-8 space-y-4">
+            <div className="space-y-2">
+              <Skeleton className="h-3 w-3/4 mr-0 ml-auto rounded-full" />
+              <Skeleton className="h-3 w-full mr-0 ml-auto rounded-full" />
+              <Skeleton className="h-3 w-5/6 mr-0 ml-auto rounded-full" />
             </div>
-            <div className="flex justify-center pt-4">
-              <div className="flex items-center gap-3 text-primary font-bold animate-pulse">
-                <RefreshCcw className="h-5 w-5 animate-spin" />
-                מנתח את הנתונים שלך...
+            <div className="flex justify-center pt-2">
+              <div className="flex items-center gap-2 text-primary text-xs font-bold animate-pulse">
+                <RefreshCcw className="h-4 w-4 animate-spin" />
+                מנתח נתונים...
               </div>
             </div>
           </div>
         ) : (
-          <div className="animate-fade-in flex-1 flex flex-col h-full max-h-[500px]">
-            <div className="p-6 md:p-8 overflow-y-auto custom-scrollbar flex-1">
-              <div className="text-right bg-white dark:bg-zinc-800 rounded-3xl border border-primary/10 shadow-inner p-6 md:p-8">
-                <div className="whitespace-pre-wrap leading-relaxed text-foreground font-medium selection:bg-primary/20 text-base md:text-lg prose prose-zinc dark:prose-invert max-w-none">
+          <div className="animate-fade-in flex-1 flex flex-col h-full max-h-[400px]">
+            <div className="p-6 overflow-y-auto custom-scrollbar flex-1">
+              <div className="text-right bg-white dark:bg-zinc-800 rounded-2xl border border-primary/10 shadow-inner p-6">
+                <div className="whitespace-pre-wrap leading-relaxed text-foreground font-medium text-sm prose prose-zinc dark:prose-invert max-w-none">
                   {results}
                 </div>
               </div>
             </div>
-            <div className="p-6 md:p-8 bg-white/50 border-t">
+            <div className="p-4 bg-white/50 border-t">
               <Button 
                 size="lg" 
                 onClick={() => setResults(null)} 
-                className="w-full gap-3 rounded-full font-black shadow-lg bg-primary text-white hover:bg-primary/90 h-14 text-lg"
+                className="w-full gap-2 rounded-full font-black shadow-lg bg-primary text-white hover:bg-primary/90 h-12 text-sm"
               >
-                <CheckCircle2 className="h-6 w-6" /> הבנתי, תודה!
+                <CheckCircle2 className="h-5 w-5" /> הבנתי, תודה!
               </Button>
             </div>
           </div>

@@ -1,3 +1,4 @@
+
 "use client"
 
 import * as React from "react"
@@ -8,7 +9,7 @@ import { VoiceCreator } from "@/components/gen-ai/voice-creator"
 import { AIRecommendations } from "@/components/gen-ai/recommendations"
 import { SubscriptionsAtRisk } from "@/components/dashboard/risk-widget"
 import { Button } from "@/components/ui/button"
-import { Plus, Download, TrendingUp, Calendar, Lightbulb, Hourglass, FileText, ShieldCheck, Zap, ArrowDown } from "lucide-react"
+import { Plus, Download, TrendingUp, Calendar, Lightbulb, Hourglass, FileText, ShieldCheck, Zap } from "lucide-react"
 import { Toaster } from "@/components/ui/toaster"
 import { AddSubscriptionModal } from "@/components/subscription/add-subscription-modal"
 import { useSubscriptions } from "@/context/subscriptions-context"
@@ -62,25 +63,25 @@ export default function Home() {
       <main className="flex-1 container mx-auto p-4 md:p-8 space-y-8 animate-fade-in pb-24 max-w-7xl">
         
         {/* Header Section */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-2">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="text-right">
             <h1 className="text-2xl md:text-3xl font-black tracking-tight text-foreground">שלום, {settings.userName.split(' ')[0]}! 👋</h1>
             <p className="text-muted-foreground mt-1 text-sm md:text-base font-medium">יש לך {subscriptions.length} מינויים רשומים במערכת.</p>
           </div>
-          <div className="flex items-center gap-2 md:gap-3 justify-end flex-wrap">
-            <Button onClick={() => setIsAddModalOpen(true)} className="rounded-full google-btn gap-2 shadow-lg h-10 px-6 text-sm font-black">
-              <Plus className="h-4 w-4" /> הוסף מינוי
+          <div className="flex items-center gap-3 justify-end">
+            <Button onClick={() => setIsAddModalOpen(true)} className="rounded-full google-btn gap-2 shadow-lg h-11 px-6 text-sm font-black">
+              <Plus className="h-5 w-5" /> הוסף מינוי
             </Button>
-            <Button variant="outline" onClick={handleGenerateDraft} className="rounded-full gap-2 border-primary/20 hover:bg-primary/5 text-primary h-10 px-5 bg-white text-sm font-bold shadow-sm">
+            <Button variant="outline" onClick={handleGenerateDraft} className="rounded-full gap-2 border-primary/20 hover:bg-primary/5 text-primary h-11 px-5 bg-white text-sm font-bold shadow-sm">
               <FileText className="h-4 w-4" /> טיוטה
             </Button>
-            <Button variant="ghost" onClick={exportData} className="rounded-full gap-2 text-muted-foreground h-10 px-4 text-sm font-bold hidden sm:flex">
+            <Button variant="ghost" onClick={exportData} className="rounded-full gap-2 text-muted-foreground h-11 px-4 text-sm font-bold hidden sm:flex">
               <Download className="h-4 w-4" /> ייצוא
             </Button>
           </div>
         </div>
 
-        {/* Stats Grid - MOVED UP AS REQUESTED */}
+        {/* Stats Grid - REDESIGNED */}
         <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
           <StatCard 
             title='סה"כ חודשי' 
@@ -115,43 +116,43 @@ export default function Home() {
           />
         </div>
 
-        {/* Action Row - AI Insights and Quick Actions */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch">
-          <div className="lg:col-span-2 min-w-0">
+        {/* AI Insights & Quick Actions - REDESIGNED ORDER & RATIO */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+          <div className="lg:col-span-2 min-w-0 h-full">
             <AIRecommendations />
           </div>
           
           <div className="lg:col-span-1 min-w-0">
-            <Card className="border-none shadow-xl bg-gradient-to-br from-primary to-blue-700 text-white rounded-[2rem] overflow-hidden h-full flex flex-col justify-center relative group">
-              <CardContent className="p-8 flex flex-col justify-between h-full relative z-10 w-full text-right">
-                <div className="space-y-4">
+            <Card className="border-none shadow-xl bg-gradient-to-br from-primary to-blue-700 text-white rounded-[2rem] overflow-hidden relative group h-auto">
+              <CardContent className="p-8 flex flex-col gap-6 text-right">
+                <div className="space-y-2">
                   <div className="inline-flex items-center gap-2 bg-white/20 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest">
-                    Panda AI Automation
+                    AI Automation
                   </div>
                   <h3 className="text-2xl font-black leading-tight">פעולה מהירה 🐼</h3>
                   <p className="text-sm opacity-90 leading-relaxed font-medium">
-                    סרוק חשבונית או השתמש בהוספה קולית לעדכון מיידי של המערכת.
+                    עדכן את המערכת במהירות בעזרת כלי ה-AI שלנו.
                   </p>
                 </div>
                 
-                <div className="flex flex-col gap-3 pt-8">
+                <div className="flex flex-col gap-3">
                   <Button 
                     variant="secondary" 
                     onClick={() => setIsAddModalOpen(true)} 
-                    className="rounded-full font-black px-6 h-12 shadow-lg bg-white text-primary hover:bg-zinc-100 transition-all border-none text-sm"
+                    className="rounded-full font-black h-12 shadow-lg bg-white text-primary hover:bg-zinc-100 transition-all border-none text-sm"
                   >
                     <ShieldCheck className="ml-2 h-5 w-5" /> סריקת AI
                   </Button>
                   <Button 
                     variant="outline"
-                    className="rounded-full border-2 border-white text-white hover:bg-white/10 font-black px-6 h-12 transition-all text-sm bg-transparent"
+                    className="rounded-full border-2 border-white text-white hover:bg-white/10 font-black h-12 transition-all text-sm bg-transparent"
                   >
                     <Zap className="ml-2 h-5 w-5" /> הוספה קולית
                   </Button>
                 </div>
                 
-                <div className="absolute -left-6 -bottom-6 opacity-10 pointer-events-none hidden sm:block">
-                  <ShieldCheck className="h-40 w-40 text-white stroke-[1]" />
+                <div className="absolute -left-6 -bottom-6 opacity-10 pointer-events-none">
+                  <ShieldCheck className="h-32 w-32 text-white stroke-[1]" />
                 </div>
               </CardContent>
             </Card>
@@ -191,32 +192,34 @@ export default function Home() {
 }
 
 function StatCard({ title, value, symbol, icon, trend, trendDir, trendDesc, color }: any) {
-  const fontSize = value.length > 8 ? 'text-2xl' : value.length > 5 ? 'text-3xl' : 'text-4xl md:text-5xl';
+  const fontSize = value.length > 8 ? 'text-2xl' : value.length > 5 ? 'text-3xl' : 'text-4xl';
 
   return (
     <Card className="shadow-sm border-none rounded-[2rem] overflow-hidden group transition-all hover:shadow-xl dark:bg-zinc-900 bg-white h-full card-shadow">
-      <CardContent className="p-6 md:p-8 text-right flex flex-col justify-between h-full relative">
-        <div className="flex justify-between items-start mb-6">
-          <div className={`p-3 rounded-2xl ${color} group-hover:scale-110 transition-transform duration-300 shadow-sm shrink-0`}>
+      <CardContent className="p-6 text-right flex flex-col justify-between h-full relative">
+        <div className="flex justify-between items-start mb-4">
+          <div className="text-right">
+            <span className="text-[11px] font-black text-muted-foreground uppercase tracking-widest">{title}</span>
+          </div>
+          <div className={`p-3 rounded-2xl ${color} group-hover:rotate-6 transition-transform duration-300 shadow-sm shrink-0`}>
             {icon}
           </div>
-          <span className="text-[11px] font-black text-muted-foreground uppercase tracking-widest mt-1">{title}</span>
         </div>
         
-        <div className="flex flex-col items-end gap-1 mb-4">
-          <div className="flex items-baseline justify-start gap-2 tabular-nums flex-wrap overflow-hidden" dir="rtl">
+        <div className="flex flex-col items-start gap-1 mb-2">
+          <div className="flex items-baseline justify-start gap-1.5 tabular-nums overflow-hidden w-full">
             <div className={cn("font-black text-foreground leading-none", fontSize)}>
               {value}
             </div>
-            {symbol && <div className="text-2xl font-black text-primary shrink-0 mb-1">{symbol}</div>}
+            {symbol && <div className="text-xl font-black text-primary mb-0.5">{symbol}</div>}
           </div>
         </div>
 
-        <div className="flex items-center gap-2 justify-end mt-2">
+        <div className="flex items-center gap-2 justify-start mt-2">
           {trend && (
             <span className={cn(
               "text-[10px] font-black px-2 py-0.5 rounded-full flex items-center gap-1",
-              trendDir === 'down' ? "bg-green-50 text-green-600 border border-green-100" : "bg-red-50 text-red-600 border border-red-100"
+              trendDir === 'down' ? "bg-green-50 text-green-600" : "bg-red-50 text-red-600"
             )}>
               {trendDir === 'down' ? '↓' : '↑'} {trend}
             </span>
