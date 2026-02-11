@@ -33,15 +33,15 @@ export function AIRecommendations({ compact = false }: { compact?: boolean }) {
   return (
     <Card className={cn(
       "overflow-hidden border-none shadow-lg rounded-3xl bg-white dark:bg-zinc-900 h-full flex flex-col",
-      compact ? "h-[180px]" : ""
+      compact ? "h-[160px]" : ""
     )}>
       {/* Updated Header with matching gradient and RTL alignment */}
       <CardHeader className={cn(
         "bg-gradient-to-br from-primary to-blue-700 text-white border-b-0",
         compact ? "p-4 py-2.5" : "p-8"
       )}>
-        <div className="flex items-center justify-between gap-4 flex-row-reverse">
-          <div className="flex items-center gap-3 flex-row-reverse">
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
             <div className={cn(
               "bg-white/20 rounded-xl shadow-sm border border-white/10",
               compact ? "p-1.5" : "p-3"

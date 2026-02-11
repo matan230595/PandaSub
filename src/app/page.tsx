@@ -82,27 +82,27 @@ export default function Home() {
 
         {/* Action Row - Side by side, equal height, smaller */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
-          <Card className="border-none shadow-lg bg-gradient-to-br from-primary to-blue-700 text-white rounded-3xl overflow-hidden relative group h-[180px] flex items-center">
-            <CardContent className="p-6 md:p-8 flex flex-row-reverse justify-between items-center gap-6 relative z-10 w-full">
-              <div className="text-right space-y-2 flex-1">
-                <div className="inline-flex items-center gap-2 bg-white/20 px-2 py-0.5 rounded-full text-[8px] font-bold uppercase tracking-widest">
+          <Card className="border-none shadow-lg bg-gradient-to-br from-primary to-blue-700 text-white rounded-3xl overflow-hidden relative group h-[160px] flex items-center">
+            <CardContent className="p-6 md:p-8 flex flex-row justify-between items-center gap-6 relative z-10 w-full h-full">
+              <div className="text-right space-y-2 flex-1 h-full flex flex-col justify-center">
+                <div className="inline-flex items-center gap-2 bg-white/20 px-2 py-0.5 rounded-full text-[8px] font-bold uppercase tracking-widest self-start">
                   Panda AI Automation
                 </div>
                 <h3 className="text-lg md:text-xl font-black">פעולה מהירה 🐼</h3>
                 <p className="text-[10px] md:text-xs opacity-90 leading-relaxed max-w-sm font-medium">
-                  סרוק חשבונית או השתמש בהוספה קולית כדי לעדכן את המערכת באופן מיידי.
+                  סרוק חשבונית או השתמש בהוספה קולית לעדכון מיידי.
                 </p>
-                <div className="flex flex-wrap gap-2 pt-1 justify-start md:justify-end">
+                <div className="flex flex-wrap gap-2 pt-1">
                   <Button 
                     variant="secondary" 
                     onClick={() => setIsAddModalOpen(true)} 
-                    className="rounded-full font-black px-5 h-9 shadow-lg bg-white text-blue-700 hover:bg-zinc-100 transition-all border-none text-[10px]"
+                    className="rounded-full font-black px-5 h-8 shadow-lg bg-white text-blue-800 hover:bg-zinc-100 transition-all border-none text-[10px]"
                   >
                     <ShieldCheck className="ml-2 h-3.5 w-3.5" /> סריקת AI
                   </Button>
                   <Button 
                     variant="outline"
-                    className="rounded-full border-2 border-white text-white hover:bg-white/10 font-black px-5 h-9 transition-all text-[10px] bg-transparent"
+                    className="rounded-full border-2 border-white text-white hover:bg-white/10 font-black px-5 h-8 transition-all text-[10px] bg-transparent"
                   >
                     <Zap className="ml-2 h-3.5 w-3.5" /> הוספה קולית
                   </Button>
@@ -114,7 +114,7 @@ export default function Home() {
             </CardContent>
           </Card>
 
-          <div className="h-[180px] overflow-hidden">
+          <div className="h-[160px] overflow-hidden">
             <AIRecommendations compact />
           </div>
         </div>
@@ -193,19 +193,19 @@ function StatCard({ title, value, symbol, icon, trend, trendDesc, color }: any) 
       <CardContent className="p-4 text-right flex flex-col justify-between h-full">
         <div>
           <div className="flex items-center justify-between mb-2">
+            <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest truncate">{title}</span>
             <div className={`p-1.5 rounded-lg ${color} group-hover:scale-110 transition-transform duration-300 shadow-sm shrink-0`}>
               {icon}
             </div>
-            <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest truncate ml-2">{title}</span>
           </div>
-          <div className="flex items-baseline justify-end gap-1.5 tabular-nums flex-wrap overflow-hidden flex-row-reverse">
+          <div className="flex items-baseline justify-start gap-1.5 tabular-nums flex-wrap overflow-hidden">
+            {symbol && <div className="text-base font-black text-primary shrink-0">{symbol}</div>}
             <div className={cn("font-black text-foreground leading-none", fontSize)}>
               {value}
             </div>
-            {symbol && <div className="text-base font-black text-primary shrink-0">{symbol}</div>}
           </div>
         </div>
-        <div className="mt-2 flex items-center gap-2 justify-end overflow-hidden flex-row-reverse">
+        <div className="mt-2 flex items-center gap-2 justify-start overflow-hidden">
           {trend && <span className="text-[9px] font-black text-green-600 bg-green-50 px-1.5 py-0.5 rounded-full shrink-0 border border-green-100">{trend}</span>}
           <span className="text-[9px] font-bold text-muted-foreground opacity-70 truncate">{trendDesc}</span>
         </div>

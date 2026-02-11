@@ -1,4 +1,3 @@
-
 "use client"
 
 import * as React from "react"
@@ -81,9 +80,9 @@ export default function AnalysisPage() {
         <div className="grid gap-6 lg:grid-cols-2">
           <Card className="card-shadow border-none rounded-3xl bg-white dark:bg-zinc-900 overflow-hidden">
             <CardHeader className="bg-muted/30 border-b">
-              <div className="flex items-center gap-2 flex-row-reverse justify-start">
-                <Activity className="h-5 w-5 text-primary" />
+              <div className="flex items-center gap-2 justify-start">
                 <CardTitle className="text-lg font-bold">יחס עלות מול תועלת</CardTitle>
+                <Activity className="h-5 w-5 text-primary" />
               </div>
               <CardDescription>כמה עולה לך כל "כניסה" או שימוש במינוי?</CardDescription>
             </CardHeader>
@@ -131,8 +130,8 @@ export default function AnalysisPage() {
             <CardContent className="space-y-6">
               {sortedCategories.map(([cat, amount]) => (
                 <div key={cat} className="space-y-2">
-                  <div className="flex justify-between items-center flex-row-reverse">
-                    <div className="flex items-center gap-2 flex-row-reverse">
+                  <div className="flex justify-between items-center">
+                    <div className="flex items-center gap-2">
                       <span className="text-xl">{CATEGORY_METADATA[cat as any].icon}</span>
                       <span className="font-bold text-sm">{CATEGORY_METADATA[cat as any].label}</span>
                     </div>
@@ -167,26 +166,26 @@ function StatCard({ title, value, symbol, icon, trend, trendDesc, primary, green
     )}>
       <CardContent className="p-6 md:p-8 text-right flex flex-col justify-between h-full">
         <div>
-          <div className="flex items-center justify-between mb-4 flex-row-reverse">
+          <div className="flex items-center justify-between mb-4">
+            <span className={cn(
+              "text-[10px] font-bold uppercase tracking-wider",
+              primary ? "opacity-80" : "text-muted-foreground"
+            )}>{title}</span>
             <div className={cn(
               "p-2.5 rounded-2xl",
               primary ? "bg-white/20" : green ? "bg-green-100 text-green-600" : orange ? "bg-orange-100 text-orange-600" : "bg-muted"
             )}>
               {icon}
             </div>
-            <span className={cn(
-              "text-[10px] font-bold uppercase tracking-wider",
-              primary ? "opacity-80" : "text-muted-foreground"
-            )}>{title}</span>
           </div>
-          <div className="flex items-baseline justify-end gap-1.5 flex-row-reverse flex-wrap overflow-hidden">
-            <span className={cn("font-black tabular-nums truncate", fontSize, !primary && "text-foreground")}>
+          <div className="flex items-baseline justify-start gap-1.5 tabular-nums flex-wrap overflow-hidden">
+            {symbol && <span className={cn("text-xl font-bold shrink-0", !primary && "text-foreground")}>{symbol}</span>}
+            <span className={cn("font-black truncate", fontSize, !primary && "text-foreground")}>
               {value}
             </span>
-            {symbol && <span className={cn("text-xl font-bold shrink-0", !primary && "text-foreground")}>{symbol}</span>}
           </div>
         </div>
-        <div className="mt-4 flex items-center gap-2 justify-end">
+        <div className="mt-4 flex items-center gap-2 justify-start">
           {trend && (
             <span className={cn(
               "px-2 py-0.5 rounded-full text-[10px] font-bold flex items-center gap-1",
