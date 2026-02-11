@@ -67,8 +67,7 @@ function buildAuthObject(currentUser: User | null): FirebaseAuthObject | null {
 function buildRequestObject(context: SecurityRuleContext): SecurityRuleRequest {
   let authObject: FirebaseAuthObject | null = null;
   try {
-    // Check if apps are initialized before accessing auth
-    if (getApps().length > 0) {
+    if (typeof window !== 'undefined' && getApps().length > 0) {
       const app = getApp();
       const firebaseAuth = getAuth(app);
       if (firebaseAuth && firebaseAuth.currentUser) {
@@ -76,7 +75,7 @@ function buildRequestObject(context: SecurityRuleContext): SecurityRuleRequest {
       }
     }
   } catch (e) {
-    // Fail silently during initial load
+    // Fail silently
   }
 
   return {

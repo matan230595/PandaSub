@@ -2,13 +2,9 @@
 
 import { firebaseConfig } from '@/firebase/config';
 import { initializeApp, getApps, getApp, FirebaseApp } from 'firebase/app';
-import { getAuth, Auth } from 'firebase/auth';
-import { getFirestore, Firestore } from 'firebase/firestore';
+import { getAuth } from 'firebase/auth';
+import { getFirestore } from 'firebase/firestore';
 
-/**
- * Singleton initialization for Firebase services.
- * Safe for use in client components and ensures app is initialized only once.
- */
 export function initializeFirebase() {
   let app: FirebaseApp;
   

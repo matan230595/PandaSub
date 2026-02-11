@@ -41,11 +41,11 @@ export default function Home() {
   const handleGenerateDraft = () => {
     const activeSubs = subscriptions.filter(s => s.status === 'active' || s.status === 'trial');
     const total = activeSubs.reduce((sum, s) => sum + convertAmount(s.amount, s.currency), 0);
-    const subListText = activeSubs.map(s => `• ${s.name}: ${s.amount}${s.currency} (≈ ₪${convertAmount(s.amount, s.currency).toFixed(1)})`).join('\n');
-    const subject = encodeURIComponent("סיכום מינויים שבועי - PandaSub IL");
-    const body = encodeURIComponent(`שלום ${settings.userName},\n\nלהלן סיכום המינויים הפעילים שלך:\n\n${subListText}\n\nסה"כ חודשי (משוקלל): ₪${total.toLocaleString()}\n\nנשלח מ-PandaSub IL`);
+    const subListText = activeSubs.map(s => `• ${s.name}: ${s.amount}${s.currency}`).join('\n');
+    const subject = encodeURIComponent("סיכום מינויים PandaSub");
+    const body = encodeURIComponent(`שלום ${settings.userName},\n\nסה"כ חודשי: ₪${total.toLocaleString()}\n\n${subListText}`);
     window.location.href = `mailto:${settings.userEmail}?subject=${subject}&body=${body}`;
-    toast({ title: "טיוטת מייל נוצרה", description: "אפליקציית המייל נפתחה עם הנתונים המומרים שלך." })
+    toast({ title: "טיוטת מייל נוצרה" })
   }
 
   if (isUserLoading) return null;
@@ -86,7 +86,7 @@ export default function Home() {
           </div>
         </div>
 
-        {/* 1. Stats Grid (TOP - AS REQUESTED) */}
+        {/* 1. Stats Grid (TOP) */}
         <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
           <StatCard 
             title='סה"כ חודשי' 
@@ -120,34 +120,34 @@ export default function Home() {
           />
         </div>
 
-        {/* 2. AI Insights & Quick Actions (Side by Side 50/50) */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
-          <AIRecommendations />
+        {/* 2. AI Insights & Quick Actions (Side by Side 2/3 and 1/3) */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
+          <div className="lg:col-span-2">
+            <AIRecommendations />
+          </div>
           <div className="grid grid-cols-1 gap-6">
             <Card className="border-none shadow-xl bg-gradient-to-br from-primary to-blue-700 text-white rounded-[2rem] overflow-hidden flex flex-col justify-center h-full min-h-[160px]">
               <CardContent className="p-6 text-right space-y-4">
-                <div>
-                  <h3 className="text-xl font-black mb-1">פעולה מהירה 🐼</h3>
-                  <p className="text-xs opacity-90 font-medium">נהל את המינויים שלך בעזרת כלי ה-AI שלנו.</p>
+                <div className="flex items-center justify-between">
+                   <Zap className="h-6 w-6 text-white/50" />
+                   <h3 className="text-lg font-black">פעולה מהירה 🐼</h3>
                 </div>
-                
-                <div className="flex flex-col sm:flex-row gap-3">
+                <div className="flex flex-col gap-3">
                   <Button 
                     onClick={() => setIsAddModalOpen(true)} 
-                    className="flex-1 rounded-full font-black h-11 shadow-lg bg-white text-primary hover:bg-zinc-100 transition-all border-none text-xs px-6"
+                    className="w-full rounded-full font-black h-11 bg-white text-primary hover:bg-zinc-100 transition-all border-none text-xs"
                   >
                     <Zap className="ml-2 h-4 w-4" /> סריקת AI
                   </Button>
                   <Button 
                     variant="outline"
-                    className="flex-1 rounded-full border-2 border-white/50 text-white hover:bg-white/10 font-black h-11 transition-all text-xs bg-transparent px-6"
+                    className="w-full rounded-full border-2 border-white/50 text-white hover:bg-white/10 font-black h-11 transition-all text-xs bg-transparent"
                   >
                     <Plus className="ml-2 h-4 w-4" /> הוספה קולית
                   </Button>
                 </div>
               </CardContent>
             </Card>
-            <VoiceCreator />
           </div>
         </div>
 
@@ -166,17 +166,6 @@ export default function Home() {
           </div>
         </div>
       </main>
-
-      <footer className="border-t bg-white dark:bg-zinc-900 py-12 text-center mt-auto">
-        <div className="container mx-auto px-4">
-          <div className="flex items-center justify-center gap-2 font-bold text-primary mb-4">
-            <div className="bg-primary text-white h-10 w-10 rounded-2xl flex items-center justify-center text-xl shadow-lg">🐼</div>
-            <span className="text-2xl font-black tracking-tight">PandaSub IL</span>
-          </div>
-          <p className="text-sm text-muted-foreground font-medium opacity-70">© 2025 כל הזכויות שמורות. נבנה עבורך בביטחון מלא.</p>
-        </div>
-      </footer>
-      <AddSubscriptionModal open={isAddModalOpen} onOpenChange={setIsAddModalOpen} />
     </div>
   )
 }
@@ -197,11 +186,11 @@ function StatCard({ title, value, symbol, icon, trendDesc, color }: any) {
         </div>
         
         <div className="flex flex-col items-start gap-1 mb-2">
-          <div className="flex items-baseline justify-start gap-1 tabular-nums overflow-hidden w-full">
+          <div className="flex items-baseline justify-start gap-1 tabular-nums overflow-hidden w-full flex-row-reverse">
+            {symbol && <div className="text-xl font-black text-primary mb-0.5 ml-1">{symbol}</div>}
             <div className={cn("font-black text-foreground leading-none", fontSize)}>
               {value}
             </div>
-            {symbol && <div className="text-xl font-black text-primary mb-0.5 ml-1">{symbol}</div>}
           </div>
         </div>
 
