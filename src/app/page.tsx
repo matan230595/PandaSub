@@ -80,26 +80,26 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Quick Actions & AI Card Grid - Compact version */}
+        {/* Quick Actions & AI Card Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <Card className="lg:col-span-2 border-none card-shadow bg-gradient-to-br from-primary to-blue-700 text-white rounded-[2.5rem] overflow-hidden relative group">
-            <CardContent className="p-6 md:p-6 flex flex-col md:flex-row items-center justify-between gap-6">
-              <div className="text-right space-y-2 z-10 flex-1">
-                <h3 className="text-lg font-black">פעולה מהירה 🐼</h3>
-                <p className="text-sm opacity-90 leading-tight max-w-md">
-                  צריך להוסיף מינוי? אמור ל-Panda AI או סרוק את החשבונית לסנכרון מיידי.
+          <Card className="lg:col-span-2 border-none card-shadow bg-gradient-to-br from-primary to-blue-700 text-white rounded-[2.5rem] overflow-hidden relative group min-w-0">
+            <CardContent className="p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 h-full">
+              <div className="text-right space-y-3 z-10 flex-1 w-full">
+                <h3 className="text-xl font-black">פעולה מהירה 🐼</h3>
+                <p className="text-sm opacity-90 leading-relaxed max-w-md">
+                  צריך להוסיף מינוי? אמור ל-Panda AI או סרוק את החשבונית לסנכרון מיידי של כל הפרטים.
                 </p>
                 <div className="flex flex-wrap gap-3 pt-2 justify-end">
                   <Button 
                     variant="secondary" 
                     onClick={() => setIsAddModalOpen(true)} 
-                    className="rounded-full font-bold px-6 h-10 shadow-xl bg-white text-primary hover:bg-zinc-100 transition-all border-none"
+                    className="rounded-full font-bold px-6 h-11 shadow-xl bg-white text-primary hover:bg-zinc-100 transition-all border-none"
                   >
                     <ShieldCheck className="ml-2 h-4 w-4" /> סריקת AI
                   </Button>
                   <Button 
                     variant="default"
-                    className="rounded-full bg-blue-900/40 hover:bg-blue-900/60 border-none text-white font-bold px-6 h-10 shadow-lg transition-all"
+                    className="rounded-full bg-blue-900/40 hover:bg-blue-900/60 border-none text-white font-bold px-6 h-11 shadow-lg transition-all"
                   >
                     <Zap className="ml-2 h-4 w-4" /> הוספה קולית
                   </Button>
@@ -107,8 +107,8 @@ export default function Home() {
               </div>
               
               <div className="relative hidden md:flex items-center justify-center shrink-0">
-                <div className="bg-white/10 p-3 rounded-[1.5rem] backdrop-blur-sm border border-white/20 shadow-inner group-hover:scale-105 transition-transform duration-500">
-                  <ShieldCheck className="h-6 w-6 text-white" />
+                <div className="bg-white/10 p-4 rounded-[2rem] backdrop-blur-sm border border-white/20 shadow-inner group-hover:scale-105 transition-transform duration-500">
+                  <ShieldCheck className="h-8 w-8 text-white" />
                 </div>
               </div>
             </CardContent>
@@ -155,7 +155,7 @@ export default function Home() {
         </div>
 
         {/* Middle Section: Charts & List */}
-        <div className="grid gap-8 lg:grid-cols-3">
+        <div className="grid gap-8 lg:grid-cols-3 min-w-0">
           <div className="lg:col-span-2 space-y-6 min-w-0 overflow-hidden">
             <DashboardCharts />
             <div className="flex items-center justify-between pt-4">

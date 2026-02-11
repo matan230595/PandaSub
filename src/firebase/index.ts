@@ -11,13 +11,17 @@ import { getFirestore } from 'firebase/firestore'
  * Uses the firebaseConfig object directly to avoid initialization errors in Vercel.
  */
 export function initializeFirebase() {
-  if (!getApps().length) {
-    // Always initialize with config object to be safe in all environments
-    const firebaseApp = initializeApp(firebaseConfig);
-    return getSdks(firebaseApp);
+  try {
+    if (!getApps().length) {
+      // Always initialize with config object to be safe in all environments
+      const firebaseApp = initializeApp(firebaseConfig);
+      return getSdks(firebaseApp);
+    }
+    return getSdks(getApp());
+  } catch (error) {
+    console.error("Firebase initialization failed, using fallback sdk access:", error);
+    return getSdks(getApp());
   }
-
-  return getSdks(getApp());
 }
 
 export function getSdks(firebaseApp: FirebaseApp) {

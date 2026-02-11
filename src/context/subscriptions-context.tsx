@@ -1,3 +1,4 @@
+
 "use client"
 
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
@@ -143,7 +144,6 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
   const playNotificationSound = () => {
     if (!settings.soundEnabled) return;
     try {
-      // אתחול ה-AudioContext רק בזמן הצורך כדי למנוע חסימת דפדפן
       if (!audioContextRef.current) {
         audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
       }
@@ -191,7 +191,6 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
       const existingIds = new Set(prev.map(n => n.id));
       const added = newNotifications.filter(n => !existingIds.has(n.id));
       if (added.length > 0) {
-        // הפעלת סאונד רק אם היתה אינטראקציה כלשהי בעבר
         playNotificationSound();
       }
       return [...added, ...prev].slice(0, 20);
