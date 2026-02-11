@@ -159,9 +159,9 @@ export function SubscriptionList() {
                   <div className="grid grid-cols-2 gap-3 mb-4">
                     <div className="bg-muted/30 p-2.5 rounded-xl text-right border border-muted/50">
                       <div className="text-[9px] font-bold text-muted-foreground uppercase mb-0.5">סכום</div>
-                      <div className="text-lg font-black text-primary truncate tabular-nums leading-none flex items-baseline justify-end gap-1 flex-row-reverse">
-                        <span className="text-xs font-bold">{sub.currency}</span>
+                      <div className="text-lg font-black text-primary truncate tabular-nums leading-none flex items-baseline justify-start gap-1">
                         {sub.amount}
+                        <span className="text-xs font-bold">{sub.currency}</span>
                       </div>
                     </div>
                     <div className="bg-muted/30 p-2.5 rounded-xl text-right border border-muted/50">
@@ -192,7 +192,7 @@ export function SubscriptionList() {
                            <span className="text-xl">{CATEGORY_METADATA[sub.category].icon}</span>
                            <span className="font-black text-xs truncate max-w-[100px] text-right">{sub.name}</span>
                         </div>
-                        <div className="text-sm font-black text-primary text-right tabular-nums flex flex-row-reverse gap-1">
+                        <div className="text-sm font-black text-primary text-right tabular-nums flex gap-1 justify-start">
                           {sub.amount}
                           <span className="text-xs">{sub.currency}</span>
                         </div>

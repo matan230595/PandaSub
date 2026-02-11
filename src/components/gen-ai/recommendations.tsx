@@ -32,16 +32,16 @@ export function AIRecommendations() {
   }
 
   return (
-    <Card className="overflow-hidden border-none shadow-lg rounded-[2rem] bg-white dark:bg-zinc-900 h-full flex flex-col min-h-[280px]" dir="rtl">
-      <CardHeader className="bg-gradient-to-br from-primary to-blue-700 text-white border-b-0 p-6">
-        <div className="flex items-center justify-between gap-4">
-          <div className="flex items-center gap-4">
-            <div className="bg-white/20 p-2.5 rounded-2xl shadow-sm border border-white/10">
-              <Sparkles className="text-white h-5 w-5" />
+    <Card className="overflow-hidden border-none shadow-lg rounded-[2rem] bg-white dark:bg-zinc-900 h-full flex flex-col min-h-[220px]" dir="rtl">
+      <CardHeader className="bg-gradient-to-br from-primary to-blue-700 text-white border-b-0 p-5">
+        <div className="flex items-center justify-between gap-4 flex-row-reverse">
+          <div className="flex items-center gap-3">
+            <div className="bg-white/20 p-2 rounded-xl border border-white/10">
+              <Sparkles className="text-white h-4 w-4" />
             </div>
             <div className="text-right">
-              <CardTitle className="font-black text-xl">תובנות Panda AI</CardTitle>
-              <CardDescription className="text-xs font-medium mt-0.5 text-blue-50/80">ניתוח חכם של הרגלי הצריכה</CardDescription>
+              <CardTitle className="font-black text-lg">תובנות Panda AI</CardTitle>
+              <CardDescription className="text-[10px] font-medium text-blue-50/80">ניתוח חכם</CardDescription>
             </div>
           </div>
           <Button 
@@ -49,65 +49,52 @@ export function AIRecommendations() {
             size="sm" 
             onClick={getRecommendations} 
             disabled={loading}
-            className="text-white hover:text-white hover:bg-white/10 rounded-full h-10 w-10 p-0"
+            className="text-white hover:text-white hover:bg-white/10 rounded-full h-8 w-8 p-0"
           >
-            <RefreshCcw className={cn(loading ? "animate-spin" : "", "h-5 w-5")} />
+            <RefreshCcw className={cn(loading ? "animate-spin" : "", "h-4 w-4")} />
           </Button>
         </div>
       </CardHeader>
       
       <CardContent className="p-0 flex-1 flex flex-col justify-center overflow-hidden bg-muted/5">
         {!results && !loading ? (
-          <div className="text-center animate-fade-in p-8 space-y-6">
-            <div className="relative mx-auto h-16 w-16">
-              <div className="absolute inset-0 bg-primary/10 rounded-full animate-pulse" />
-              <div className="relative h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center text-primary mx-auto border-2 border-primary/20">
-                <Sparkles className="h-8 w-8" />
-              </div>
-            </div>
-            <div className="space-y-1">
-              <h4 className="font-black text-lg">מוכן לחיסכון חכם?</h4>
-              <p className="text-muted-foreground text-xs mx-auto font-medium leading-relaxed max-w-[240px]">
-                ה-AI שלנו יסרוק את המינויים שלך וימצא עבורך הזדמנויות לחיסכון מיידי.
-              </p>
-            </div>
+          <div className="text-center animate-fade-in p-6 space-y-4">
+            <h4 className="font-black text-base">מוכן לחיסכון חכם?</h4>
             <Button 
               onClick={getRecommendations} 
-              className="bg-primary hover:bg-primary/90 rounded-full shadow-xl shadow-primary/20 font-black px-8 h-12 text-sm"
+              size="sm"
+              className="bg-primary hover:bg-primary/90 rounded-full shadow-lg font-black px-6 h-10 text-xs"
             >
               צור המלצות עכשיו
             </Button>
           </div>
         ) : loading ? (
-          <div className="p-8 space-y-4">
-            <div className="space-y-2">
-              <Skeleton className="h-3 w-3/4 mr-0 ml-auto rounded-full" />
-              <Skeleton className="h-3 w-full mr-0 ml-auto rounded-full" />
-              <Skeleton className="h-3 w-5/6 mr-0 ml-auto rounded-full" />
-            </div>
+          <div className="p-6 space-y-3">
+            <Skeleton className="h-3 w-3/4 mr-0 ml-auto rounded-full" />
+            <Skeleton className="h-3 w-full mr-0 ml-auto rounded-full" />
             <div className="flex justify-center pt-2">
               <div className="flex items-center gap-2 text-primary text-xs font-bold animate-pulse">
                 <RefreshCcw className="h-4 w-4 animate-spin" />
-                מנתח נתונים...
+                מנתח...
               </div>
             </div>
           </div>
         ) : (
-          <div className="animate-fade-in flex-1 flex flex-col h-full max-h-[400px]">
-            <div className="p-6 overflow-y-auto custom-scrollbar flex-1">
-              <div className="text-right bg-white dark:bg-zinc-800 rounded-2xl border border-primary/10 shadow-inner p-6">
-                <div className="whitespace-pre-wrap leading-relaxed text-foreground font-medium text-sm prose prose-zinc dark:prose-invert max-w-none">
+          <div className="animate-fade-in flex-1 flex flex-col h-full max-h-[300px]">
+            <div className="p-4 overflow-y-auto custom-scrollbar flex-1">
+              <div className="text-right bg-white dark:bg-zinc-800 rounded-xl border border-primary/10 p-4">
+                <div className="whitespace-pre-wrap leading-relaxed text-foreground font-medium text-xs prose prose-zinc dark:prose-invert max-w-none">
                   {results}
                 </div>
               </div>
             </div>
-            <div className="p-4 bg-white/50 border-t">
+            <div className="p-3 bg-white/50 border-t">
               <Button 
-                size="lg" 
+                size="sm" 
                 onClick={() => setResults(null)} 
-                className="w-full gap-2 rounded-full font-black shadow-lg bg-primary text-white hover:bg-primary/90 h-12 text-sm"
+                className="w-full rounded-full font-black shadow-lg bg-primary text-white hover:bg-primary/90 h-10 text-xs"
               >
-                <CheckCircle2 className="h-5 w-5" /> הבנתי, תודה!
+                הבנתי, תודה!
               </Button>
             </div>
           </div>

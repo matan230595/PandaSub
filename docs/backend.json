@@ -1,3 +1,4 @@
+
 {
   "entities": {
     "User": {
@@ -270,8 +271,7 @@
   },
   "auth": {
     "providers": [
-      "password",
-      "anonymous"
+      "password"
     ]
   },
   "firestore": {
@@ -417,6 +417,6 @@
         }
       }
     ],
-    "reasoning": "The Firestore data structure is designed to support the PandaSub IL application's features, including subscription management, usage tracking, family sharing, bank integration, and push notifications. The structure emphasizes Authorization Independence, DBAC (Database-Based Access Control), and facilitates secure `list` operations (QAPs - Rules are not Filters). It leverages path-based ownership and denormalization to achieve these goals.\n\n1.  **Authorization Independence:**\n    *   The structure avoids hierarchical authorization dependencies (`get()` calls in security rules) by denormalizing authorization data. For example, the `FamilyName` ID is denormalized into the `User` document, enabling rules to directly verify family membership without querying the `FamilyName` document.\n\n2.  **Structural Segregation:**\n    *   The structure follows the principle of Structural Segregation by storing user-specific data like subscriptions, usage data, bank accounts, and notifications under the `/users/{userId}` path. This ensures that each collection has a homogeneous security posture, simplifying security rules.\n\n3.  **Access Modeling:**\n    *   **Private Data:**  Path-based ownership is used for user-owned data (e.g., `/users/{userId}/subscriptions/{subscriptionId}`).\n    *   **Collaborative Data:** Family sharing is implemented using the `FamilyName` entity, with the `familyNameId` stored in the `User` document. While a full membership map is not required here given the lack of document-level sharing within a family, the family ID is still denormalized.\n    *   **Global Roles (DBAC):**  The application does not require global roles according to the user request.\n\n4.  **Data Clarity and Predictability:**\n    *   The schema for each entity includes explicit data types and descriptions to ensure data clarity. Standardized naming conventions (e.g., `userId`, `subscriptionId`) are used throughout the structure.\n\n**Support for Features:**\n\n*   **Subscription Management:** The `subscriptions` collection stores subscription details, facilitating easy management and retrieval.\n*   **Advanced Expense Analysis:** The `usageData` subcollection under each subscription enables detailed tracking of subscription usage for \"Price per Use\" calculations and expense analysis.\n*   **Real Push Notifications:** The `notifications` collection stores notification data for Firebase Cloud Messaging (FCM) integration.\n*   **Family Sharing:** The `familyNames` collection and the `familyNameId` field in the `User` document enable family sharing capabilities, allowing users to view subscriptions of other family members.\n*   **Bank Automation:** The `bankAccounts` and `transactions` collections support the bank automation feature, storing bank account information and transaction data."
+    "reasoning": "The Firestore data structure is designed to support the PandaSub IL application's features, including subscription management, usage tracking, family sharing, bank integration, and push notifications."
   }
 }

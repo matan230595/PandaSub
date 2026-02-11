@@ -2,35 +2,28 @@
 'use client';
 
 import { firebaseConfig } from '@/firebase/config';
-import { initializeApp, getApps, getApp, FirebaseApp } from 'firebase/app';
+import { initializeApp, getApps, FirebaseApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
-import { getFirestore } from 'firebase/firestore'
+import { getFirestore } from 'firebase/firestore';
 
 /**
- * Initializes Firebase services correctly for both local and deployment environments.
- * Uses the firebaseConfig object directly to avoid initialization errors.
+ * Initializes Firebase services correctly. 
+ * Hardened to prevent 'reading properties of undefined' errors.
  */
 export function initializeFirebase() {
-  try {
-    if (!getApps().length) {
-      // Always initialize with config object to be safe in all environments
-      const firebaseApp = initializeApp(firebaseConfig);
-      return getSdks(firebaseApp);
-    }
-    return getSdks(getApp());
-  } catch (error) {
-    console.warn("Firebase fallback initialization:", error);
-    // In some server-side or early build contexts, app might not be available
-    const fallbackApp = initializeApp(firebaseConfig, "fallback-" + Math.random());
-    return getSdks(fallbackApp);
+  let app: FirebaseApp;
+  
+  const apps = getApps();
+  if (apps.length > 0) {
+    app = apps[0];
+  } else {
+    app = initializeApp(firebaseConfig);
   }
-}
-
-export function getSdks(firebaseApp: FirebaseApp) {
+  
   return {
-    firebaseApp,
-    auth: getAuth(firebaseApp),
-    firestore: getFirestore(firebaseApp)
+    firebaseApp: app,
+    auth: getAuth(app),
+    firestore: getFirestore(app)
   };
 }
 

@@ -120,30 +120,30 @@ export default function Home() {
           />
         </div>
 
-        {/* 2. AI Insights (1/2) & Quick Actions (1/2) - Compact & Symmetrical */}
+        {/* 2. AI Insights & Quick Actions (Side by Side - Compact) */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
           <AIRecommendations />
-          <Card className="border-none shadow-xl bg-gradient-to-br from-primary to-blue-700 text-white rounded-[2rem] overflow-hidden relative min-h-[280px] flex flex-col justify-center">
-            <CardContent className="p-8 text-right space-y-6">
+          <Card className="border-none shadow-xl bg-gradient-to-br from-primary to-blue-700 text-white rounded-[2rem] overflow-hidden relative min-h-[220px] flex flex-col justify-center">
+            <CardContent className="p-6 text-right space-y-4">
               <div>
-                <h3 className="text-2xl font-black mb-2 flex items-center gap-2 justify-end">פעולה מהירה 🐼</h3>
-                <p className="text-sm opacity-90 leading-relaxed font-medium">
-                  נהל את המינויים שלך בעזרת כלי ה-AI שלנו לחיסכון מקסימלי.
+                <h3 className="text-xl font-black mb-1 flex items-center gap-2 justify-end">פעולה מהירה 🐼</h3>
+                <p className="text-xs opacity-90 leading-relaxed font-medium">
+                  נהל את המינויים שלך בעזרת כלי ה-AI שלנו.
                 </p>
               </div>
               
-              <div className="flex flex-col sm:flex-row gap-4 justify-end">
+              <div className="flex flex-col sm:flex-row gap-3 justify-end">
                 <Button 
                   onClick={() => setIsAddModalOpen(true)} 
-                  className="rounded-full font-black h-14 shadow-lg bg-white text-primary hover:bg-zinc-100 transition-all border-none text-base px-8 order-2 sm:order-1"
+                  className="rounded-full font-black h-12 shadow-lg bg-white text-primary hover:bg-zinc-100 transition-all border-none text-sm px-6 order-2 sm:order-1"
                 >
-                  <ShieldCheck className="ml-2 h-5 w-5" /> סריקת AI
+                  <ShieldCheck className="ml-2 h-4 w-4" /> סריקת AI
                 </Button>
                 <Button 
                   variant="outline"
-                  className="rounded-full border-2 border-white text-white hover:bg-white/10 font-black h-14 transition-all text-base bg-transparent px-8 order-1 sm:order-2"
+                  className="rounded-full border-2 border-white/50 text-white hover:bg-white/10 font-black h-12 transition-all text-sm bg-transparent px-6 order-1 sm:order-2"
                 >
-                  <Zap className="ml-2 h-5 w-5" /> הוספה קולית
+                  <Zap className="ml-2 h-4 w-4" /> הוספה קולית
                 </Button>
               </div>
             </CardContent>
@@ -186,7 +186,7 @@ function StatCard({ title, value, symbol, icon, trendDesc, color }: any) {
 
   return (
     <Card className="shadow-sm border-none rounded-[2rem] overflow-hidden group transition-all hover:shadow-xl dark:bg-zinc-900 bg-white h-full card-shadow">
-      <CardContent className="p-6 text-right flex flex-col justify-between h-full relative">
+      <CardContent className="p-6 text-right flex flex-col justify-between h-full relative" dir="rtl">
         <div className="flex justify-between items-start mb-4">
           <div className="text-right">
             <span className="text-[11px] font-black text-muted-foreground uppercase tracking-widest">{title}</span>
@@ -196,16 +196,16 @@ function StatCard({ title, value, symbol, icon, trendDesc, color }: any) {
           </div>
         </div>
         
-        <div className="flex flex-col items-end gap-1 mb-2">
-          <div className="flex items-baseline justify-start gap-1.5 tabular-nums overflow-hidden w-full flex-row-reverse">
-             <div className={cn("font-black text-foreground leading-none", fontSize)}>
+        <div className="flex flex-col items-start gap-1 mb-2">
+          <div className="flex items-baseline justify-start gap-1.5 tabular-nums overflow-hidden w-full">
+            <div className={cn("font-black text-foreground leading-none", fontSize)}>
               {value}
             </div>
             {symbol && <div className="text-xl font-black text-primary mb-0.5">{symbol}</div>}
           </div>
         </div>
 
-        <div className="flex items-center justify-end mt-2">
+        <div className="flex items-center justify-start mt-2">
           <span className="text-[10px] font-bold text-muted-foreground opacity-70 truncate">{trendDesc}</span>
         </div>
       </CardContent>
