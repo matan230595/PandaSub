@@ -236,7 +236,7 @@ export function AddSubscriptionModal({ open, onOpenChange, subscription }: AddSu
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="sm:max-w-[650px] max-h-[90vh] text-right p-0 overflow-hidden border-none shadow-2xl rounded-[2.5rem]" aria-describedby="add-sub-modal-desc">
+        <DialogContent className="sm:max-w-[650px] max-h-[90vh] text-right p-0 overflow-hidden border-none shadow-2xl rounded-[2.5rem]">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit, onFormError)} className="flex flex-col max-h-[90vh]">
               <DialogHeader className="p-8 bg-primary/5 border-b">
@@ -245,7 +245,7 @@ export function AddSubscriptionModal({ open, onOpenChange, subscription }: AddSu
                     <DialogTitle className="text-3xl font-black text-primary">
                       {isEdit ? "עריכת מינוי" : "הוספת מינוי חדש"}
                     </DialogTitle>
-                    <DialogDescription id="add-sub-modal-desc" className="text-muted-foreground mt-1">
+                    <DialogDescription className="text-muted-foreground mt-1">
                       מלא את פרטי המינוי כדי לקבל תזכורות וסטטיסטיקה מדויקת.
                     </DialogDescription>
                   </div>
@@ -594,13 +594,13 @@ export function AddSubscriptionModal({ open, onOpenChange, subscription }: AddSu
       </Dialog>
 
       <AlertDialog open={showDeleteAlert} onOpenChange={setShowDeleteAlert}>
-        <AlertDialogContent className="text-right rounded-[2.5rem] border-none shadow-2xl p-10" dir="rtl" aria-describedby="delete-modal-desc">
+        <AlertDialogContent className="text-right rounded-[2.5rem] border-none shadow-2xl p-10" dir="rtl">
           <AlertDialogHeader className="items-center">
             <div className="h-24 w-24 rounded-full bg-destructive/10 flex items-center justify-center text-destructive mb-6">
               <AlertTriangle className="h-12 w-12" />
             </div>
             <AlertDialogTitle className="text-3xl font-black">מחיקת מינוי?</AlertDialogTitle>
-            <AlertDialogDescription id="delete-modal-desc" className="text-center text-muted-foreground text-lg mt-2">
+            <AlertDialogDescription className="text-center text-muted-foreground text-lg mt-2">
               פעולה זו היא סופית ולא ניתן יהיה לשחזר את המידע על המינוי הזה.
             </AlertDialogDescription>
           </AlertDialogHeader>

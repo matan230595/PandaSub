@@ -1,3 +1,4 @@
+
 "use client"
 
 import * as React from "react"
@@ -57,7 +58,7 @@ export default function Home() {
       <TopNav />
       <main className="flex-1 container mx-auto p-4 md:p-8 space-y-8 animate-fade-in pb-24 max-w-7xl">
         
-        {/* Stats Grid - Square on Mobile, Proportional Rectangles on Desktop */}
+        {/* Stats Grid - Fixed Proportions */}
         <div className="grid gap-4 grid-cols-2 lg:grid-cols-4 lg:justify-items-center">
           <StatCard 
             title='סה"כ חודשי' 
@@ -122,7 +123,6 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Main Content */}
         <div className="grid gap-8 lg:grid-cols-3">
           <div className="lg:col-span-2 space-y-8">
             <DashboardCharts />

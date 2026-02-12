@@ -13,7 +13,6 @@ import {
   query,
   orderBy,
   limit,
-  addDoc
 } from 'firebase/firestore';
 import { db } from '@/lib/firebaseClient';
 import { useUser } from '@/firebase';
@@ -102,7 +101,7 @@ function scrubUndefined(obj: any): any {
   const result: any = {};
   Object.keys(obj).forEach(key => {
     const value = obj[key];
-    if (value !== undefined) {
+    if (value !== undefined && value !== null) {
       result[key] = scrubUndefined(value);
     }
   });
@@ -119,7 +118,6 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
   
   const { user, isUserLoading } = useUser();
 
-  // Listen for Subscriptions
   useEffect(() => {
     if (isUserLoading) return;
 
@@ -150,7 +148,6 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
       }
     });
 
-    // Listen for Notifications from Firestore
     const notificationsRef = collection(db!, 'users', user.uid, 'notifications');
     const qNotifications = query(notificationsRef, orderBy('date', 'desc'), limit(20));
     const unsubscribeNotifications = onSnapshot(qNotifications, (snapshot) => {
@@ -167,9 +164,6 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
   }, [user, isUserLoading]);
 
   useEffect(() => {
-    if (!user && subscriptions.length > 0) {
-      localStorage.setItem('panda_subs_v11', JSON.stringify(subscriptions));
-    }
     if (user && !isLoading) {
       checkReminders();
     }
@@ -221,10 +215,7 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
       
       const activeReminders = sub.reminderDays || [3];
       if (activeReminders.includes(diffDays)) {
-        // Unique ID for this specific notification to prevent duplicates in Firestore
         const noteId = `renewal-${sub.id}-${diffDays}-${todayStr}`;
-        
-        // Check if we already have this notification in the current list
         if (!notifications.some(n => n.id === noteId)) {
           const newNote: Omit<Notification, 'id'> = {
             userId: user.uid,
@@ -259,33 +250,27 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
     if (user && db) {
       const subWithUser = { ...sub, userId: user.uid };
       const dataToSave = scrubUndefined(subWithUser);
-      const newDoc = doc(collection(db, 'users', user.uid, 'subscriptions'));
+      const subCol = collection(db, 'users', user.uid, 'subscriptions');
+      const newDoc = doc(subCol);
       setDoc(newDoc, { ...dataToSave, id: newDoc.id }).catch(e => {
         console.error("Error adding subscription:", e);
       });
-    } else {
-      const newSub = { ...scrubUndefined(sub), id: Math.random().toString(36).substr(2, 9), userId: 'local' } as Subscription;
-      setSubscriptions(prev => [newSub, ...prev]);
     }
   };
 
   const updateSubscription = (id: string, sub: Partial<Subscription>) => {
-    const dataToSave = scrubUndefined(sub);
     if (user && db) {
+      const dataToSave = scrubUndefined(sub);
       const subRef = doc(db, 'users', user.uid, 'subscriptions', id);
       updateDoc(subRef, dataToSave).catch(e => {
         console.error("Error updating subscription:", e);
       });
-    } else {
-      setSubscriptions(prev => prev.map(s => s.id === id ? { ...s, ...dataToSave } : s));
     }
   };
 
   const deleteSubscription = (id: string) => {
     if (user && db) {
       deleteDoc(doc(db, 'users', user.uid, 'subscriptions', id));
-    } else {
-      setSubscriptions(prev => prev.filter(s => s.id !== id));
     }
   };
 
@@ -325,8 +310,6 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
   const markNotificationAsRead = (id: string) => {
     if (user && db) {
       updateDoc(doc(db, 'users', user.uid, 'notifications', id), { read: true });
-    } else {
-      setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
     }
   };
 
