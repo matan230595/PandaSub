@@ -1,3 +1,4 @@
+
 "use client"
 
 import * as React from "react"
@@ -54,7 +55,7 @@ export function VoiceCreator() {
 
   return (
     <>
-      <div className="flex flex-col items-center gap-4 p-6 rounded-2xl bg-gradient-to-br from-primary/10 to-accent/10 border border-primary/20 shadow-inner">
+      <div className="flex flex-col items-center gap-4 p-6 rounded-3xl bg-gradient-to-br from-primary/5 to-accent/5 border border-primary/10 shadow-inner">
         <div className="text-center space-y-2">
           <h3 className="font-bold text-lg">הוספה קולית חכמה</h3>
           <p className="text-sm text-muted-foreground">פשוט תגיד "הוסף נטפליקס ב-55 שקלים כל חודש"</p>
@@ -63,59 +64,57 @@ export function VoiceCreator() {
         <Button 
           size="lg" 
           variant={isRecording ? "destructive" : "default"}
-          className={`h-16 w-16 rounded-full shadow-lg transition-all ${isRecording ? 'animate-pulse scale-110' : 'hover:scale-105'}`}
+          className={`h-20 w-20 rounded-full shadow-xl transition-all ${isRecording ? 'animate-pulse scale-110' : 'hover:scale-105'}`}
           onClick={toggleRecording}
           disabled={isProcessing}
         >
           {isProcessing ? (
-            <Loader2 className="h-8 w-8 animate-spin" />
+            <Loader2 className="h-10 w-10 animate-spin" />
           ) : isRecording ? (
-            <MicOff className="h-8 w-8" />
+            <MicOff className="h-10 w-10" />
           ) : (
-            <Mic className="h-8 w-8" />
+            <Mic className="h-10 w-10" />
           )}
         </Button>
 
         {isProcessing && (
-          <div className="flex items-center gap-2 text-primary animate-pulse font-medium">
-            <Sparkles className="h-4 w-4" />
-            מעבד את הבקשה שלך...
+          <div className="flex items-center gap-2 text-primary animate-pulse font-bold">
+            <Sparkles className="h-5 w-5" />
+            Panda AI מנתח את הקול שלך...
           </div>
         )}
       </div>
 
       <Dialog open={showConfirm} onOpenChange={setShowConfirm}>
-        <DialogContent className="sm:max-w-md text-right">
+        <DialogContent className="sm:max-w-md text-right rounded-[2rem] border-none shadow-2xl p-8" aria-describedby="voice-confirm-desc">
           <DialogHeader>
-            <DialogTitle>זיהינו מינוי חדש!</DialogTitle>
-            <DialogDescription>האם הפרטים שחולצו מהקול שלך נכונים? אשר כדי לשמור אותם למערכת.</DialogDescription>
+            <DialogTitle className="text-2xl font-black text-primary">זיהינו מינוי חדש! 🐼</DialogTitle>
+            <DialogDescription id="voice-confirm-desc" className="text-base mt-2">
+              האם הפרטים שחולצו מהקול שלך נכונים? אשר כדי לשמור.
+            </DialogDescription>
           </DialogHeader>
           {extractedData && (
-            <div className="space-y-4 py-4">
-              <div className="flex justify-between items-center p-3 bg-secondary rounded-lg">
-                <span className="font-bold">{extractedData.subscriptionName}</span>
-                <span className="text-xs text-muted-foreground">שם המינוי</span>
+            <div className="space-y-4 py-6">
+              <div className="flex justify-between items-center p-4 bg-primary/5 rounded-2xl">
+                <span className="font-black text-lg">{extractedData.subscriptionName}</span>
+                <span className="text-xs font-bold text-muted-foreground">שם המינוי</span>
               </div>
-              <div className="flex justify-between items-center p-3 bg-secondary rounded-lg">
-                <span className="font-bold">{extractedData.amount} {extractedData.currency}</span>
-                <span className="text-xs text-muted-foreground">סכום</span>
+              <div className="flex justify-between items-center p-4 bg-primary/5 rounded-2xl">
+                <span className="font-black text-lg text-primary">{extractedData.amount} {extractedData.currency}</span>
+                <span className="text-xs font-bold text-muted-foreground">סכום</span>
               </div>
-              <div className="flex justify-between items-center p-3 bg-secondary rounded-lg">
-                <span className="font-bold">{extractedData.category}</span>
-                <span className="text-xs text-muted-foreground">קטגוריה</span>
-              </div>
-              <div className="flex justify-between items-center p-3 bg-secondary rounded-lg">
-                <span className="font-bold">{extractedData.renewalDate}</span>
-                <span className="text-xs text-muted-foreground">תאריך חידוש</span>
+              <div className="flex justify-between items-center p-4 bg-primary/5 rounded-2xl">
+                <span className="font-black text-lg">{extractedData.renewalDate}</span>
+                <span className="text-xs font-bold text-muted-foreground">תאריך חידוש</span>
               </div>
             </div>
           )}
-          <DialogFooter className="gap-2 sm:justify-start">
-            <Button variant="default" onClick={() => {
+          <DialogFooter className="gap-3 sm:justify-start flex-row-reverse">
+            <Button className="bg-primary hover:bg-primary/90 rounded-full px-8 h-12 font-black" onClick={() => {
               setShowConfirm(false)
-              toast({ title: "המינוי נוסף בהצלחה!", description: "המינוי החדש זמין כעת ברשימה." })
+              toast({ title: "המינוי נוסף בהצלחה!" })
             }}>אישור ושמירה</Button>
-            <Button variant="outline" onClick={() => setShowConfirm(false)}>ביטול</Button>
+            <Button variant="ghost" className="rounded-full h-12 font-bold" onClick={() => setShowConfirm(false)}>ביטול</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

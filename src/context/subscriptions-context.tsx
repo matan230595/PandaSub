@@ -1,3 +1,4 @@
+
 "use client"
 
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
@@ -8,7 +9,9 @@ import {
   setDoc, 
   onSnapshot, 
   deleteDoc,
-  updateDoc
+  updateDoc,
+  query,
+  where
 } from 'firebase/firestore';
 import { db } from '@/lib/firebaseClient';
 import { useUser } from '@/firebase';
@@ -55,6 +58,7 @@ interface SubscriptionsContextType {
   settings: UserSettings;
   updateSettings: (newSettings: Partial<UserSettings>) => void;
   convertAmount: (amount: number, fromCurrency: string) => number;
+  isLoading: boolean;
 }
 
 const SubscriptionsContext = createContext<SubscriptionsContextType | undefined>(undefined);
@@ -85,15 +89,15 @@ const EXCHANGE_RATES: Record<string, number> = {
   'EUR': 4.05,
 };
 
-// Deeply scrub undefined values
 function scrubUndefined(obj: any): any {
   if (obj === null || typeof obj !== 'object') return obj;
   if (Array.isArray(obj)) return obj.map(scrubUndefined);
   
   const result: any = {};
   Object.keys(obj).forEach(key => {
-    if (obj[key] !== undefined) {
-      result[key] = scrubUndefined(obj[key]);
+    const value = obj[key];
+    if (value !== undefined) {
+      result[key] = scrubUndefined(value);
     }
   });
   return result;
@@ -104,27 +108,35 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
   const [isWizardComplete, setIsWizardComplete] = useState<boolean>(true);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [settings, setSettings] = useState<UserSettings>(DEFAULT_SETTINGS);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const audioContextRef = useRef<AudioContext | null>(null);
   
   const { user, isUserLoading } = useUser();
 
   useEffect(() => {
-    if (isUserLoading || !db || !user) {
+    if (isUserLoading) return;
+
+    if (!user) {
       const saved = localStorage.getItem('panda_subs_v11');
       if (saved) setSubscriptions(JSON.parse(saved));
+      setIsLoading(false);
       return;
     }
 
-    const subsRef = collection(db, 'users', user.uid, 'subscriptions');
+    // המשתמש מחובר - נאזין לענן בלבד
+    setIsLoading(true);
+    const subsRef = collection(db!, 'users', user.uid, 'subscriptions');
     const unsubscribe = onSnapshot(subsRef, (snapshot) => {
       const subs: Subscription[] = [];
       snapshot.forEach(doc => subs.push({ ...doc.data() as Subscription, id: doc.id }));
       setSubscriptions(subs);
+      setIsLoading(false);
     }, (error) => {
       console.error("Firestore error:", error);
+      setIsLoading(false);
     });
 
-    const settingsRef = doc(db, 'users', user.uid);
+    const settingsRef = doc(db!, 'users', user.uid);
     const unsubscribeSettings = onSnapshot(settingsRef, (snapshot) => {
       if (snapshot.exists()) {
         const data = snapshot.data();
@@ -138,10 +150,13 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
     }
   }, [user, isUserLoading]);
 
+  // שמירה ללוקאל סטורג' רק עבור משתמשים לא מחוברים
   useEffect(() => {
-    localStorage.setItem('panda_subs_v11', JSON.stringify(subscriptions));
+    if (!user && subscriptions.length > 0) {
+      localStorage.setItem('panda_subs_v11', JSON.stringify(subscriptions));
+    }
     checkReminders();
-  }, [subscriptions]);
+  }, [subscriptions, user]);
 
   const convertAmount = (amount: number, fromCurrency: string) => {
     const rate = EXCHANGE_RATES[fromCurrency] || EXCHANGE_RATES[fromCurrency.toUpperCase()] || 1;
@@ -221,27 +236,27 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
 
   const addSubscription = (sub: Omit<Subscription, 'id' | 'userId'>) => {
     if (user && db) {
-      const scrubbedSub = scrubUndefined({ ...sub, userId: user.uid });
+      const subWithUser = { ...sub, userId: user.uid };
+      const dataToSave = scrubUndefined(subWithUser);
       const newDoc = doc(collection(db, 'users', user.uid, 'subscriptions'));
-      setDoc(newDoc, { ...scrubbedSub, id: newDoc.id }).catch(e => {
+      setDoc(newDoc, { ...dataToSave, id: newDoc.id }).catch(e => {
         console.error("Error adding subscription:", e);
       });
     } else {
-      const scrubbedSub = scrubUndefined(sub);
-      const newSub = { ...scrubbedSub, id: Math.random().toString(36).substr(2, 9), userId: 'local' } as Subscription;
+      const newSub = { ...scrubUndefined(sub), id: Math.random().toString(36).substr(2, 9), userId: 'local' } as Subscription;
       setSubscriptions(prev => [newSub, ...prev]);
     }
   };
 
   const updateSubscription = (id: string, sub: Partial<Subscription>) => {
-    const scrubbedSub = scrubUndefined(sub);
+    const dataToSave = scrubUndefined(sub);
     if (user && db) {
       const subRef = doc(db, 'users', user.uid, 'subscriptions', id);
-      updateDoc(subRef, scrubbedSub).catch(e => {
+      updateDoc(subRef, dataToSave).catch(e => {
         console.error("Error updating subscription:", e);
       });
     } else {
-      setSubscriptions(prev => prev.map(s => s.id === id ? { ...s, ...scrubbedSub } : s));
+      setSubscriptions(prev => prev.map(s => s.id === id ? { ...s, ...dataToSave } : s));
     }
   };
 
@@ -295,7 +310,7 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
       subscriptions, addSubscription, updateSubscription, deleteSubscription,
       duplicateSubscription, markAsUsed, isWizardComplete, completeWizard,
       exportData, notifications, markNotificationAsRead, settings, updateSettings,
-      convertAmount
+      convertAmount, isLoading
     }}>
       <div onClick={() => initAudio()}>
         {children}
