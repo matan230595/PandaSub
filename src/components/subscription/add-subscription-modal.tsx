@@ -1,4 +1,3 @@
-
 "use client"
 
 import * as React from "react"
@@ -71,7 +70,7 @@ const formSchema = z.object({
   email: z.string().optional(),
   password: z.string().optional(),
   phone: z.string().optional(),
-  // שדות חדשים
+  // Expanded UX fields
   durationMonths: z.coerce.number().optional(),
   trialPeriodDays: z.coerce.number().optional(),
 })
@@ -189,7 +188,7 @@ export function AddSubscriptionModal({ open, onOpenChange, subscription }: AddSu
   }
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    // חישוב תאריך סיום (בונוס UX)
+    // Advanced UX logic: calculate trial end date
     let trialEndsAt = undefined;
     if (values.status === 'trial' && values.trialPeriodDays) {
       trialEndsAt = addDays(new Date(values.renewalDate), values.trialPeriodDays).toISOString().split('T')[0];
@@ -227,7 +226,6 @@ export function AddSubscriptionModal({ open, onOpenChange, subscription }: AddSu
   }
 
   function onFormError(errors: any) {
-    console.log("Form Errors:", errors);
     const firstError = Object.values(errors)[0] as any;
     toast({
       variant: "destructive",

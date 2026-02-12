@@ -1,4 +1,3 @@
-
 "use client"
 
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
@@ -89,6 +88,7 @@ const EXCHANGE_RATES: Record<string, number> = {
   'EUR': 4.05,
 };
 
+// Deep scrubbing to remove undefined values before Firestore sync
 function scrubUndefined(obj: any): any {
   if (obj === null || typeof obj !== 'object') return obj;
   if (Array.isArray(obj)) return obj.map(scrubUndefined);
@@ -123,7 +123,7 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
       return;
     }
 
-    // המשתמש מחובר - נאזין לענן בלבד
+    // User is logged in - listen to Cloud only
     setIsLoading(true);
     const subsRef = collection(db!, 'users', user.uid, 'subscriptions');
     const unsubscribe = onSnapshot(subsRef, (snapshot) => {
@@ -150,7 +150,7 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
     }
   }, [user, isUserLoading]);
 
-  // שמירה ללוקאל סטורג' רק עבור משתמשים לא מחוברים
+  // Sync LocalStorage only for non-logged in users
   useEffect(() => {
     if (!user && subscriptions.length > 0) {
       localStorage.setItem('panda_subs_v11', JSON.stringify(subscriptions));
@@ -236,6 +236,7 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
 
   const addSubscription = (sub: Omit<Subscription, 'id' | 'userId'>) => {
     if (user && db) {
+      // CRITICAL: We must include the internal userId field to satisfy Firestore Security Rules
       const subWithUser = { ...sub, userId: user.uid };
       const dataToSave = scrubUndefined(subWithUser);
       const newDoc = doc(collection(db, 'users', user.uid, 'subscriptions'));
