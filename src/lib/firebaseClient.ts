@@ -11,7 +11,7 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID!,
 };
 
-// Singleton initialization pattern
+// Singleton initialization pattern with ENV guards
 let app;
 let auth: any;
 let db: any;

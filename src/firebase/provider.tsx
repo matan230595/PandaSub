@@ -100,8 +100,8 @@ export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({
 
 export const useFirebase = (): FirebaseServicesAndUser => {
   const context = useContext(FirebaseContext);
-  // Important: Instead of throwing, we return nulls during SSR
-  if (context === undefined) {
+  // Return safe defaults for SSR instead of throwing
+  if (!context) {
     return {
       firebaseApp: null,
       firestore: null,
