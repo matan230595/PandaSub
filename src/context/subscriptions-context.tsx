@@ -1,3 +1,4 @@
+
 "use client"
 
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
@@ -8,9 +9,7 @@ import {
   setDoc, 
   onSnapshot, 
   deleteDoc,
-  updateDoc,
-  query,
-  where
+  updateDoc
 } from 'firebase/firestore';
 import { db } from '@/lib/firebaseClient';
 import { useUser } from '@/firebase';
@@ -88,7 +87,6 @@ const EXCHANGE_RATES: Record<string, number> = {
   'EUR': 4.05,
 };
 
-// Deep scrubbing to remove undefined values before Firestore sync
 function scrubUndefined(obj: any): any {
   if (obj === null || typeof obj !== 'object') return obj;
   if (Array.isArray(obj)) return obj.map(scrubUndefined);
@@ -123,7 +121,6 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
       return;
     }
 
-    // User is logged in - listen to Cloud only
     setIsLoading(true);
     const subsRef = collection(db!, 'users', user.uid, 'subscriptions');
     const unsubscribe = onSnapshot(subsRef, (snapshot) => {
@@ -150,7 +147,6 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
     }
   }, [user, isUserLoading]);
 
-  // Sync LocalStorage only for non-logged in users
   useEffect(() => {
     if (!user && subscriptions.length > 0) {
       localStorage.setItem('panda_subs_v11', JSON.stringify(subscriptions));
@@ -169,9 +165,7 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
       audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
     }
     const ctx = audioContextRef.current;
-    if (ctx.state === 'suspended') {
-      ctx.resume();
-    }
+    if (ctx.state === 'suspended') ctx.resume();
     return ctx;
   };
 
@@ -207,7 +201,7 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
         newNotifications.push({
           id: `renewal-${sub.id}-${diffDays}-${today.getDate()}`,
           title: diffDays === 0 ? `היום חיוב: ${sub.name}` : `חיוב עבור ${sub.name} בעוד ${diffDays} ימים`,
-          message: `סכום: ${sub.amount}${sub.currency}. וודא שהכל מוכן!`,
+          message: `סכום: ${sub.amount}${sub.currency}.`,
           date: new Date().toISOString(),
           read: false,
           type: diffDays <= 1 ? 'critical' : 'warning',
@@ -219,9 +213,7 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
     setNotifications(prev => {
       const existingIds = new Set(prev.map(n => n.id));
       const added = newNotifications.filter(n => !existingIds.has(n.id));
-      if (added.length > 0) {
-        playNotificationSound();
-      }
+      if (added.length > 0) playNotificationSound();
       return [...added, ...prev].slice(0, 20);
     });
   };
@@ -236,7 +228,6 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
 
   const addSubscription = (sub: Omit<Subscription, 'id' | 'userId'>) => {
     if (user && db) {
-      // CRITICAL: We must include the internal userId field to satisfy Firestore Security Rules
       const subWithUser = { ...sub, userId: user.uid };
       const dataToSave = scrubUndefined(subWithUser);
       const newDoc = doc(collection(db, 'users', user.uid, 'subscriptions'));
