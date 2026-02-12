@@ -102,7 +102,11 @@ function scrubUndefined(obj: any): any {
   Object.keys(obj).forEach(key => {
     const value = obj[key];
     if (value !== undefined && value !== null) {
-      result[key] = scrubUndefined(value);
+      if (typeof value === 'object') {
+        result[key] = scrubUndefined(value);
+      } else {
+        result[key] = value;
+      }
     }
   });
   return result;
@@ -164,7 +168,7 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
   }, [user, isUserLoading]);
 
   useEffect(() => {
-    if (user && !isLoading) {
+    if (user && !isLoading && subscriptions.length > 0) {
       checkReminders();
     }
   }, [subscriptions, user, isLoading]);
@@ -202,7 +206,7 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
   };
 
   const checkReminders = async () => {
-    if (!user) return;
+    if (!user || !db) return;
     
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -217,7 +221,7 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
       if (activeReminders.includes(diffDays)) {
         const noteId = `renewal-${sub.id}-${diffDays}-${todayStr}`;
         if (!notifications.some(n => n.id === noteId)) {
-          const newNote: Omit<Notification, 'id'> = {
+          const newNote = scrubUndefined({
             userId: user.uid,
             title: diffDays === 0 ? `היום חיוב: ${sub.name}` : `חיוב עבור ${sub.name} בעוד ${diffDays} ימים`,
             message: `סכום: ${sub.amount}${sub.currency}.`,
@@ -225,10 +229,10 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
             read: false,
             type: diffDays <= 1 ? 'critical' : 'warning',
             priority: diffDays <= 1 ? 'critical' : 'high'
-          };
+          });
           
           try {
-            await setDoc(doc(db!, 'users', user.uid, 'notifications', noteId), newNote);
+            await setDoc(doc(db, 'users', user.uid, 'notifications', noteId), newNote);
             playNotificationSound();
           } catch (e) {
             console.error("Error creating notification:", e);
@@ -260,7 +264,7 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
 
   const updateSubscription = (id: string, sub: Partial<Subscription>) => {
     if (user && db) {
-      const dataToSave = scrubUndefined(sub);
+      const dataToSave = scrubUndefined({ ...sub, userId: user.uid });
       const subRef = doc(db, 'users', user.uid, 'subscriptions', id);
       updateDoc(subRef, dataToSave).catch(e => {
         console.error("Error updating subscription:", e);

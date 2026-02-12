@@ -600,7 +600,7 @@ export function AddSubscriptionModal({ open, onOpenChange, subscription }: AddSu
               <AlertTriangle className="h-12 w-12" />
             </div>
             <AlertDialogTitle className="text-3xl font-black">מחיקת מינוי?</AlertDialogTitle>
-            <AlertDialogDescription className="text-center text-muted-foreground text-lg mt-2">
+            <AlertDialogDescription id="delete-desc" className="text-center text-muted-foreground text-lg mt-2">
               פעולה זו היא סופית ולא ניתן יהיה לשחזר את המידע על המינוי הזה.
             </AlertDialogDescription>
           </AlertDialogHeader>

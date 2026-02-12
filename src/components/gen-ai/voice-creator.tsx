@@ -89,7 +89,7 @@ export function VoiceCreator() {
         <DialogContent className="sm:max-w-md text-right rounded-[2rem] border-none shadow-2xl p-8">
           <DialogHeader>
             <DialogTitle className="text-2xl font-black text-primary">זיהינו מינוי חדש! 🐼</DialogTitle>
-            <DialogDescription className="text-base mt-2">
+            <DialogDescription id="voice-desc" className="text-base mt-2">
               האם הפרטים שחולצו מהקול שלך נכונים? אשר כדי לשמור אותם במערכת.
             </DialogDescription>
           </DialogHeader>

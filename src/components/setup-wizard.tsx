@@ -1,3 +1,4 @@
+
 "use client"
 
 import * as React from "react"
@@ -64,7 +65,7 @@ export function SetupWizard() {
             {currentStep.icon}
           </div>
           <DialogTitle className="text-2xl font-bold">{currentStep.title}</DialogTitle>
-          <DialogDescription className="text-base mt-2">
+          <DialogDescription id="setup-desc" className="text-base mt-2">
             {currentStep.description}
           </DialogDescription>
         </DialogHeader>

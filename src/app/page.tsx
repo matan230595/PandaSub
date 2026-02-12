@@ -58,7 +58,7 @@ export default function Home() {
       <TopNav />
       <main className="flex-1 container mx-auto p-4 md:p-8 space-y-8 animate-fade-in pb-24 max-w-7xl">
         
-        {/* Stats Grid - Fixed Proportions */}
+        {/* Stats Grid - Mobile Squares, Desktop Rectangles */}
         <div className="grid gap-4 grid-cols-2 lg:grid-cols-4 lg:justify-items-center">
           <StatCard 
             title='סה"כ חודשי' 
@@ -147,7 +147,7 @@ function StatCard({ title, value, symbol, icon, trendDesc, color }: any) {
   const fontSize = value.length > 8 ? 'text-lg' : value.length > 5 ? 'text-xl' : 'text-2xl md:text-3xl';
 
   return (
-    <Card className="shadow-sm border-none rounded-[2rem] overflow-hidden group transition-all hover:shadow-xl dark:bg-zinc-900 bg-white aspect-square lg:aspect-auto lg:h-32 lg:w-full w-full card-shadow">
+    <Card className="shadow-sm border-none rounded-[2rem] overflow-hidden group transition-all hover:shadow-xl dark:bg-zinc-900 bg-white aspect-square lg:aspect-auto lg:h-32 lg:max-w-[240px] w-full card-shadow">
       <CardContent className="p-4 md:p-6 text-right flex flex-col justify-between h-full relative">
         <div className="flex justify-between items-start mb-2">
           <div className="text-right">
