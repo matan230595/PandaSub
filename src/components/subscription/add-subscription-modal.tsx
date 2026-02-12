@@ -1,4 +1,3 @@
-
 "use client"
 
 import * as React from "react"
@@ -21,7 +20,6 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-  FormDescription,
 } from "@/components/ui/form"
 import {
   AlertDialog,
@@ -47,10 +45,9 @@ import { useSubscriptions } from "@/context/subscriptions-context"
 import { CATEGORY_METADATA, SubscriptionCategory, SubscriptionStatus, Subscription, PRIORITY_CONFIG } from "@/app/lib/subscription-store"
 import { useToast } from "@/hooks/use-toast"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { User, Key, FileText, AlertTriangle, Clock, Sparkles, Loader2, Save, Copy, Trash2, CalendarRange, CreditCard, Mail, Phone, ShieldAlert } from "lucide-react"
+import { User, Key, FileText, AlertTriangle, Clock, Sparkles, Loader2, Save, Copy, Trash2, CalendarRange, CreditCard, Mail, Phone } from "lucide-react"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { addDays } from "date-fns"
-import { cn } from "@/lib/utils"
 import { extractSubscriptionFromInvoice } from "@/ai/flows/invoice-extraction-flow"
 
 const formSchema = z.object({
@@ -138,8 +135,8 @@ export function AddSubscriptionModal({ open, onOpenChange, subscription }: AddSu
           email: subscription.credentials?.email || "",
           password: subscription.credentials?.password || "",
           phone: subscription.credentials?.phone || "",
-          durationMonths: 1,
-          trialPeriodDays: 14,
+          durationMonths: subscription.durationMonths || 1,
+          trialPeriodDays: subscription.trialPeriodDays || 14,
         })
       } else {
         form.reset({
@@ -205,6 +202,8 @@ export function AddSubscriptionModal({ open, onOpenChange, subscription }: AddSu
       status: values.status as SubscriptionStatus,
       priority: values.priority as any,
       notes: values.notes || "",
+      durationMonths: values.durationMonths,
+      trialPeriodDays: values.trialPeriodDays,
       trialEndsAt,
       credentials: {
         username: values.username || "",
@@ -225,6 +224,7 @@ export function AddSubscriptionModal({ open, onOpenChange, subscription }: AddSu
   }
 
   function onFormError(errors: any) {
+    console.log("Form Errors:", errors);
     const firstError = Object.values(errors)[0] as any;
     toast({
       variant: "destructive",

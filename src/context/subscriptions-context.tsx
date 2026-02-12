@@ -1,4 +1,3 @@
-
 "use client"
 
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
@@ -87,6 +86,9 @@ const EXCHANGE_RATES: Record<string, number> = {
   'EUR': 4.05,
 };
 
+/**
+ * Deeply scrubs undefined values from an object to prevent Firebase crashes.
+ */
 function scrubUndefined(obj: any): any {
   if (obj === null || typeof obj !== 'object') return obj;
   if (Array.isArray(obj)) return obj.map(scrubUndefined);

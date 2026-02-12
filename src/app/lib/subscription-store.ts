@@ -22,6 +22,8 @@ export interface Subscription {
   paymentMethod?: string;
   reminderDays: number[];
   trialEndsAt?: string;
+  trialPeriodDays?: number;
+  durationMonths?: number;
   status: SubscriptionStatus;
   atRisk?: boolean;
   usageCount?: number;
