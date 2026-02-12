@@ -1,3 +1,4 @@
+
 "use client"
 
 import * as React from "react"
@@ -89,7 +90,7 @@ export function VoiceCreator() {
           <DialogHeader>
             <DialogTitle className="text-2xl font-black text-primary">זיהינו מינוי חדש! 🐼</DialogTitle>
             <DialogDescription id="voice-confirm-desc" className="text-base mt-2">
-              האם הפרטים שחולצו מהקול שלך נכונים? אשר כדי לשמור.
+              האם הפרטים שחולצו מהקול שלך נכונים? אשר כדי לשמור אותם במערכת.
             </DialogDescription>
           </DialogHeader>
           {extractedData && (

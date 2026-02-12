@@ -1,3 +1,4 @@
+
 "use client"
 
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
@@ -8,7 +9,11 @@ import {
   setDoc, 
   onSnapshot, 
   deleteDoc,
-  updateDoc
+  updateDoc,
+  query,
+  orderBy,
+  limit,
+  addDoc
 } from 'firebase/firestore';
 import { db } from '@/lib/firebaseClient';
 import { useUser } from '@/firebase';
@@ -32,6 +37,7 @@ interface UserSettings {
 
 interface Notification {
   id: string;
+  userId: string;
   title: string;
   message: string;
   date: string;
@@ -113,6 +119,7 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
   
   const { user, isUserLoading } = useUser();
 
+  // Listen for Subscriptions
   useEffect(() => {
     if (isUserLoading) return;
 
@@ -131,7 +138,7 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
       setSubscriptions(subs);
       setIsLoading(false);
     }, (error) => {
-      console.error("Firestore error:", error);
+      console.error("Firestore subscriptions error:", error);
       setIsLoading(false);
     });
 
@@ -143,9 +150,19 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
       }
     });
 
+    // Listen for Notifications from Firestore
+    const notificationsRef = collection(db!, 'users', user.uid, 'notifications');
+    const qNotifications = query(notificationsRef, orderBy('date', 'desc'), limit(20));
+    const unsubscribeNotifications = onSnapshot(qNotifications, (snapshot) => {
+      const notes: Notification[] = [];
+      snapshot.forEach(doc => notes.push({ ...doc.data() as Notification, id: doc.id }));
+      setNotifications(notes);
+    });
+
     return () => {
       unsubscribe();
       unsubscribeSettings();
+      unsubscribeNotifications();
     }
   }, [user, isUserLoading]);
 
@@ -153,8 +170,10 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
     if (!user && subscriptions.length > 0) {
       localStorage.setItem('panda_subs_v11', JSON.stringify(subscriptions));
     }
-    checkReminders();
-  }, [subscriptions, user]);
+    if (user && !isLoading) {
+      checkReminders();
+    }
+  }, [subscriptions, user, isLoading]);
 
   const convertAmount = (amount: number, fromCurrency: string) => {
     const rate = EXCHANGE_RATES[fromCurrency] || EXCHANGE_RATES[fromCurrency.toUpperCase()] || 1;
@@ -188,36 +207,44 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
     } catch (e) {}
   };
 
-  const checkReminders = () => {
+  const checkReminders = async () => {
+    if (!user) return;
+    
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    const newNotifications: Notification[] = [];
+    const todayStr = today.toISOString().split('T')[0];
 
-    subscriptions.forEach(sub => {
+    for (const sub of subscriptions) {
       const renewalDate = new Date(sub.renewalDate);
       renewalDate.setHours(0,0,0,0);
       const diffDays = Math.ceil((renewalDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
       
       const activeReminders = sub.reminderDays || [3];
       if (activeReminders.includes(diffDays)) {
-        newNotifications.push({
-          id: `renewal-${sub.id}-${diffDays}-${today.getDate()}`,
-          title: diffDays === 0 ? `היום חיוב: ${sub.name}` : `חיוב עבור ${sub.name} בעוד ${diffDays} ימים`,
-          message: `סכום: ${sub.amount}${sub.currency}.`,
-          date: new Date().toISOString(),
-          read: false,
-          type: diffDays <= 1 ? 'critical' : 'warning',
-          priority: diffDays <= 1 ? 'critical' : 'high'
-        });
+        // Unique ID for this specific notification to prevent duplicates in Firestore
+        const noteId = `renewal-${sub.id}-${diffDays}-${todayStr}`;
+        
+        // Check if we already have this notification in the current list
+        if (!notifications.some(n => n.id === noteId)) {
+          const newNote: Omit<Notification, 'id'> = {
+            userId: user.uid,
+            title: diffDays === 0 ? `היום חיוב: ${sub.name}` : `חיוב עבור ${sub.name} בעוד ${diffDays} ימים`,
+            message: `סכום: ${sub.amount}${sub.currency}.`,
+            date: new Date().toISOString(),
+            read: false,
+            type: diffDays <= 1 ? 'critical' : 'warning',
+            priority: diffDays <= 1 ? 'critical' : 'high'
+          };
+          
+          try {
+            await setDoc(doc(db!, 'users', user.uid, 'notifications', noteId), newNote);
+            playNotificationSound();
+          } catch (e) {
+            console.error("Error creating notification:", e);
+          }
+        }
       }
-    });
-
-    setNotifications(prev => {
-      const existingIds = new Set(prev.map(n => n.id));
-      const added = newNotifications.filter(n => !existingIds.has(n.id));
-      if (added.length > 0) playNotificationSound();
-      return [...added, ...prev].slice(0, 20);
-    });
+    }
   };
 
   const updateSettings = (newSettings: Partial<UserSettings>) => {
@@ -296,7 +323,11 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
   };
 
   const markNotificationAsRead = (id: string) => {
-    setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
+    if (user && db) {
+      updateDoc(doc(db, 'users', user.uid, 'notifications', id), { read: true });
+    } else {
+      setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
+    }
   };
 
   return (

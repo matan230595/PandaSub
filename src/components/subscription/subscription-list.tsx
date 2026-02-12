@@ -1,3 +1,4 @@
+
 "use client"
 
 import * as React from "react"
@@ -210,13 +211,13 @@ export function SubscriptionList() {
       </div>
       <AddSubscriptionModal open={isModalOpen} onOpenChange={(val) => { setIsModalOpen(val); if (!val) setSelectedSub(null); }} subscription={selectedSub} />
       <AlertDialog open={!!deleteConfirmId} onOpenChange={(open) => !open && setDeleteConfirmId(null)}>
-        <AlertDialogContent className="text-right rounded-3xl" dir="rtl" aria-describedby="delete-confirm-description">
+        <AlertDialogContent className="text-right rounded-3xl" dir="rtl" aria-describedby="delete-item-modal-desc">
           <AlertDialogHeader className="items-center">
             <div className="h-20 w-20 rounded-full bg-destructive/10 flex items-center justify-center text-destructive mb-4">
               <AlertTriangle className="h-10 w-10" />
             </div>
             <AlertDialogTitle className="text-2xl font-black">מחיקת מינוי?</AlertDialogTitle>
-            <AlertDialogDescription id="delete-confirm-description" className="text-center">
+            <AlertDialogDescription id="delete-item-modal-desc" className="text-center">
               האם אתה בטוח שברצונך למחוק את המינוי לצמיתות? לא ניתן יהיה לשחזר את המידע.
             </AlertDialogDescription>
           </AlertDialogHeader>
