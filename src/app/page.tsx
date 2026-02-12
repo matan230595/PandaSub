@@ -7,7 +7,7 @@ import { SubscriptionList } from "@/components/subscription/subscription-list"
 import { AIRecommendations } from "@/components/gen-ai/recommendations"
 import { SubscriptionsAtRisk } from "@/components/dashboard/risk-widget"
 import { Button } from "@/components/ui/button"
-import { Plus, TrendingUp, Calendar, Lightbulb, Hourglass, Zap, Mic, Sparkles } from "lucide-react"
+import { TrendingUp, Calendar, Lightbulb, Hourglass, Zap, Mic, Sparkles } from "lucide-react"
 import { AddSubscriptionModal } from "@/components/subscription/add-subscription-modal"
 import { useSubscriptions } from "@/context/subscriptions-context"
 import { Card, CardContent } from "@/components/ui/card"
@@ -57,7 +57,7 @@ export default function Home() {
       <TopNav />
       <main className="flex-1 container mx-auto p-4 md:p-8 space-y-8 animate-fade-in pb-24 max-w-7xl">
         
-        {/* Stats Grid - Fixed for 2x2 Square look on Mobile */}
+        {/* Stats Grid - Fixed for 2x2 Square on Mobile, Horizontal on Desktop */}
         <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
           <StatCard 
             title='סה"כ חודשי' 
@@ -91,7 +91,7 @@ export default function Home() {
           />
         </div>
 
-        {/* AI Insights & Quick Actions - Balanced 2/3 and 1/3 layout */}
+        {/* AI Insights & Quick Actions - Balanced layout */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="md:col-span-2">
             <AIRecommendations />
@@ -147,13 +147,13 @@ function StatCard({ title, value, symbol, icon, trendDesc, color }: any) {
   const fontSize = value.length > 8 ? 'text-lg' : value.length > 5 ? 'text-xl' : 'text-2xl md:text-3xl';
 
   return (
-    <Card className="shadow-sm border-none rounded-[2rem] overflow-hidden group transition-all hover:shadow-xl dark:bg-zinc-900 bg-white aspect-square h-full card-shadow">
+    <Card className="shadow-sm border-none rounded-[2rem] overflow-hidden group transition-all hover:shadow-xl dark:bg-zinc-900 bg-white aspect-square lg:aspect-auto lg:h-32 h-full card-shadow">
       <CardContent className="p-4 md:p-6 text-right flex flex-col justify-between h-full relative">
         <div className="flex justify-between items-start mb-2">
           <div className="text-right">
             <span className="text-[10px] md:text-[11px] font-black text-muted-foreground uppercase tracking-widest">{title}</span>
           </div>
-          <div className={`p-2 md:p-3 rounded-2xl ${color} group-hover:rotate-6 transition-transform duration-300 shadow-sm shrink-0`}>
+          <div className={cn("p-2 md:p-3 rounded-2xl group-hover:rotate-6 transition-transform duration-300 shadow-sm shrink-0", color)}>
             {icon}
           </div>
         </div>
