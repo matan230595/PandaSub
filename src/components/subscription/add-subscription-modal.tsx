@@ -245,12 +245,21 @@ export function AddSubscriptionModal({ open, onOpenChange, subscription }: AddSu
     onOpenChange(false)
   }
 
+  function onFormError(errors: any) {
+    console.log("Form Errors:", errors);
+    toast({
+      variant: "destructive",
+      title: "שגיאה בטופס",
+      description: "אנא בדוק את כל השדות בשלבי הטופס השונים.",
+    });
+  }
+
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent className="sm:max-w-[600px] max-h-[90vh] text-right p-0 overflow-hidden border-none shadow-2xl rounded-3xl">
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col max-h-[90vh]">
+            <form onSubmit={form.handleSubmit(onSubmit, onFormError)} className="flex flex-col max-h-[90vh]">
               <DialogHeader className="p-6 bg-primary/5 border-b flex flex-row items-center justify-between">
                 <div className="flex-1">
                   <DialogTitle className="text-2xl font-black">
@@ -364,6 +373,7 @@ export function AddSubscriptionModal({ open, onOpenChange, subscription }: AddSu
                             <FormControl>
                               <Input type="number" step="0.01" className="rounded-xl h-12 text-right text-lg font-black" {...field} />
                             </FormControl>
+                            <FormMessage />
                           </FormItem>
                         )}
                       />
@@ -399,6 +409,7 @@ export function AddSubscriptionModal({ open, onOpenChange, subscription }: AddSu
                             <FormControl>
                               <Input type="date" className="rounded-xl h-12 text-right" {...field} />
                             </FormControl>
+                            <FormMessage />
                           </FormItem>
                         )}
                       />
@@ -519,7 +530,7 @@ export function AddSubscriptionModal({ open, onOpenChange, subscription }: AddSu
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="sm:justify-center flex flex-row-reverse gap-4 mt-10">
-            <AlertDialogAction onClick={() => { deleteSubscription(subscription!.id); onOpenChange(false); }} className="bg-destructive hover:bg-destructive/90 rounded-full px-10 h-14 text-lg font-black">
+            <AlertDialogAction onClick={() => { if(subscription) deleteSubscription(subscription.id); onOpenChange(false); }} className="bg-destructive hover:bg-destructive/90 rounded-full px-10 h-14 text-lg font-black">
               כן, מחק מינוי
             </AlertDialogAction>
             <AlertDialogCancel className="rounded-full h-14 px-10 text-lg font-bold">ביטול</AlertDialogCancel>

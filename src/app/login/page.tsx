@@ -27,6 +27,10 @@ export default function LoginPage() {
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (!auth) {
+      toast({ variant: "destructive", title: "שגיאה", description: "שירותי Firebase אינם זמינים כרגע." });
+      return;
+    }
     setIsLoading(true)
     try {
       if (isRegistering) {

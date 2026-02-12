@@ -69,24 +69,8 @@ export default function Home() {
       <TopNav />
       <main className="flex-1 container mx-auto p-4 md:p-8 space-y-8 animate-fade-in pb-24 max-w-7xl">
         
-        {/* Header Section */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="text-right">
-            <h1 className="text-2xl md:text-3xl font-black tracking-tight text-foreground">שלום, {settings.userName.split(' ')[0]}! 👋</h1>
-            <p className="text-muted-foreground mt-1 text-sm md:text-base font-medium">יש לך {subscriptions.length} מינויים רשומים במערכת.</p>
-          </div>
-          <div className="flex items-center gap-3">
-            <Button variant="outline" onClick={handleGenerateDraft} className="rounded-full gap-2 border-primary/20 hover:bg-primary/5 text-primary h-11 px-5 bg-white font-bold shadow-sm">
-              <FileText className="h-4 w-4" /> טיוטה
-            </Button>
-            <Button onClick={() => setIsAddModalOpen(true)} className="rounded-full google-btn gap-2 shadow-lg h-11 px-6 font-black">
-              <Plus className="h-5 w-5" /> הוסף מינוי
-            </Button>
-          </div>
-        </div>
-
-        {/* 1. Stats Grid (TOP) - Square optimization for Mobile */}
-        <div className="grid gap-4 grid-cols-2 md:grid-cols-2 lg:grid-cols-4">
+        {/* Stats Grid (Top) - Fixed for Mobile Square look */}
+        <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
           <StatCard 
             title='סה"כ חודשי' 
             value={totalMonthlyILS.toLocaleString(undefined, { maximumFractionDigits: 0 })} 
@@ -119,28 +103,28 @@ export default function Home() {
           />
         </div>
 
-        {/* 2. AI Insights & Quick Actions - Balanced side-by-side layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2 h-full">
+        {/* 2. AI Insights & Quick Actions */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="md:col-span-2 h-full">
             <AIRecommendations />
           </div>
           <div className="h-full">
-            <Card className="border-none shadow-xl bg-gradient-to-br from-primary to-blue-700 text-white rounded-[2rem] overflow-hidden flex flex-col justify-center h-full min-h-[200px]">
-              <CardContent className="p-6 md:p-8 text-right space-y-6">
+            <Card className="border-none shadow-xl bg-gradient-to-br from-primary to-blue-700 text-white rounded-[2rem] overflow-hidden flex flex-col justify-center h-full min-h-[180px]">
+              <CardContent className="p-6 text-right space-y-4">
                 <div className="flex items-center justify-between mb-2">
-                   <Zap className="h-8 w-8 text-white/50" />
-                   <h3 className="text-lg md:text-xl font-black">פעולה מהירה 🐼</h3>
+                   <Zap className="h-6 w-6 text-white/50" />
+                   <h3 className="text-lg font-black">פעולה מהירה 🐼</h3>
                 </div>
-                <div className="flex flex-col gap-4">
+                <div className="flex flex-col gap-3">
                   <Button 
                     onClick={() => setIsAddModalOpen(true)} 
-                    className="w-full rounded-full font-black h-12 bg-white text-primary hover:bg-zinc-100 transition-all border-none text-xs md:text-sm"
+                    className="w-full rounded-full font-black h-11 bg-white text-primary hover:bg-zinc-100 transition-all border-none text-xs"
                   >
                     <Sparkles className="ml-2 h-4 w-4" /> סריקת חשבונית AI
                   </Button>
                   <Button 
                     variant="outline"
-                    className="w-full rounded-full border-2 border-white/50 text-white hover:bg-white/10 font-black h-12 transition-all text-xs md:text-sm bg-transparent"
+                    className="w-full rounded-full border-2 border-white/50 text-white hover:bg-white/10 font-black h-11 transition-all text-xs bg-transparent"
                   >
                     <Mic className="ml-2 h-4 w-4" /> הוספה קולית
                   </Button>
@@ -175,7 +159,7 @@ function StatCard({ title, value, symbol, icon, trendDesc, color }: any) {
   const fontSize = value.length > 8 ? 'text-lg' : value.length > 5 ? 'text-xl' : 'text-2xl md:text-3xl';
 
   return (
-    <Card className="shadow-sm border-none rounded-[2rem] overflow-hidden group transition-all hover:shadow-xl dark:bg-zinc-900 bg-white aspect-square md:aspect-auto md:h-full card-shadow">
+    <Card className="shadow-sm border-none rounded-[2rem] overflow-hidden group transition-all hover:shadow-xl dark:bg-zinc-900 bg-white aspect-square md:h-full card-shadow">
       <CardContent className="p-4 md:p-6 text-right flex flex-col justify-between h-full relative">
         <div className="flex justify-between items-start mb-2">
           <div className="text-right">
@@ -186,11 +170,11 @@ function StatCard({ title, value, symbol, icon, trendDesc, color }: any) {
           </div>
         </div>
         
-        <div className="flex flex-row items-baseline justify-start gap-1 tabular-nums mt-auto">
-          {symbol && <div className="text-lg md:text-xl font-black text-primary ml-1">{symbol}</div>}
+        <div className="flex flex-row-reverse items-baseline justify-start gap-1 tabular-nums mt-auto">
           <div className={cn("font-black text-foreground leading-none", fontSize)}>
             {value}
           </div>
+          {symbol && <div className="text-lg md:text-xl font-black text-primary mr-1">{symbol}</div>}
         </div>
 
         <div className="flex items-center justify-start mt-1">
