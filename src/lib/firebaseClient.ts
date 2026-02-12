@@ -12,7 +12,6 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID || staticConfig.appId,
 };
 
-// Guard: וודא שכל משתני הסביבה קיימים
 const missing = Object.entries(firebaseConfig)
   .filter(([_, v]) => !v)
   .map(([k]) => k);

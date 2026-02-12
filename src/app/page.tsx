@@ -85,36 +85,36 @@ export default function Home() {
           </div>
         </div>
 
-        {/* 1. Stats Grid (TOP) - Fixed RTL alignment */}
-        <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+        {/* 1. Stats Grid (TOP) - Square optimization for Mobile */}
+        <div className="grid gap-4 grid-cols-2 md:grid-cols-2 lg:grid-cols-4">
           <StatCard 
             title='סה"כ חודשי' 
             value={totalMonthlyILS.toLocaleString(undefined, { maximumFractionDigits: 0 })} 
             symbol="₪"
             icon={<TrendingUp className="text-primary h-5 w-5" />}
-            trendDesc="הוצאה חודשית משוקללת"
+            trendDesc="הוצאה חודשית"
             color="bg-primary/10"
           />
           <StatCard 
-            title='חידושים קרובים' 
+            title='חידושים' 
             value={`${upcomingRenewals}`} 
             icon={<Calendar className="text-[#4CAF50] h-5 w-5" />}
-            trendDesc="ב-7 הימים הקרובים"
+            trendDesc="ב-7 ימים"
             color="bg-[#4CAF50]/10"
           />
           <StatCard 
-            title='חיסכון אפשרי' 
+            title='חיסכון' 
             value={`1,420`} 
             symbol="₪"
             icon={<Lightbulb className="text-[#FF9800] h-5 w-5" />}
-            trendDesc="לפי ניתוח Panda AI"
+            trendDesc="לפי ה-AI"
             color="bg-[#FF9800]/10"
           />
           <StatCard 
-            title='תקופות ניסיון' 
+            title='ניסיון' 
             value={`${trialCount}`} 
             icon={<Hourglass className="text-[#E91E63] h-5 w-5" />}
-            trendDesc="דורש החלטה בקרוב"
+            trendDesc="דורש החלטה"
             color="bg-[#E91E63]/10"
           />
         </div>
@@ -125,22 +125,22 @@ export default function Home() {
             <AIRecommendations />
           </div>
           <div className="h-full">
-            <Card className="border-none shadow-xl bg-gradient-to-br from-primary to-blue-700 text-white rounded-[2rem] overflow-hidden flex flex-col justify-center h-full min-h-[220px]">
-              <CardContent className="p-8 text-right space-y-6">
+            <Card className="border-none shadow-xl bg-gradient-to-br from-primary to-blue-700 text-white rounded-[2rem] overflow-hidden flex flex-col justify-center h-full min-h-[200px]">
+              <CardContent className="p-6 md:p-8 text-right space-y-6">
                 <div className="flex items-center justify-between mb-2">
                    <Zap className="h-8 w-8 text-white/50" />
-                   <h3 className="text-xl font-black">פעולה מהירה 🐼</h3>
+                   <h3 className="text-lg md:text-xl font-black">פעולה מהירה 🐼</h3>
                 </div>
                 <div className="flex flex-col gap-4">
                   <Button 
                     onClick={() => setIsAddModalOpen(true)} 
-                    className="w-full rounded-full font-black h-12 bg-white text-primary hover:bg-zinc-100 transition-all border-none text-sm"
+                    className="w-full rounded-full font-black h-12 bg-white text-primary hover:bg-zinc-100 transition-all border-none text-xs md:text-sm"
                   >
                     <Sparkles className="ml-2 h-4 w-4" /> סריקת חשבונית AI
                   </Button>
                   <Button 
                     variant="outline"
-                    className="w-full rounded-full border-2 border-white/50 text-white hover:bg-white/10 font-black h-12 transition-all text-sm bg-transparent"
+                    className="w-full rounded-full border-2 border-white/50 text-white hover:bg-white/10 font-black h-12 transition-all text-xs md:text-sm bg-transparent"
                   >
                     <Mic className="ml-2 h-4 w-4" /> הוספה קולית
                   </Button>
@@ -172,29 +172,29 @@ export default function Home() {
 }
 
 function StatCard({ title, value, symbol, icon, trendDesc, color }: any) {
-  const fontSize = value.length > 8 ? 'text-xl' : value.length > 5 ? 'text-2xl' : 'text-3xl md:text-4xl';
+  const fontSize = value.length > 8 ? 'text-lg' : value.length > 5 ? 'text-xl' : 'text-2xl md:text-3xl';
 
   return (
-    <Card className="shadow-sm border-none rounded-[2rem] overflow-hidden group transition-all hover:shadow-xl dark:bg-zinc-900 bg-white h-full card-shadow">
-      <CardContent className="p-6 text-right flex flex-col justify-between h-full relative">
-        <div className="flex justify-between items-start mb-4">
+    <Card className="shadow-sm border-none rounded-[2rem] overflow-hidden group transition-all hover:shadow-xl dark:bg-zinc-900 bg-white aspect-square md:aspect-auto md:h-full card-shadow">
+      <CardContent className="p-4 md:p-6 text-right flex flex-col justify-between h-full relative">
+        <div className="flex justify-between items-start mb-2">
           <div className="text-right">
-            <span className="text-[11px] font-black text-muted-foreground uppercase tracking-widest">{title}</span>
+            <span className="text-[10px] md:text-[11px] font-black text-muted-foreground uppercase tracking-widest">{title}</span>
           </div>
-          <div className={`p-3 rounded-2xl ${color} group-hover:rotate-6 transition-transform duration-300 shadow-sm shrink-0`}>
+          <div className={`p-2 md:p-3 rounded-2xl ${color} group-hover:rotate-6 transition-transform duration-300 shadow-sm shrink-0`}>
             {icon}
           </div>
         </div>
         
         <div className="flex flex-row items-baseline justify-start gap-1 tabular-nums mt-auto">
-          {symbol && <div className="text-xl font-black text-primary ml-1">{symbol}</div>}
+          {symbol && <div className="text-lg md:text-xl font-black text-primary ml-1">{symbol}</div>}
           <div className={cn("font-black text-foreground leading-none", fontSize)}>
             {value}
           </div>
         </div>
 
-        <div className="flex items-center justify-start mt-2">
-          <span className="text-[10px] font-bold text-muted-foreground opacity-70 truncate">{trendDesc}</span>
+        <div className="flex items-center justify-start mt-1">
+          <span className="text-[9px] md:text-[10px] font-bold text-muted-foreground opacity-70 truncate">{trendDesc}</span>
         </div>
       </CardContent>
     </Card>
