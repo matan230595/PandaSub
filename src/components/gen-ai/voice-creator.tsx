@@ -100,7 +100,7 @@ export function VoiceCreator() {
                 <span className="text-xs font-bold text-muted-foreground">שם המינוי</span>
               </div>
               <div className="flex justify-between items-center p-4 bg-primary/5 rounded-2xl">
-                <span className="font-black text-lg text-primary">{extractedData.amount} {extractedData.currency}</span>
+                <span className="font-black text-lg text-primary tabular-nums">{extractedData.amount} {extractedData.currency}</span>
                 <span className="text-xs font-bold text-muted-foreground">סכום</span>
               </div>
               <div className="flex justify-between items-center p-4 bg-primary/5 rounded-2xl">

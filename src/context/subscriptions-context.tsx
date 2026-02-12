@@ -123,11 +123,18 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
   const { user, isUserLoading } = useUser();
 
   useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const wizard = localStorage.getItem('panda_wizard');
+      setIsWizardComplete(wizard === 'complete');
+    }
+  }, []);
+
+  useEffect(() => {
     if (isUserLoading) return;
 
     if (!user) {
-      const saved = localStorage.getItem('panda_subs_v11');
-      if (saved) setSubscriptions(JSON.parse(saved));
+      setSubscriptions([]);
+      setNotifications([]);
       setIsLoading(false);
       return;
     }
@@ -218,13 +225,13 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
       const diffDays = Math.ceil((renewalDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
       
       const activeReminders = sub.reminderDays || [3];
-      if (activeReminders.includes(diffDays)) {
+      if (activeReminders.includes(diffDays) || diffDays === 0) {
         const noteId = `renewal-${sub.id}-${diffDays}-${todayStr}`;
         if (!notifications.some(n => n.id === noteId)) {
           const newNote = scrubUndefined({
             userId: user.uid,
             title: diffDays === 0 ? `היום חיוב: ${sub.name}` : `חיוב עבור ${sub.name} בעוד ${diffDays} ימים`,
-            message: `סכום: ${sub.amount}${sub.currency}.`,
+            message: `סכום: ${sub.amount}${sub.currency}. וודא שיש כיסוי בחשבון.`,
             date: new Date().toISOString(),
             read: false,
             type: diffDays <= 1 ? 'critical' : 'warning',
@@ -233,7 +240,7 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
           
           try {
             await setDoc(doc(db, 'users', user.uid, 'notifications', noteId), newNote);
-            playNotificationSound();
+            if (diffDays <= 3) playNotificationSound();
           } catch (e) {
             console.error("Error creating notification:", e);
           }
@@ -281,7 +288,7 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
   const duplicateSubscription = (id: string) => {
     const subToCopy = subscriptions.find(s => s.id === id);
     if (subToCopy) {
-      const { id: _, ...rest } = subToCopy;
+      const { id: _, userId: __, ...rest } = subToCopy;
       addSubscription({ ...rest, name: `${subToCopy.name} (עותק)` });
     }
   };

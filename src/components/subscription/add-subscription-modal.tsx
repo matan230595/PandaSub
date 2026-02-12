@@ -225,37 +225,43 @@ export function AddSubscriptionModal({ open, onOpenChange, subscription }: AddSu
   }
 
   function onFormError(errors: any) {
-    const firstError = Object.values(errors)[0] as any;
-    toast({
-      variant: "destructive",
-      title: "חסרים פרטים בטופס",
-      description: firstError?.message || "אנא מלא את כל שדות החובה המסומנים.",
-    });
+    const errorEntries = Object.entries(errors);
+    if (errorEntries.length > 0) {
+      console.log("Form Errors:", errors);
+      toast({
+        variant: "destructive",
+        title: "חסרים פרטים בטופס",
+        description: "אנא מלא את כל שדות החובה המסומנים בכוכבית.",
+      });
+    }
   }
 
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent className="sm:max-w-[650px] max-h-[90vh] text-right p-0 overflow-hidden border-none shadow-2xl rounded-[2.5rem]">
+          <DialogHeader className="p-8 bg-primary/5 border-b sr-only">
+            <DialogTitle>פרטי המינוי</DialogTitle>
+            <DialogDescription id="add-sub-desc">ערוך או הוסף מינוי חדש למערכת</DialogDescription>
+          </DialogHeader>
+          
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit, onFormError)} className="flex flex-col max-h-[90vh]">
-              <DialogHeader className="p-8 bg-primary/5 border-b">
-                <div className="flex items-center justify-between">
-                  <div className="text-right">
-                    <DialogTitle className="text-3xl font-black text-primary">
-                      {isEdit ? "עריכת מינוי" : "הוספת מינוי חדש"}
-                    </DialogTitle>
-                    <DialogDescription className="text-muted-foreground mt-1">
-                      מלא את פרטי המינוי כדי לקבל תזכורות וסטטיסטיקה מדויקת.
-                    </DialogDescription>
-                  </div>
-                  {!isEdit && (
-                    <Button type="button" variant="outline" onClick={handleAiScan} disabled={isAiLoading} className="rounded-full gap-2 border-primary/30 bg-white text-primary font-bold h-10 px-4">
-                      {isAiLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />} סריקה חכמה
-                    </Button>
-                  )}
+              <div className="p-8 bg-primary/5 border-b flex items-center justify-between">
+                <div className="text-right">
+                  <h2 className="text-3xl font-black text-primary">
+                    {isEdit ? "עריכת מינוי" : "הוספת מינוי חדש"}
+                  </h2>
+                  <p className="text-muted-foreground mt-1">
+                    מלא את פרטי המינוי כדי לקבל תזכורות וסטטיסטיקה מדויקת.
+                  </p>
                 </div>
-              </DialogHeader>
+                {!isEdit && (
+                  <Button type="button" variant="outline" onClick={handleAiScan} disabled={isAiLoading} className="rounded-full gap-2 border-primary/30 bg-white text-primary font-bold h-10 px-4">
+                    {isAiLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />} סריקה חכמה
+                  </Button>
+                )}
+              </div>
 
               <ScrollArea className="flex-1 px-8 py-6">
                 <Tabs defaultValue="basic" className="w-full">
@@ -381,7 +387,7 @@ export function AddSubscriptionModal({ open, onOpenChange, subscription }: AddSu
                           <FormItem className="text-right col-span-2">
                             <FormLabel className="text-base font-bold">סכום לתשלום *</FormLabel>
                             <FormControl>
-                              <Input type="number" step="0.01" className="rounded-xl h-14 text-right text-xl font-black" {...field} />
+                              <Input type="number" step="0.01" className="rounded-xl h-14 text-right text-xl font-black tabular-nums" {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -600,7 +606,7 @@ export function AddSubscriptionModal({ open, onOpenChange, subscription }: AddSu
               <AlertTriangle className="h-12 w-12" />
             </div>
             <AlertDialogTitle className="text-3xl font-black">מחיקת מינוי?</AlertDialogTitle>
-            <AlertDialogDescription id="delete-desc" className="text-center text-muted-foreground text-lg mt-2">
+            <AlertDialogDescription id="delete-alert-desc" className="text-center text-muted-foreground text-lg mt-2">
               פעולה זו היא סופית ולא ניתן יהיה לשחזר את המידע על המינוי הזה.
             </AlertDialogDescription>
           </AlertDialogHeader>
