@@ -10,7 +10,7 @@ import {
   deleteDoc,
   updateDoc
 } from 'firebase/firestore';
-import { db, auth as firebaseAuth } from '@/lib/firebaseClient';
+import { db } from '@/lib/firebaseClient';
 import { useUser } from '@/firebase';
 import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError } from '@/firebase/errors';
@@ -71,8 +71,8 @@ const DEFAULT_SETTINGS: UserSettings = {
   currency: '₪',
   language: 'he',
   userName: 'ישראל ישראלי',
-  userEmail: 'israel@example.com',
-  userPhone: '050-1234567',
+  userEmail: '',
+  userPhone: '',
   familyName: '',
   visibleColumns: ['name', 'amount', 'renewalDate', 'status', 'category'],
   bankSyncEnabled: false
@@ -87,6 +87,21 @@ const EXCHANGE_RATES: Record<string, number> = {
   'EUR': 4.05,
 };
 
+// Helper to scrub undefined values for Firestore
+function scrubUndefined(obj: any): any {
+  const result: any = {};
+  Object.keys(obj).forEach(key => {
+    if (obj[key] !== undefined) {
+      if (typeof obj[key] === 'object' && obj[key] !== null && !Array.isArray(obj[key])) {
+        result[key] = scrubUndefined(obj[key]);
+      } else {
+        result[key] = obj[key];
+      }
+    }
+  });
+  return result;
+}
+
 export function SubscriptionsProvider({ children }: { children: React.ReactNode }) {
   const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
   const [isWizardComplete, setIsWizardComplete] = useState<boolean>(true);
@@ -100,7 +115,6 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
     if (isUserLoading || !db || !user) {
       const saved = localStorage.getItem('panda_subs_v11');
       if (saved) setSubscriptions(JSON.parse(saved));
-      else if (!user && !isUserLoading) setSubscriptions(SAMPLE_SUBSCRIPTIONS);
       return;
     }
 
@@ -110,10 +124,7 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
       snapshot.forEach(doc => subs.push({ ...doc.data() as Subscription, id: doc.id }));
       setSubscriptions(subs);
     }, (error) => {
-      errorEmitter.emit('permission-error', new FirestorePermissionError({
-        path: subsRef.path,
-        operation: 'list'
-      }));
+      console.error("Firestore error:", error);
     });
 
     const settingsRef = doc(db, 'users', user.uid);
@@ -207,38 +218,32 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
     const updated = { ...settings, ...newSettings };
     setSettings(updated);
     if (user && db) {
-      setDoc(doc(db, 'users', user.uid), { settings: updated }, { merge: true });
+      setDoc(doc(db, 'users', user.uid), { settings: scrubUndefined(updated) }, { merge: true });
     }
   };
 
   const addSubscription = (sub: Omit<Subscription, 'id'>) => {
+    const scrubbedSub = scrubUndefined(sub);
     if (user && db) {
       const newDoc = doc(collection(db, 'users', user.uid, 'subscriptions'));
-      setDoc(newDoc, { ...sub, id: newDoc.id }).catch(e => {
-        errorEmitter.emit('permission-error', new FirestorePermissionError({
-          path: newDoc.path,
-          operation: 'create',
-          requestResourceData: sub
-        }));
+      setDoc(newDoc, { ...scrubbedSub, id: newDoc.id }).catch(e => {
+        console.error("Error adding subscription:", e);
       });
     } else {
-      const newSub = { ...sub, id: Math.random().toString(36).substr(2, 9) };
+      const newSub = { ...scrubbedSub, id: Math.random().toString(36).substr(2, 9) };
       setSubscriptions(prev => [newSub, ...prev]);
     }
   };
 
   const updateSubscription = (id: string, sub: Partial<Subscription>) => {
+    const scrubbedSub = scrubUndefined(sub);
     if (user && db) {
       const subRef = doc(db, 'users', user.uid, 'subscriptions', id);
-      updateDoc(subRef, sub).catch(e => {
-        errorEmitter.emit('permission-error', new FirestorePermissionError({
-          path: subRef.path,
-          operation: 'update',
-          requestResourceData: sub
-        }));
+      updateDoc(subRef, scrubbedSub).catch(e => {
+        console.error("Error updating subscription:", e);
       });
     } else {
-      setSubscriptions(prev => prev.map(s => s.id === id ? { ...s, ...sub } : s));
+      setSubscriptions(prev => prev.map(s => s.id === id ? { ...s, ...scrubbedSub } : s));
     }
   };
 

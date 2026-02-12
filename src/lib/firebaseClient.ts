@@ -3,14 +3,13 @@ import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 import { firebaseConfig } from "@/firebase/config";
 
-// Singleton initialization pattern
+// Singleton initialization pattern to prevent multiple instances
 let app: any;
 let auth: any;
 let db: any;
 
 try {
   // Use the standard configuration provided in src/firebase/config.ts
-  // This avoids issues with missing or incorrect environment variables.
   app = getApps().length ? getApp() : initializeApp(firebaseConfig);
   auth = getAuth(app);
   db = getFirestore(app);

@@ -11,6 +11,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from "@/components/ui/dialog"
 import {
   Form,
@@ -221,16 +222,16 @@ export function AddSubscriptionModal({ open, onOpenChange, subscription }: AddSu
       currency: values.currency,
       renewalDate: values.renewalDate,
       billingCycle: values.billingCycle,
-      paymentMethod: values.paymentMethod,
+      paymentMethod: values.paymentMethod || "",
       reminderDays: values.reminderDays,
       status: values.status as SubscriptionStatus,
       priority: values.priority as any,
-      notes: values.notes || undefined,
+      notes: values.notes || "",
       credentials: {
-        username: values.username,
-        email: values.email,
-        password: values.password,
-        phone: values.phone,
+        username: values.username || "",
+        email: values.email || "",
+        password: values.password || "",
+        phone: values.phone || "",
       }
     }
 
@@ -246,17 +247,18 @@ export function AddSubscriptionModal({ open, onOpenChange, subscription }: AddSu
 
   function onFormError(errors: any) {
     console.log("Form Errors:", errors);
+    const firstError = Object.values(errors)[0] as any;
     toast({
       variant: "destructive",
       title: "שגיאה בטופס",
-      description: "אנא בדוק את כל השדות בשלבי הטופס השונים (בסיסי, חיוב וכו').",
+      description: firstError?.message || "אנא בדוק שכל שדות החובה מלאים.",
     });
   }
 
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="sm:max-w-[600px] max-h-[90vh] text-right p-0 overflow-hidden border-none shadow-2xl rounded-3xl">
+        <DialogContent className="sm:max-w-[600px] max-h-[90vh] text-right p-0 overflow-hidden border-none shadow-2xl rounded-3xl" aria-describedby="add-subscription-description">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit, onFormError)} className="flex flex-col max-h-[90vh]">
               <DialogHeader className="p-6 bg-primary/5 border-b flex flex-row items-center justify-between">
@@ -264,6 +266,9 @@ export function AddSubscriptionModal({ open, onOpenChange, subscription }: AddSu
                   <DialogTitle className="text-2xl font-black">
                     {isEdit ? "עריכת מינוי" : "הוספת מינוי חדש"}
                   </DialogTitle>
+                  <DialogDescription id="add-subscription-description" className="sr-only">
+                    טופס להוספה או עריכה של פרטי המינוי שלך במערכת PandaSub.
+                  </DialogDescription>
                 </div>
                 <div className="flex items-center gap-2">
                   {!isEdit && (

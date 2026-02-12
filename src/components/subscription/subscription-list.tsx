@@ -210,13 +210,15 @@ export function SubscriptionList() {
       </div>
       <AddSubscriptionModal open={isModalOpen} onOpenChange={(val) => { setIsModalOpen(val); if (!val) setSelectedSub(null); }} subscription={selectedSub} />
       <AlertDialog open={!!deleteConfirmId} onOpenChange={(open) => !open && setDeleteConfirmId(null)}>
-        <AlertDialogContent className="text-right rounded-3xl" dir="rtl">
+        <AlertDialogContent className="text-right rounded-3xl" dir="rtl" aria-describedby="delete-confirm-description">
           <AlertDialogHeader className="items-center">
             <div className="h-20 w-20 rounded-full bg-destructive/10 flex items-center justify-center text-destructive mb-4">
               <AlertTriangle className="h-10 w-10" />
             </div>
             <AlertDialogTitle className="text-2xl font-black">מחיקת מינוי?</AlertDialogTitle>
-            <AlertDialogDescription className="text-center">האם אתה בטוח שברצונך למחוק את המינוי לצמיתות?</AlertDialogDescription>
+            <AlertDialogDescription id="delete-confirm-description" className="text-center">
+              האם אתה בטוח שברצונך למחוק את המינוי לצמיתות? לא ניתן יהיה לשחזר את המידע.
+            </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="flex flex-row-reverse gap-3 mt-8 justify-center">
             <AlertDialogAction onClick={() => { if (deleteConfirmId) deleteSubscription(deleteConfirmId); setDeleteConfirmId(null); }} className="bg-destructive hover:bg-destructive/90 rounded-full px-8 h-12 font-black">כן, מחק</AlertDialogAction>
