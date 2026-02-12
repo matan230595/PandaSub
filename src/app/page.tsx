@@ -57,7 +57,7 @@ export default function Home() {
       <TopNav />
       <main className="flex-1 container mx-auto p-4 md:p-8 space-y-8 animate-fade-in pb-24 max-w-7xl">
         
-        {/* Stats Grid - Square on Mobile, Proportionate on Desktop */}
+        {/* Stats Grid - Square on Mobile, Proportional Rectangles on Desktop */}
         <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
           <StatCard 
             title='סה"כ חודשי' 
@@ -91,7 +91,7 @@ export default function Home() {
           />
         </div>
 
-        {/* AI Insights & Quick Actions - 2/3 and 1/3 Balanced */}
+        {/* AI Insights & Quick Actions - Balanced Sidebar Style */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2">
             <AIRecommendations />
@@ -144,10 +144,12 @@ export default function Home() {
 }
 
 function StatCard({ title, value, symbol, icon, trendDesc, color }: any) {
+  // Use aspect-square for mobile to keep them as squares even on wide phones.
+  // On desktop (lg), use aspect-auto and a fixed height to avoid huge squares.
   const fontSize = value.length > 8 ? 'text-lg' : value.length > 5 ? 'text-xl' : 'text-2xl md:text-3xl';
 
   return (
-    <Card className="shadow-sm border-none rounded-[2rem] overflow-hidden group transition-all hover:shadow-xl dark:bg-zinc-900 bg-white aspect-square lg:aspect-auto lg:h-36 h-full card-shadow">
+    <Card className="shadow-sm border-none rounded-[2rem] overflow-hidden group transition-all hover:shadow-xl dark:bg-zinc-900 bg-white aspect-square lg:aspect-auto lg:h-32 h-full card-shadow">
       <CardContent className="p-4 md:p-6 text-right flex flex-col justify-between h-full relative">
         <div className="flex justify-between items-start mb-2">
           <div className="text-right">
