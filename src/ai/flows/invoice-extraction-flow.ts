@@ -18,12 +18,25 @@ const ExtractSubscriptionFromInvoiceOutputSchema = z.object({
   currency: z.string().describe('The currency symbol or code.'),
   renewalDate: z.string().describe('The estimated renewal or next billing date (YYYY-MM-DD).'),
   category: z.string().describe('The most appropriate category for the service.'),
+  error: z.string().optional().describe('Error message if extraction fails.'),
 });
 
 export type ExtractSubscriptionFromInvoiceOutput = z.infer<typeof ExtractSubscriptionFromInvoiceOutputSchema>;
 
 export async function extractSubscriptionFromInvoice(input: ExtractSubscriptionFromInvoiceInput): Promise<ExtractSubscriptionFromInvoiceOutput> {
-  return extractSubscriptionFromInvoiceFlow(input);
+  try {
+    return await extractSubscriptionFromInvoiceFlow(input);
+  } catch (error: any) {
+    console.error("Invoice AI Error:", error);
+    return {
+      subscriptionName: "",
+      amount: 0,
+      currency: "₪",
+      renewalDate: "",
+      category: "other",
+      error: "לא הצלחנו לנתח את החשבונית. נסה להעתיק טקסט ברור יותר."
+    };
+  }
 }
 
 const prompt = ai.definePrompt({

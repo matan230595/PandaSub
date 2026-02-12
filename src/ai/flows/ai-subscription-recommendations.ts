@@ -1,4 +1,3 @@
-
 "use server";
 /**
  * @fileOverview AI-powered recommendations for duplicate subscriptions and cheaper alternatives, to optimize spending.
@@ -14,12 +13,21 @@ export type SubscriptionRecommendationInput = z.infer<typeof SubscriptionRecomme
 
 const SubscriptionRecommendationOutputSchema = z.object({
   recommendations: z.string().describe('AI-generated recommendations for duplicate subscriptions, cheaper alternatives, and usage pattern analysis.'),
+  error: z.string().optional().describe('Error message if the recommendation fails.'),
 });
 
 export type SubscriptionRecommendationOutput = z.infer<typeof SubscriptionRecommendationOutputSchema>;
 
 export async function subscriptionRecommendation(input: SubscriptionRecommendationInput): Promise<SubscriptionRecommendationOutput> {
-  return subscriptionRecommendationFlow(input);
+  try {
+    return await subscriptionRecommendationFlow(input);
+  } catch (error: any) {
+    console.error("AI Flow Error:", error);
+    return { 
+      recommendations: "", 
+      error: "מצטערים, חלה שגיאה בחיבור למודול ה-AI. ייתכן שיש עומס על השרת." 
+    };
+  }
 }
 
 const subscriptionRecommendationPrompt = ai.definePrompt({

@@ -3,28 +3,43 @@
 import * as React from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { Sparkles, RefreshCcw } from "lucide-react"
+import { Sparkles, RefreshCcw, AlertCircle } from "lucide-react"
 import { subscriptionRecommendation } from "@/ai/flows/ai-subscription-recommendations"
 import { useSubscriptions } from "@/context/subscriptions-context"
 import { Skeleton } from "@/components/ui/skeleton"
 import { cn } from "@/lib/utils"
+import { useToast } from "@/hooks/use-toast"
 
 export function AIRecommendations() {
   const { subscriptions, convertAmount } = useSubscriptions()
   const [loading, setLoading] = React.useState(false)
   const [results, setResults] = React.useState<string | null>(null)
+  const [error, setError] = React.useState<string | null>(null)
+  const { toast } = useToast()
 
   const getRecommendations = async () => {
     setLoading(true)
+    setError(null)
     try {
       const subListStr = subscriptions.length > 0 
         ? subscriptions.map(s => `${s.name}: ${s.amount}${s.currency} (${s.category}), ≈ ₪${convertAmount(s.amount, s.currency).toFixed(1)}, מחדש ב-${s.renewalDate}`).join('\n')
         : "אין מינויים כרגע"
       
-      const { recommendations } = await subscriptionRecommendation({ subscriptionList: subListStr })
-      setResults(recommendations)
-    } catch (error) {
-      console.error(error)
+      const result = await subscriptionRecommendation({ subscriptionList: subListStr })
+      
+      if (result.error) {
+        throw new Error(result.error);
+      }
+      
+      setResults(result.recommendations)
+    } catch (err: any) {
+      const msg = err.message || "שגיאה בחיבור לשרת ה-AI. נסה שוב מאוחר יותר."
+      setError(msg)
+      toast({
+        variant: "destructive",
+        title: "שגיאת AI",
+        description: msg
+      })
     } finally {
       setLoading(false)
     }
@@ -56,7 +71,17 @@ export function AIRecommendations() {
       </CardHeader>
       
       <CardContent className="p-0 flex-1 flex flex-col justify-center overflow-hidden bg-muted/5">
-        {!results && !loading ? (
+        {error ? (
+          <div className="p-6 text-center space-y-3">
+            <div className="bg-destructive/10 p-3 rounded-full w-fit mx-auto">
+              <AlertCircle className="h-6 w-6 text-destructive" />
+            </div>
+            <p className="text-xs font-bold text-destructive">{error}</p>
+            <Button onClick={getRecommendations} variant="outline" size="sm" className="rounded-full h-8 text-[10px]">
+              נסה שוב
+            </Button>
+          </div>
+        ) : !results && !loading ? (
           <div className="text-center animate-fade-in p-6 space-y-4">
             <h4 className="font-black text-base">מוכן לחיסכון חכם?</h4>
             <Button 

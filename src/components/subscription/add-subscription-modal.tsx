@@ -169,6 +169,8 @@ export function AddSubscriptionModal({ open, onOpenChange, subscription }: AddSu
     setIsAiLoading(true);
     try {
       const result = await extractSubscriptionFromInvoice({ invoiceText: text });
+      if (result.error) throw new Error(result.error);
+      
       form.setValue('name', result.subscriptionName);
       form.setValue('amount', result.amount);
       form.setValue('currency', result.currency);
@@ -177,8 +179,8 @@ export function AddSubscriptionModal({ open, onOpenChange, subscription }: AddSu
         form.setValue('category', result.category);
       }
       toast({ title: "הנתונים חולצו בהצלחה", description: "ה-AI מילא את השדות עבורך." });
-    } catch (e) {
-      toast({ title: "שגיאה בסריקה", description: "לא הצלחנו לחלץ נתונים.", variant: "destructive" });
+    } catch (e: any) {
+      toast({ title: "שגיאה בסריקה", description: e.message || "לא הצלחנו לחלץ נתונים.", variant: "destructive" });
     } finally {
       setIsAiLoading(false);
     }
@@ -226,7 +228,6 @@ export function AddSubscriptionModal({ open, onOpenChange, subscription }: AddSu
   function onFormError(errors: any) {
     const errorEntries = Object.entries(errors);
     if (errorEntries.length > 0) {
-      console.log("Form Errors:", errors);
       toast({
         variant: "destructive",
         title: "חסרים פרטים בטופס",
@@ -238,10 +239,13 @@ export function AddSubscriptionModal({ open, onOpenChange, subscription }: AddSu
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="sm:max-w-[650px] max-h-[90vh] text-right p-0 overflow-hidden border-none shadow-2xl rounded-[2.5rem]">
+        <DialogContent 
+          className="sm:max-w-[650px] max-h-[90vh] text-right p-0 overflow-hidden border-none shadow-2xl rounded-[2.5rem]"
+          aria-describedby="add-sub-modal-desc"
+        >
           <DialogHeader className="p-8 bg-primary/5 border-b sr-only">
             <DialogTitle>פרטי המינוי</DialogTitle>
-            <DialogDescription id="add-sub-desc">ערוך או הוסף מינוי חדש למערכת</DialogDescription>
+            <DialogDescription id="add-sub-modal-desc">ערוך או הוסף מינוי חדש למערכת כולל פרטי תשלום וגישה.</DialogDescription>
           </DialogHeader>
           
           <Form {...form}>
@@ -599,14 +603,18 @@ export function AddSubscriptionModal({ open, onOpenChange, subscription }: AddSu
       </Dialog>
 
       <AlertDialog open={showDeleteAlert} onOpenChange={setShowDeleteAlert}>
-        <AlertDialogContent className="text-right rounded-[2.5rem] border-none shadow-2xl p-10" dir="rtl">
+        <AlertDialogContent 
+          className="text-right rounded-[2.5rem] border-none shadow-2xl p-10" 
+          dir="rtl"
+          aria-describedby="delete-alert-desc"
+        >
           <AlertDialogHeader className="items-center">
             <div className="h-24 w-24 rounded-full bg-destructive/10 flex items-center justify-center text-destructive mb-6">
               <AlertTriangle className="h-12 w-12" />
             </div>
             <AlertDialogTitle className="text-3xl font-black">מחיקת מינוי?</AlertDialogTitle>
             <AlertDialogDescription id="delete-alert-desc" className="text-center text-muted-foreground text-lg mt-2">
-              פעולה זו היא סופית ולא ניתן יהיה לשחזר את המידע על המינוי הזה.
+              פעולה זו היא סופית ולא ניתן יהיה לשחזר את המידע על המינוי הזה מהמערכת.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="sm:justify-center flex flex-row-reverse gap-4 mt-10">
