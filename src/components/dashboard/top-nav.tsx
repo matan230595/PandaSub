@@ -1,3 +1,4 @@
+
 "use client"
 
 import { Bell, Search, User, X, Calendar as CalendarIcon, Zap } from "lucide-react"
@@ -52,7 +53,7 @@ export function TopNav() {
                       onClick={() => markNotificationAsRead(n.id)}
                     >
                       <div className="flex justify-between items-start mb-1">
-                        <span className="text-[9px] text-muted-foreground">
+                        <span className="text-[9px] text-muted-foreground tabular-nums">
                           {new Date(n.date).toLocaleDateString('he-IL', { hour: '2-digit', minute: '2-digit' })}
                         </span>
                         <div className="flex items-center gap-2">
@@ -118,7 +119,6 @@ export function TopNav() {
         />
       </div>
       
-      {/* Space for SidebarTrigger on Desktop if needed */}
       <div className="hidden lg:block w-10"></div>
     </header>
   )

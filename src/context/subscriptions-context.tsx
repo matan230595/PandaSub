@@ -1,3 +1,4 @@
+
 "use client"
 
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
@@ -92,6 +93,7 @@ const EXCHANGE_RATES: Record<string, number> = {
 
 /**
  * Deeply scrubs undefined values from an object to prevent Firebase crashes.
+ * Handles nested objects like credentials.
  */
 function scrubUndefined(obj: any): any {
   if (obj === null || typeof obj !== 'object') return obj;
@@ -101,7 +103,7 @@ function scrubUndefined(obj: any): any {
   Object.keys(obj).forEach(key => {
     const value = obj[key];
     if (value !== undefined && value !== null) {
-      if (typeof value === 'object') {
+      if (typeof value === 'object' && !Array.isArray(value)) {
         result[key] = scrubUndefined(value);
       } else {
         result[key] = value;
@@ -139,6 +141,7 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
     }
 
     setIsLoading(true);
+    // Real-time sync for subscriptions
     const subsRef = collection(db!, 'users', user.uid, 'subscriptions');
     const unsubscribe = onSnapshot(subsRef, (snapshot) => {
       const subs: Subscription[] = [];
@@ -150,6 +153,7 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
       setIsLoading(false);
     });
 
+    // Real-time sync for user settings
     const settingsRef = doc(db!, 'users', user.uid);
     const unsubscribeSettings = onSnapshot(settingsRef, (snapshot) => {
       if (snapshot.exists()) {
@@ -158,6 +162,7 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
       }
     });
 
+    // Real-time sync for persistent notifications
     const notificationsRef = collection(db!, 'users', user.uid, 'notifications');
     const qNotifications = query(notificationsRef, orderBy('date', 'desc'), limit(20));
     const unsubscribeNotifications = onSnapshot(qNotifications, (snapshot) => {
@@ -173,6 +178,7 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
     }
   }, [user, isUserLoading]);
 
+  // Automated reminder logic
   useEffect(() => {
     if (user && !isLoading && subscriptions.length > 0) {
       checkReminders();
@@ -225,7 +231,10 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
       
       const activeReminders = sub.reminderDays || [3];
       if (activeReminders.includes(diffDays) || diffDays === 0) {
+        // Unique ID for each reminder per sub per day
         const noteId = `renewal-${sub.id}-${diffDays}-${todayStr}`;
+        
+        // Only create if it doesn't exist already
         if (!notifications.some(n => n.id === noteId)) {
           const newNote = scrubUndefined({
             userId: user.uid,
@@ -270,6 +279,7 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
 
   const updateSubscription = (id: string, sub: Partial<Subscription>) => {
     if (user && db) {
+      // CRITICAL: Must always include userId for security rules
       const dataToSave = scrubUndefined({ ...sub, userId: user.uid });
       const subRef = doc(db, 'users', user.uid, 'subscriptions', id);
       updateDoc(subRef, dataToSave).catch(e => {

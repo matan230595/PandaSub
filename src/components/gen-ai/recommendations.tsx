@@ -1,3 +1,4 @@
+
 "use client"
 
 import * as React from "react"
@@ -70,7 +71,8 @@ export function AIRecommendations() {
         </div>
       </CardHeader>
       
-      <CardContent className="p-0 flex-1 flex flex-col justify-center overflow-hidden bg-muted/5">
+      <CardContent className="p-0 flex-1 flex flex-col justify-center overflow-hidden bg-muted/5" aria-describedby="ai-rec-desc">
+        <div id="ai-rec-desc" className="sr-only">המלצות בינה מלאכותית לחיסכון במינויים</div>
         {error ? (
           <div className="p-6 text-center space-y-3">
             <div className="bg-destructive/10 p-3 rounded-full w-fit mx-auto">

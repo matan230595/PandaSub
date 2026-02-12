@@ -1,3 +1,4 @@
+
 "use client"
 
 import * as React from "react"
@@ -187,6 +188,7 @@ export function AddSubscriptionModal({ open, onOpenChange, subscription }: AddSu
   }
 
   function onSubmit(values: z.infer<typeof formSchema>) {
+    // Calculate trial end date automatically
     let trialEndsAt = undefined;
     if (values.status === 'trial' && values.trialPeriodDays) {
       trialEndsAt = addDays(new Date(values.renewalDate), values.trialPeriodDays).toISOString().split('T')[0];
@@ -225,17 +227,6 @@ export function AddSubscriptionModal({ open, onOpenChange, subscription }: AddSu
     onOpenChange(false)
   }
 
-  function onFormError(errors: any) {
-    const errorEntries = Object.entries(errors);
-    if (errorEntries.length > 0) {
-      toast({
-        variant: "destructive",
-        title: "חסרים פרטים בטופס",
-        description: "אנא מלא את כל שדות החובה המסומנים בכוכבית.",
-      });
-    }
-  }
-
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
@@ -249,7 +240,7 @@ export function AddSubscriptionModal({ open, onOpenChange, subscription }: AddSu
           </DialogHeader>
           
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit, onFormError)} className="flex flex-col max-h-[90vh]">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col max-h-[90vh]">
               <div className="p-8 bg-primary/5 border-b flex items-center justify-between">
                 <div className="text-right">
                   <h2 className="text-3xl font-black text-primary">
