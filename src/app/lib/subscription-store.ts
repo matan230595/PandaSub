@@ -64,16 +64,6 @@ export const PRIORITY_CONFIG = {
   none: { label: 'ללא', color: '#E0E0E0' }
 };
 
-export const CANCELLATION_LINKS: Record<string, string> = {
-  'netflix': 'https://www.netflix.com/cancelplan',
-  'spotify': 'https://www.spotify.com/account/subscription/',
-  'apple': 'https://support.apple.com/HT202039',
-  'google': 'https://myaccount.google.com/subscriptions',
-  'adobe': 'https://account.adobe.com/plans',
-  'amazon': 'https://www.amazon.com/mc/manage',
-  'disney': 'https://www.disneyplus.com/account/subscription',
-};
-
 export const SAMPLE_SUBSCRIPTIONS: Subscription[] = [
   {
     id: '1',
