@@ -1,4 +1,3 @@
-
 "use client"
 
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
@@ -91,9 +90,6 @@ const EXCHANGE_RATES: Record<string, number> = {
   'EUR': 4.05,
 };
 
-/**
- * Robustly scrubs undefined and null values from an object to prevent Firebase crashes.
- */
 function scrubUndefined(obj: any): any {
   if (obj === null || typeof obj !== 'object') return obj;
   if (Array.isArray(obj)) return obj.map(scrubUndefined);
@@ -140,7 +136,6 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
     }
 
     setIsLoading(true);
-    // Real-time sync for subscriptions
     const subsRef = collection(db, 'users', user.uid, 'subscriptions');
     const unsubscribe = onSnapshot(subsRef, (snapshot) => {
       const subs: Subscription[] = [];
@@ -152,7 +147,6 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
       setIsLoading(false);
     });
 
-    // Real-time sync for user settings
     const settingsRef = doc(db, 'users', user.uid);
     const unsubscribeSettings = onSnapshot(settingsRef, (snapshot) => {
       if (snapshot.exists()) {
@@ -161,7 +155,6 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
       }
     });
 
-    // Real-time sync for persistent notifications
     const notificationsRef = collection(db, 'users', user.uid, 'notifications');
     const qNotifications = query(notificationsRef, orderBy('date', 'desc'), limit(20));
     const unsubscribeNotifications = onSnapshot(qNotifications, (snapshot) => {
@@ -177,7 +170,6 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
     }
   }, [user, isUserLoading]);
 
-  // Automated reminder logic
   useEffect(() => {
     if (user && !isLoading && subscriptions.length > 0) {
       checkReminders();
@@ -264,7 +256,6 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
 
   const addSubscription = (sub: Omit<Subscription, 'id' | 'userId'>) => {
     if (user && db) {
-      // CRITICAL: Explicitly ensure userId is in the data object for Security Rules
       const dataToSave = scrubUndefined({ ...sub, userId: user.uid });
       const subCol = collection(db, 'users', user.uid, 'subscriptions');
       const newDoc = doc(subCol);
@@ -276,7 +267,6 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
 
   const updateSubscription = (id: string, sub: Partial<Subscription>) => {
     if (user && db) {
-      // CRITICAL: Explicitly ensure userId is in the data object for Security Rules
       const dataToSave = scrubUndefined({ ...sub, userId: user.uid });
       const subRef = doc(db, 'users', user.uid, 'subscriptions', id);
       updateDoc(subRef, dataToSave).catch(e => {

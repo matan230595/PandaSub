@@ -1,4 +1,3 @@
-
 "use client"
 
 import * as React from "react"
@@ -265,7 +264,7 @@ export function AddSubscriptionModal({ open, onOpenChange, subscription }: AddSu
                     <TabsTrigger value="security" className="rounded-xl font-bold">גישה</TabsTrigger>
                   </TabsList>
                   
-                  <TabsContent value="basic" className="space-y-6 animate-fade-in">
+                  <TabsContent value="basic" className="space-y-6">
                     <FormField
                       control={form.control}
                       name="name"
@@ -352,7 +351,7 @@ export function AddSubscriptionModal({ open, onOpenChange, subscription }: AddSu
                     />
 
                     {watchStatus === 'trial' && (
-                      <div className="bg-orange-50 p-6 rounded-3xl border border-orange-100 animate-in fade-in">
+                      <div className="bg-orange-50 p-6 rounded-3xl border border-orange-100">
                         <FormField
                           control={form.control}
                           name="trialPeriodDays"
@@ -461,7 +460,7 @@ export function AddSubscriptionModal({ open, onOpenChange, subscription }: AddSu
                     />
 
                     {watchCycle === 'monthly' && (
-                      <div className="bg-primary/5 p-6 rounded-3xl border border-primary/10 animate-in fade-in">
+                      <div className="bg-primary/5 p-6 rounded-3xl border border-primary/10">
                         <FormField
                           control={form.control}
                           name="durationMonths"
