@@ -1,3 +1,4 @@
+
 "use client"
 
 import * as React from "react"
@@ -85,7 +86,7 @@ export function VoiceCreator() {
       </div>
 
       <Dialog open={showConfirm} onOpenChange={showConfirm ? setShowConfirm : undefined}>
-        <DialogContent className="sm:max-w-md text-right rounded-[2rem] border-none shadow-2xl p-8">
+        <DialogContent className="sm:max-w-md text-right rounded-[2rem] border-none shadow-2xl p-8" aria-describedby="voice-desc">
           <DialogHeader>
             <DialogTitle className="text-2xl font-black text-primary">זיהינו מינוי חדש! 🐼</DialogTitle>
             <DialogDescription id="voice-desc" className="text-base mt-2">

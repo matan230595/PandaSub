@@ -92,8 +92,7 @@ const EXCHANGE_RATES: Record<string, number> = {
 };
 
 /**
- * Deeply scrubs undefined values from an object to prevent Firebase crashes.
- * Handles nested objects like credentials.
+ * Robustly scrubs undefined and null values from an object to prevent Firebase crashes.
  */
 function scrubUndefined(obj: any): any {
   if (obj === null || typeof obj !== 'object') return obj;
@@ -133,7 +132,7 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
   useEffect(() => {
     if (isUserLoading) return;
 
-    if (!user) {
+    if (!user || !db) {
       setSubscriptions([]);
       setNotifications([]);
       setIsLoading(false);
@@ -142,7 +141,7 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
 
     setIsLoading(true);
     // Real-time sync for subscriptions
-    const subsRef = collection(db!, 'users', user.uid, 'subscriptions');
+    const subsRef = collection(db, 'users', user.uid, 'subscriptions');
     const unsubscribe = onSnapshot(subsRef, (snapshot) => {
       const subs: Subscription[] = [];
       snapshot.forEach(doc => subs.push({ ...doc.data() as Subscription, id: doc.id }));
@@ -154,7 +153,7 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
     });
 
     // Real-time sync for user settings
-    const settingsRef = doc(db!, 'users', user.uid);
+    const settingsRef = doc(db, 'users', user.uid);
     const unsubscribeSettings = onSnapshot(settingsRef, (snapshot) => {
       if (snapshot.exists()) {
         const data = snapshot.data();
@@ -163,7 +162,7 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
     });
 
     // Real-time sync for persistent notifications
-    const notificationsRef = collection(db!, 'users', user.uid, 'notifications');
+    const notificationsRef = collection(db, 'users', user.uid, 'notifications');
     const qNotifications = query(notificationsRef, orderBy('date', 'desc'), limit(20));
     const unsubscribeNotifications = onSnapshot(qNotifications, (snapshot) => {
       const notes: Notification[] = [];
@@ -231,10 +230,8 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
       
       const activeReminders = sub.reminderDays || [3];
       if (activeReminders.includes(diffDays) || diffDays === 0) {
-        // Unique ID for each reminder per sub per day
         const noteId = `renewal-${sub.id}-${diffDays}-${todayStr}`;
         
-        // Only create if it doesn't exist already
         if (!notifications.some(n => n.id === noteId)) {
           const newNote = scrubUndefined({
             userId: user.uid,
@@ -267,8 +264,8 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
 
   const addSubscription = (sub: Omit<Subscription, 'id' | 'userId'>) => {
     if (user && db) {
-      const subWithUser = { ...sub, userId: user.uid };
-      const dataToSave = scrubUndefined(subWithUser);
+      // CRITICAL: Explicitly ensure userId is in the data object for Security Rules
+      const dataToSave = scrubUndefined({ ...sub, userId: user.uid });
       const subCol = collection(db, 'users', user.uid, 'subscriptions');
       const newDoc = doc(subCol);
       setDoc(newDoc, { ...dataToSave, id: newDoc.id }).catch(e => {
@@ -279,7 +276,7 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
 
   const updateSubscription = (id: string, sub: Partial<Subscription>) => {
     if (user && db) {
-      // CRITICAL: Must always include userId for security rules
+      // CRITICAL: Explicitly ensure userId is in the data object for Security Rules
       const dataToSave = scrubUndefined({ ...sub, userId: user.uid });
       const subRef = doc(db, 'users', user.uid, 'subscriptions', id);
       updateDoc(subRef, dataToSave).catch(e => {
@@ -290,7 +287,9 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
 
   const deleteSubscription = (id: string) => {
     if (user && db) {
-      deleteDoc(doc(db, 'users', user.uid, 'subscriptions', id));
+      deleteDoc(doc(db, 'users', user.uid, 'subscriptions', id)).catch(e => {
+        console.error("Error deleting subscription:", e);
+      });
     }
   };
 
@@ -329,7 +328,9 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
 
   const markNotificationAsRead = (id: string) => {
     if (user && db) {
-      updateDoc(doc(db, 'users', user.uid, 'notifications', id), { read: true });
+      updateDoc(doc(db, 'users', user.uid, 'notifications', id), { read: true }).catch(e => {
+        console.error("Error marking notification as read:", e);
+      });
     }
   };
 

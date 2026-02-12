@@ -188,7 +188,6 @@ export function AddSubscriptionModal({ open, onOpenChange, subscription }: AddSu
   }
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    // Calculate trial end date automatically
     let trialEndsAt = undefined;
     if (values.status === 'trial' && values.trialPeriodDays) {
       trialEndsAt = addDays(new Date(values.renewalDate), values.trialPeriodDays).toISOString().split('T')[0];

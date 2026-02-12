@@ -1,3 +1,4 @@
+
 "use client"
 
 import * as React from "react"
@@ -58,7 +59,7 @@ export function SetupWizard() {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className="sm:max-w-[500px] text-right">
+      <DialogContent className="sm:max-w-[500px] text-right" aria-describedby="setup-desc">
         <DialogHeader className="items-center">
           <div className="mb-4 bg-primary/10 p-4 rounded-full animate-bounce">
             {currentStep.icon}
