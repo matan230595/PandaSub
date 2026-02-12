@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/button"
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -43,7 +42,7 @@ import {
 import { Checkbox } from "@/components/ui/checkbox"
 import { Badge } from "@/components/ui/badge"
 import { useSubscriptions } from "@/context/subscriptions-context"
-import { CATEGORY_METADATA, SubscriptionCategory, SubscriptionStatus, PRIORITY_CONFIG, Subscription } from "@/app/lib/subscription-store"
+import { CATEGORY_METADATA, SubscriptionCategory, SubscriptionStatus, Subscription } from "@/app/lib/subscription-store"
 import { useToast } from "@/hooks/use-toast"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { User, Key, FileText, AlertTriangle, Clock, Sparkles, Loader2, Save, Copy, Trash2 } from "lucide-react"
@@ -250,7 +249,7 @@ export function AddSubscriptionModal({ open, onOpenChange, subscription }: AddSu
     toast({
       variant: "destructive",
       title: "שגיאה בטופס",
-      description: "אנא בדוק את כל השדות בשלבי הטופס השונים.",
+      description: "אנא בדוק את כל השדות בשלבי הטופס השונים (בסיסי, חיוב וכו').",
     });
   }
 

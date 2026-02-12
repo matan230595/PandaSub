@@ -1,6 +1,6 @@
-import { initializeApp, getApps, getApp, FirebaseApp } from "firebase/app";
-import { getAuth, Auth } from "firebase/auth";
-import { getFirestore, Firestore } from "firebase/firestore";
+import { initializeApp, getApps, getApp } from "firebase/app";
+import { getAuth } from "firebase/auth";
+import { getFirestore } from "firebase/firestore";
 import { firebaseConfig as staticConfig } from "@/firebase/config";
 
 const firebaseConfig = {
@@ -12,25 +12,26 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID || staticConfig.appId,
 };
 
-let app: FirebaseApp | undefined;
-let auth: Auth | undefined;
-let db: Firestore | undefined;
+// Singleton initialization pattern
+let app;
+let auth: any;
+let db: any;
 
-if (typeof window !== "undefined") {
+try {
   const missing = Object.entries(firebaseConfig)
     .filter(([_, v]) => !v)
     .map(([k]) => k);
 
-  if (missing.length > 0) {
+  if (missing.length > 0 && typeof window !== "undefined") {
     console.warn("Missing Firebase env vars: " + missing.join(", "));
   }
 
-  try {
-    app = getApps().length ? getApp() : initializeApp(firebaseConfig);
-    auth = getAuth(app);
-    db = getFirestore(app);
-  } catch (error) {
-    console.error("Firebase initialization failed:", error);
+  app = getApps().length ? getApp() : initializeApp(firebaseConfig);
+  auth = getAuth(app);
+  db = getFirestore(app);
+} catch (error) {
+  if (typeof window !== "undefined") {
+    console.error("Firebase singleton initialization failed:", error);
   }
 }
 

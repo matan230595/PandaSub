@@ -86,7 +86,13 @@ export default function LoginPage() {
               />
             </div>
             <Button type="submit" disabled={isLoading} className="w-full h-14 rounded-full font-black text-lg google-btn">
-              {isLoading ? <Loader2 className="h-6 w-6 animate-spin" /> : isRegistering ? <><UserPlus className="ml-2 h-5 w-5" /> הרשמה</> : <><LogIn className="ml-2 h-5 w-5" /> התחברות</>}
+              {isLoading ? (
+                <Loader2 className="h-6 w-6 animate-spin" />
+              ) : isRegistering ? (
+                <span className="flex items-center gap-2 justify-center"><UserPlus className="h-5 w-5" /> הרשמה</span>
+              ) : (
+                <span className="flex items-center gap-2 justify-center"><LogIn className="h-5 w-5" /> התחברות</span>
+              )}
             </Button>
           </form>
           <div className="mt-6 flex flex-col gap-3">

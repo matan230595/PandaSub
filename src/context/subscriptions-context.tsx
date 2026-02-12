@@ -1,4 +1,3 @@
-
 "use client"
 
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
@@ -11,7 +10,8 @@ import {
   deleteDoc,
   updateDoc
 } from 'firebase/firestore';
-import { useFirestore, useUser } from '@/firebase';
+import { db, auth as firebaseAuth } from '@/lib/firebaseClient';
+import { useUser } from '@/firebase';
 import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError } from '@/firebase/errors';
 
@@ -95,7 +95,6 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
   const audioContextRef = useRef<AudioContext | null>(null);
   
   const { user, isUserLoading } = useUser();
-  const db = useFirestore();
 
   useEffect(() => {
     if (isUserLoading || !db || !user) {
@@ -129,7 +128,7 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
       unsubscribe();
       unsubscribeSettings();
     }
-  }, [db, user, isUserLoading]);
+  }, [user, isUserLoading]);
 
   useEffect(() => {
     localStorage.setItem('panda_subs_v11', JSON.stringify(subscriptions));

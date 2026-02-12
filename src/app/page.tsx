@@ -7,21 +7,19 @@ import { SubscriptionList } from "@/components/subscription/subscription-list"
 import { AIRecommendations } from "@/components/gen-ai/recommendations"
 import { SubscriptionsAtRisk } from "@/components/dashboard/risk-widget"
 import { Button } from "@/components/ui/button"
-import { Plus, TrendingUp, Calendar, Lightbulb, Hourglass, FileText, Zap, Mic, Sparkles } from "lucide-react"
+import { Plus, TrendingUp, Calendar, Lightbulb, Hourglass, Zap, Mic, Sparkles } from "lucide-react"
 import { AddSubscriptionModal } from "@/components/subscription/add-subscription-modal"
 import { useSubscriptions } from "@/context/subscriptions-context"
 import { Card, CardContent } from "@/components/ui/card"
 import { SetupWizard } from "@/components/setup-wizard"
-import { useToast } from "@/hooks/use-toast"
 import { cn } from "@/lib/utils"
 import { useUser } from "@/firebase"
 import Link from "next/link"
 
 export default function Home() {
   const [isAddModalOpen, setIsAddModalOpen] = React.useState(false)
-  const { subscriptions, settings, convertAmount } = useSubscriptions()
+  const { subscriptions, convertAmount } = useSubscriptions()
   const { user, isUserLoading } = useUser()
-  const { toast } = useToast()
 
   const totalMonthlyILS = subscriptions
     .filter(s => s.status === 'active' || s.status === 'trial')
@@ -36,16 +34,6 @@ export default function Home() {
   }).length
 
   const trialCount = subscriptions.filter(s => s.status === 'trial').length
-
-  const handleGenerateDraft = () => {
-    const activeSubs = subscriptions.filter(s => s.status === 'active' || s.status === 'trial');
-    const total = activeSubs.reduce((sum, s) => sum + convertAmount(s.amount, s.currency), 0);
-    const subListText = activeSubs.map(s => `• ${s.name}: ${s.amount}${s.currency}`).join('\n');
-    const subject = encodeURIComponent("סיכום מינויים PandaSub");
-    const body = encodeURIComponent(`שלום ${settings.userName},\n\nסה"כ חודשי: ₪${total.toLocaleString()}\n\n${subListText}`);
-    window.location.href = `mailto:${settings.userEmail}?subject=${subject}&body=${body}`;
-    toast({ title: "טיוטת מייל נוצרה" })
-  }
 
   if (isUserLoading) return null;
   if (!user) {
@@ -69,7 +57,7 @@ export default function Home() {
       <TopNav />
       <main className="flex-1 container mx-auto p-4 md:p-8 space-y-8 animate-fade-in pb-24 max-w-7xl">
         
-        {/* Stats Grid (Top) - Fixed for Mobile Square look */}
+        {/* Stats Grid - Fixed for 2x2 Square look on Mobile */}
         <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
           <StatCard 
             title='סה"כ חודשי' 
@@ -103,12 +91,12 @@ export default function Home() {
           />
         </div>
 
-        {/* 2. AI Insights & Quick Actions */}
+        {/* AI Insights & Quick Actions - Balanced 2/3 and 1/3 layout */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="md:col-span-2 h-full">
+          <div className="md:col-span-2">
             <AIRecommendations />
           </div>
-          <div className="h-full">
+          <div>
             <Card className="border-none shadow-xl bg-gradient-to-br from-primary to-blue-700 text-white rounded-[2rem] overflow-hidden flex flex-col justify-center h-full min-h-[180px]">
               <CardContent className="p-6 text-right space-y-4">
                 <div className="flex items-center justify-between mb-2">
@@ -134,7 +122,7 @@ export default function Home() {
           </div>
         </div>
 
-        {/* 3. Main Content Area */}
+        {/* Main Content */}
         <div className="grid gap-8 lg:grid-cols-3">
           <div className="lg:col-span-2 space-y-8">
             <DashboardCharts />
@@ -159,7 +147,7 @@ function StatCard({ title, value, symbol, icon, trendDesc, color }: any) {
   const fontSize = value.length > 8 ? 'text-lg' : value.length > 5 ? 'text-xl' : 'text-2xl md:text-3xl';
 
   return (
-    <Card className="shadow-sm border-none rounded-[2rem] overflow-hidden group transition-all hover:shadow-xl dark:bg-zinc-900 bg-white aspect-square md:h-full card-shadow">
+    <Card className="shadow-sm border-none rounded-[2rem] overflow-hidden group transition-all hover:shadow-xl dark:bg-zinc-900 bg-white aspect-square h-full card-shadow">
       <CardContent className="p-4 md:p-6 text-right flex flex-col justify-between h-full relative">
         <div className="flex justify-between items-start mb-2">
           <div className="text-right">
@@ -170,11 +158,11 @@ function StatCard({ title, value, symbol, icon, trendDesc, color }: any) {
           </div>
         </div>
         
-        <div className="flex flex-row-reverse items-baseline justify-start gap-1 tabular-nums mt-auto">
+        <div className="flex flex-row items-baseline justify-start gap-1 tabular-nums mt-auto">
+          {symbol && <div className="text-lg md:text-xl font-black text-primary">{symbol}</div>}
           <div className={cn("font-black text-foreground leading-none", fontSize)}>
             {value}
           </div>
-          {symbol && <div className="text-lg md:text-xl font-black text-primary mr-1">{symbol}</div>}
         </div>
 
         <div className="flex items-center justify-start mt-1">
