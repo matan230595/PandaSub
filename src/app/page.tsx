@@ -57,8 +57,8 @@ export default function Home() {
       <TopNav />
       <main className="flex-1 container mx-auto p-4 md:p-8 space-y-8 animate-fade-in pb-24 max-w-7xl">
         
-        {/* Stats Grid - Square on Mobile, Proportional Rectangles on Desktop */}
-        <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
+        {/* Stats Grid - Square on Mobile, Balanced Rectangles on Desktop */}
+        <div className="grid gap-4 grid-cols-2 lg:grid-cols-4 lg:justify-items-center">
           <StatCard 
             title='סה"כ חודשי' 
             value={totalMonthlyILS.toLocaleString(undefined, { maximumFractionDigits: 0 })} 
@@ -91,7 +91,7 @@ export default function Home() {
           />
         </div>
 
-        {/* AI Insights & Quick Actions - Balanced Sidebar Style */}
+        {/* AI Insights & Quick Actions */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2">
             <AIRecommendations />
@@ -144,18 +144,16 @@ export default function Home() {
 }
 
 function StatCard({ title, value, symbol, icon, trendDesc, color }: any) {
-  // Use aspect-square for mobile to keep them as squares even on wide phones.
-  // On desktop (lg), use aspect-auto and a fixed height to avoid huge squares.
   const fontSize = value.length > 8 ? 'text-lg' : value.length > 5 ? 'text-xl' : 'text-2xl md:text-3xl';
 
   return (
-    <Card className="shadow-sm border-none rounded-[2rem] overflow-hidden group transition-all hover:shadow-xl dark:bg-zinc-900 bg-white aspect-square lg:aspect-auto lg:h-32 h-full card-shadow">
+    <Card className="shadow-sm border-none rounded-[2rem] overflow-hidden group transition-all hover:shadow-xl dark:bg-zinc-900 bg-white aspect-square lg:aspect-square lg:h-40 lg:w-40 w-full card-shadow">
       <CardContent className="p-4 md:p-6 text-right flex flex-col justify-between h-full relative">
         <div className="flex justify-between items-start mb-2">
           <div className="text-right">
             <span className="text-[10px] md:text-[11px] font-black text-muted-foreground uppercase tracking-widest">{title}</span>
           </div>
-          <div className={cn("p-2 md:p-3 rounded-2xl group-hover:rotate-6 transition-transform duration-300 shadow-sm shrink-0", color)}>
+          <div className={cn("p-2 md:p-2.5 rounded-2xl group-hover:rotate-6 transition-transform duration-300 shadow-sm shrink-0", color)}>
             {icon}
           </div>
         </div>

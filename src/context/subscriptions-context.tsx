@@ -1,7 +1,7 @@
 "use client"
 
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
-import { Subscription, SAMPLE_SUBSCRIPTIONS } from '@/app/lib/subscription-store';
+import { Subscription } from '@/app/lib/subscription-store';
 import { 
   collection, 
   doc, 
@@ -12,8 +12,6 @@ import {
 } from 'firebase/firestore';
 import { db } from '@/lib/firebaseClient';
 import { useUser } from '@/firebase';
-import { errorEmitter } from '@/firebase/error-emitter';
-import { FirestorePermissionError } from '@/firebase/errors';
 
 interface UserSettings {
   darkMode: boolean;
@@ -44,7 +42,7 @@ interface Notification {
 
 interface SubscriptionsContextType {
   subscriptions: Subscription[];
-  addSubscription: (sub: Omit<Subscription, 'id'>) => void;
+  addSubscription: (sub: Omit<Subscription, 'id' | 'userId'>) => void;
   updateSubscription: (id: string, sub: Partial<Subscription>) => void;
   deleteSubscription: (id: string) => void;
   duplicateSubscription: (id: string) => void;
@@ -87,16 +85,15 @@ const EXCHANGE_RATES: Record<string, number> = {
   'EUR': 4.05,
 };
 
-// Helper to scrub undefined values for Firestore
+// Deeply scrub undefined values
 function scrubUndefined(obj: any): any {
+  if (obj === null || typeof obj !== 'object') return obj;
+  if (Array.isArray(obj)) return obj.map(scrubUndefined);
+  
   const result: any = {};
   Object.keys(obj).forEach(key => {
     if (obj[key] !== undefined) {
-      if (typeof obj[key] === 'object' && obj[key] !== null && !Array.isArray(obj[key])) {
-        result[key] = scrubUndefined(obj[key]);
-      } else {
-        result[key] = obj[key];
-      }
+      result[key] = scrubUndefined(obj[key]);
     }
   });
   return result;
@@ -222,15 +219,16 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
     }
   };
 
-  const addSubscription = (sub: Omit<Subscription, 'id'>) => {
-    const scrubbedSub = scrubUndefined(sub);
+  const addSubscription = (sub: Omit<Subscription, 'id' | 'userId'>) => {
     if (user && db) {
+      const scrubbedSub = scrubUndefined({ ...sub, userId: user.uid });
       const newDoc = doc(collection(db, 'users', user.uid, 'subscriptions'));
       setDoc(newDoc, { ...scrubbedSub, id: newDoc.id }).catch(e => {
         console.error("Error adding subscription:", e);
       });
     } else {
-      const newSub = { ...scrubbedSub, id: Math.random().toString(36).substr(2, 9) };
+      const scrubbedSub = scrubUndefined(sub);
+      const newSub = { ...scrubbedSub, id: Math.random().toString(36).substr(2, 9), userId: 'local' } as Subscription;
       setSubscriptions(prev => [newSub, ...prev]);
     }
   };

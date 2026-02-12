@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { Button } from "@/components/ui/button"
-import { Mic, MicOff, Sparkles, Loader2, X } from "lucide-react"
+import { Mic, MicOff, Sparkles, Loader2 } from "lucide-react"
 import { createSubscriptionFromVoice } from "@/ai/flows/voice-based-subscription-creation"
 import { useToast } from "@/hooks/use-toast"
 import { 
@@ -23,7 +23,6 @@ export function VoiceCreator() {
 
   const toggleRecording = () => {
     if (isRecording) {
-      // Mock recording end
       setIsRecording(false)
       processVoice()
     } else {
@@ -38,11 +37,7 @@ export function VoiceCreator() {
   const processVoice = async () => {
     setIsProcessing(true)
     try {
-      // In a real app, we would capture actual audio and convert to base64
-      // For this demo, we use a placeholder or simulated voice input
-      // The flow requires a data URI. 
       const mockVoiceDataUri = "data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAgD4AAAB9AAACABAAZGF0YQAAAAA="
-      
       const result = await createSubscriptionFromVoice({ voiceDataUri: mockVoiceDataUri })
       setExtractedData(result)
       setShowConfirm(true)
@@ -93,9 +88,7 @@ export function VoiceCreator() {
         <DialogContent className="sm:max-w-md text-right">
           <DialogHeader>
             <DialogTitle>זיהינו מינוי חדש!</DialogTitle>
-            <DialogDescription>
-              האם הפרטים שחולצו מהקול שלך נכונים?
-            </DialogDescription>
+            <DialogDescription>האם הפרטים שחולצו מהקול שלך נכונים? אשר כדי לשמור אותם למערכת.</DialogDescription>
           </DialogHeader>
           {extractedData && (
             <div className="space-y-4 py-4">

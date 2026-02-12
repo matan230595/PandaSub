@@ -12,6 +12,7 @@ export type SubscriptionStatus = 'active' | 'trial' | 'cancelled' | 'frozen' | '
 
 export interface Subscription {
   id: string;
+  userId: string;
   name: string;
   category: SubscriptionCategory;
   amount: number;
@@ -74,6 +75,7 @@ export const CANCELLATION_LINKS: Record<string, string> = {
 export const SAMPLE_SUBSCRIPTIONS: Subscription[] = [
   {
     id: '1',
+    userId: 'sample',
     name: 'Netflix',
     category: 'streaming',
     amount: 54.9,
@@ -87,33 +89,5 @@ export const SAMPLE_SUBSCRIPTIONS: Subscription[] = [
     lastUsed: '2024-05-20',
     priority: 'medium',
     credentials: { email: 'user@example.com', username: 'israel_n' }
-  },
-  {
-    id: '2',
-    name: 'Spotify Family',
-    category: 'streaming',
-    amount: 9.99,
-    currency: '$',
-    renewalDate: new Date(new Date().setDate(new Date().getDate() + 10)).toISOString().split('T')[0],
-    billingCycle: 'monthly',
-    paymentMethod: 'Mastercard 1234',
-    reminderDays: [3, 0],
-    status: 'active',
-    priority: 'none'
-  },
-  {
-    id: '3',
-    name: 'Adobe Creative Cloud',
-    category: 'saas',
-    amount: 52.99,
-    currency: '€',
-    renewalDate: '2025-05-28',
-    billingCycle: 'yearly',
-    paymentMethod: 'Mastercard 8899',
-    reminderDays: [14, 7, 0],
-    status: 'trial',
-    usageCount: 8,
-    lastUsed: '2024-05-18',
-    priority: 'critical'
   },
 ];
